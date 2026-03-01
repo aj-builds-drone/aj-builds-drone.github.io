@@ -1,0 +1,262 @@
+@import "tailwindcss";
+
+/* ── Ground Control Station Theme ── */
+:root {
+  --bg-base: #0A0A0A;
+  --bg-surface: #111111;
+  --bg-elevated: #1A1A1A;
+  --border-dim: #222222;
+  --border-bright: #333333;
+  --text-primary: #F0F0F0;
+  --text-secondary: #B0B0B0;
+  --accent-orange: #FF5F1F;
+  --accent-orange-dim: #CC4C19;
+  --accent-green: #00FF41;
+  --accent-green-dim: #00CC34;
+  --accent-red: #FF3333;
+  --accent-cyan: #00D4FF;
+  --scanline-opacity: 0.03;
+}
+
+@theme inline {
+  --color-background: var(--bg-base);
+  --color-foreground: var(--text-primary);
+  --color-surface: var(--bg-surface);
+  --color-elevated: var(--bg-elevated);
+  --color-border-dim: var(--border-dim);
+  --color-border-bright: var(--border-bright);
+  --color-accent-orange: var(--accent-orange);
+  --color-accent-green: var(--accent-green);
+  --color-accent-red: var(--accent-red);
+  --color-accent-cyan: var(--accent-cyan);
+  --color-text-secondary: var(--text-secondary);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+/* ── Base ── */
+* { scrollbar-width: thin; scrollbar-color: var(--border-bright) var(--bg-base); }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--accent-orange);
+  color: #000;
+}
+
+/* ── Scanline Overlay ── */
+.scanline-overlay {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 255, 65, var(--scanline-opacity)) 2px,
+    rgba(0, 255, 65, var(--scanline-opacity)) 4px
+  );
+}
+
+/* ── Glitch Button Effect ── */
+.btn-glitch {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-glitch::before,
+.btn-glitch::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.btn-glitch:hover::before {
+  opacity: 1;
+  animation: glitch-shift 0.3s steps(2) infinite;
+  clip-path: inset(20% 0 60% 0);
+  background: var(--accent-orange);
+}
+
+.btn-glitch:hover::after {
+  opacity: 1;
+  animation: glitch-shift 0.3s steps(2) infinite reverse;
+  clip-path: inset(60% 0 10% 0);
+  background: var(--accent-orange);
+}
+
+.btn-glitch:hover {
+  text-shadow: 2px 0 var(--accent-green), -2px 0 var(--accent-cyan);
+  animation: glitch-text 0.3s steps(3) infinite;
+}
+
+@keyframes glitch-shift {
+  0% { transform: translate(0); }
+  25% { transform: translate(-2px, 1px); }
+  50% { transform: translate(2px, -1px); }
+  75% { transform: translate(-1px, 2px); }
+  100% { transform: translate(0); }
+}
+
+@keyframes glitch-text {
+  0% { text-shadow: 2px 0 var(--accent-green), -2px 0 var(--accent-cyan); }
+  33% { text-shadow: -2px 0 var(--accent-green), 2px 0 var(--accent-cyan); }
+  66% { text-shadow: 1px 1px var(--accent-green), -1px -1px var(--accent-cyan); }
+  100% { text-shadow: 2px 0 var(--accent-green), -2px 0 var(--accent-cyan); }
+}
+
+/* ── Scanning Animation ── */
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+.scan-sweep::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+  box-shadow: 0 0 20px var(--accent-green), 0 0 60px var(--accent-green);
+  animation: scan-line 4s linear infinite;
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .scan-sweep::after,
+  .ticker-scroll,
+  .pulse-green,
+  .scanline-overlay {
+    animation: none !important;
+  }
+
+  .btn-glitch:hover::before,
+  .btn-glitch:hover::after {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+
+  .btn-glitch:hover {
+    animation: none !important;
+    text-shadow: none !important;
+  }
+}
+
+/* ── Skip to Content ── */
+.skip-to-content {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  padding: 0.75rem 1.5rem;
+  background: var(--accent-orange);
+  color: #000;
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  border-radius: 0 0 0.5rem 0.5rem;
+  transition: top 0.2s ease;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* ── Focus Visible ── */
+*:focus-visible {
+  outline: 2px solid var(--accent-orange);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── HUD Corner Decorations ── */
+.hud-corners {
+  position: relative;
+}
+
+.hud-corners::before,
+.hud-corners::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: var(--accent-green);
+  border-style: solid;
+  opacity: 0.5;
+}
+
+.hud-corners::before {
+  top: -1px;
+  left: -1px;
+  border-width: 2px 0 0 2px;
+}
+
+.hud-corners::after {
+  bottom: -1px;
+  right: -1px;
+  border-width: 0 2px 2px 0;
+}
+
+/* ── Ticker Animation ── */
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-scroll {
+  animation: ticker-scroll 30s linear infinite;
+}
+
+/* ── Status Pulse ── */
+@keyframes pulse-green {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.pulse-green {
+  animation: pulse-green 2s ease-in-out infinite;
+}
+
+/* ── Grid Background ── */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── OSD Card ── */
+.osd-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  transition: all 0.3s ease;
+}
+
+.osd-card:hover {
+  border-color: var(--accent-orange);
+  box-shadow: 0 0 30px rgba(255, 95, 31, 0.1), inset 0 0 30px rgba(255, 95, 31, 0.02);
+}
+
+/* ── Custom Select Arrow (dark theme) ── */
+select.appearance-none {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 12px 8px;
+  padding-right: 2.5rem;
+}

@@ -1,0 +1,211 @@
+[
+  {
+    "id": "stm32-rth-drone",
+    "title": "STM32 RETURN-TO-HOME DRONE",
+    "subtitle": "Custom PCB Flight Controller on F450 Frame",
+    "thumbnail": "/images/stm32-drone.jpg",
+    "status": "OPERATIONAL",
+    "bom": [
+      "STM32F103C8T6 (Blue Pill)",
+      "DJI F450 Frame",
+      "Custom PCB (KiCad Designed)",
+      "GPS Module (Return-to-Home)",
+      "Brushless Motors + ESCs",
+      "3D-Printed Component Mounts"
+    ],
+    "softwareStack": ["Arduino IDE", "KiCad", "STM32", "C/C++", "GrabCAD"],
+    "description": "A full custom-built quadcopter featuring a hand-designed PCB flight controller using the STM32 Blue Pill. The board sits directly on top of the F450 frame, integrating GPS for autonomous return-to-home capability. Project spans 3D modeling, schematic capture, PCB layout, firmware development, and flight testing.",
+    "specs": {
+      "controller": "STM32F103C8T6",
+      "frame": "DJI F450",
+      "feature": "GPS RTH",
+      "views": "9,500+ on Hackster"
+    },
+    "links": {
+      "hackster": "https://www.hackster.io/ajayadahal/diy-return-to-home-drone-using-stm32-bluepill-9b1886",
+      "youtube": "https://www.youtube.com/watch?v=x70c3RrDk2c",
+      "grabcad": "https://grabcad.com/library/joop-brokking-diy-autonomous-return-to-home-drone-with-gerber-file-1"
+    }
+  },
+  {
+    "id": "px4-roi-tracking",
+    "title": "PX4 ROI OBJECT TRACKING",
+    "subtitle": "QGroundControl Region-of-Interest Simulation",
+    "thumbnail": "/images/px4-roi.jpg",
+    "status": "ACTIVE",
+    "bom": [
+      "PX4 Autopilot (SITL)",
+      "QGroundControl Ground Station",
+      "Gazebo Simulation Environment",
+      "ROI Tracking Algorithm",
+      "MAVLink Protocol"
+    ],
+    "softwareStack": ["PX4", "QGroundControl", "Gazebo", "MAVLink", "SITL"],
+    "description": "A simulation-first approach to region-of-interest tracking using PX4 autopilot and QGroundControl. The system autonomously locks onto and tracks a target while maintaining stable flight, demonstrating the full SITL pipeline from algorithm development to mission validation.",
+    "specs": {
+      "autopilot": "PX4 SITL",
+      "gcs": "QGroundControl",
+      "mode": "ROI Track",
+      "status": "Sim Validated"
+    },
+    "links": {
+      "youtube": "https://www.youtube.com/watch?v=-4iIzqeIK_s"
+    }
+  },
+  {
+    "id": "hovergames-3-hazard",
+    "title": "CHEMICAL HAZARD TESTING RANGER",
+    "subtitle": "NXP HoverGames 3.0 Competition Entry",
+    "thumbnail": "/images/hovergames3.jpg",
+    "status": "OPERATIONAL",
+    "bom": [
+      "NXP FMUK66 Flight Controller",
+      "NXP HoverGames Drone Kit",
+      "Chemical/Gas Sensor Array",
+      "Telemetry Downlink",
+      "Custom Sensor Integration Board"
+    ],
+    "softwareStack": ["PX4", "NuttX", "MAVLink", "Python", "Sensor Fusion"],
+    "description": "Competition entry for NXP HoverGames 3.0 — an autonomous drone platform designed to detect and map chemical hazards in disaster zones. Features real-time sensor data telemetry and autonomous survey patterns for first-responder safety assessment.",
+    "specs": {
+      "competition": "HoverGames 3.0",
+      "sponsor": "NXP Semiconductors",
+      "mission": "Hazard Detection",
+      "autonomy": "Waypoint Survey"
+    },
+    "links": {
+      "youtube": "https://www.youtube.com/watch?v=Ba8dZ647reI"
+    }
+  },
+  {
+    "id": "hovergames-2",
+    "title": "NXP HOVERGAMES CHALLENGE 2",
+    "subtitle": "Autonomous Drone for Social Good",
+    "thumbnail": "/images/hovergames2.jpg",
+    "status": "OPERATIONAL",
+    "bom": [
+      "NXP FMUK66 Flight Controller",
+      "NXP HoverGames Drone Kit",
+      "Companion Computer",
+      "Camera Payload",
+      "Custom Mission Software"
+    ],
+    "softwareStack": ["PX4", "NuttX", "MAVLink", "ROS", "OpenCV"],
+    "description": "Second-generation HoverGames competition entry leveraging the NXP FMUK66 flight management unit. Focused on using drone technology for social good, integrating computer vision for autonomous mission execution.",
+    "specs": {
+      "competition": "HoverGames 2",
+      "fmu": "NXP FMUK66",
+      "framework": "PX4 + ROS",
+      "mission": "Social Good"
+    },
+    "links": {
+      "youtube": "https://www.youtube.com/watch?v=gxKfjFzo7fg"
+    }
+  },
+  {
+    "id": "s500-build",
+    "title": "S500 QUADCOPTER BUILD",
+    "subtitle": "Multi-Purpose Research Quadcopter Platform",
+    "thumbnail": "/images/s500.jpg",
+    "status": "OPERATIONAL",
+    "bom": [
+      "S500 Frame Kit",
+      "Pixhawk-Compatible FC",
+      "920KV Brushless Motors x4",
+      "30A ESCs x4",
+      "GPS + Compass Module",
+      "FPV Camera System"
+    ],
+    "softwareStack": ["ArduPilot", "Mission Planner", "MAVLink", "Telemetry"],
+    "description": "A versatile S500-class quadcopter built as a reliable platform for testing flight controllers, sensors, and autonomous navigation algorithms. Designed for modularity, allowing quick payload swaps and sensor integration for research applications.",
+    "specs": {
+      "frame": "S500",
+      "config": "Quadcopter",
+      "use": "Research Platform",
+      "status": "Flight Tested"
+    },
+    "links": {
+      "youtube": "https://www.youtube.com/watch?v=yG9O7N9spW8"
+    }
+  },
+  {
+    "id": "shark-aero-rc",
+    "title": "SHARK AERO RC PLANE",
+    "subtitle": "3D-Printed Fixed-Wing RC Aircraft",
+    "thumbnail": "/images/shark-aero.jpg",
+    "status": "OPERATIONAL",
+    "bom": [
+      "3D-Printed Airframe (PLA/PETG)",
+      "Brushless Outrunner Motor",
+      "ESC + LiPo Battery",
+      "Servo Actuators x4",
+      "RC Transmitter/Receiver",
+      "Custom 3D-Printed Components"
+    ],
+    "softwareStack": ["FreeCAD", "Cura Slicer", "3D Printing", "RC Systems"],
+    "description": "A fully 3D-printed fixed-wing RC aircraft designed and manufactured in-house. Demonstrates end-to-end aerospace fabrication: CAD modeling, slicing for FDM printing, structural analysis, assembly, and flight testing of a custom airframe.",
+    "specs": {
+      "type": "Fixed-Wing",
+      "fabrication": "3D Printed",
+      "material": "PLA/PETG",
+      "views": "100+ on YouTube"
+    },
+    "links": {
+      "youtube": "https://www.youtube.com/watch?v=zGE-E661loY"
+    }
+  },
+  {
+    "id": "collide-o-scope",
+    "title": "COLLIDE-O-SCOPE",
+    "subtitle": "Anti-Collision Drone System",
+    "thumbnail": "/images/collide-o-scope.jpg",
+    "status": "RESEARCH",
+    "bom": [
+      "Custom Drone Platform",
+      "Proximity Sensor Array",
+      "Companion Computer",
+      "Collision Avoidance Algorithm",
+      "Real-Time Telemetry"
+    ],
+    "softwareStack": ["Python", "ROS", "Sensor Fusion", "MAVLink", "OpenCV"],
+    "description": "A team-developed anti-collision drone system with pitch-deck-ready commercial viability. Features multi-sensor obstacle detection and autonomous avoidance maneuvers for safe operation in cluttered environments.",
+    "specs": {
+      "type": "Anti-Collision",
+      "team": "Collide-O-Scope",
+      "stage": "Pitch-Ready",
+      "detection": "Multi-Sensor"
+    },
+    "links": {
+      "youtube": "https://www.youtube.com/watch?v=Iy9BQ6hLyu4",
+      "pitch": "https://www.youtube.com/watch?v=h99lT8m0vn4"
+    }
+  },
+  {
+    "id": "aerial-cinematography",
+    "title": "AERIAL CINEMATOGRAPHY REEL",
+    "subtitle": "Part 107 Certified Drone Videography",
+    "thumbnail": "/images/aerial-reel.jpg",
+    "status": "ACTIVE",
+    "bom": [
+      "DJI Drone Platform",
+      "4K Camera Gimbal",
+      "ND Filter Kit",
+      "Part 107 Certification",
+      "Post-Production Pipeline"
+    ],
+    "softwareStack": ["DaVinci Resolve", "LUT Grading", "4K Workflow", "FAA Part 107"],
+    "description": "Professional aerial videography across multiple states — Downtown Austin TX, New York City, Miami FL, Noxubee Lake MS, Fossil Rim TX, and Little Sturgis Rally. All flights conducted under FAA Part 107 certification with proper airspace authorization.",
+    "specs": {
+      "certification": "FAA Part 107",
+      "locations": "TX, NY, FL, MS",
+      "resolution": "4K",
+      "flights": "50+ missions"
+    },
+    "links": {
+      "austin": "https://www.youtube.com/watch?v=sSDNeOy3z3g",
+      "rally": "https://www.youtube.com/watch?v=NSjGU2b5mi8",
+      "miami": "https://www.youtube.com/watch?v=T4jWjB5ql9o",
+      "noxubee": "https://www.youtube.com/watch?v=6rhIfveJ1Mc"
+    }
+  }
+]

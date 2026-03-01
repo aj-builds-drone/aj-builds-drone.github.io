@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0A0A0A"/>
+  <!-- Grid -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0,255,65,0.05)" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <!-- Scan line -->
+  <rect x="0" y="200" width="1200" height="2" fill="#00FF41" opacity="0.3"/>
+  <!-- Top HUD bar -->
+  <rect x="60" y="60" width="8" height="8" fill="#00FF41"/>
+  <text x="80" y="68" font-family="monospace" font-size="12" fill="#00FF41" letter-spacing="3">GROUND CONTROL STATION v2.4.1</text>
+  <line x1="380" y1="64" x2="1140" y2="64" stroke="#00FF41" stroke-opacity="0.2" stroke-width="1"/>
+  <!-- Main title -->
+  <text x="60" y="260" font-family="monospace" font-size="56" font-weight="bold" fill="#E0E0E0" letter-spacing="2">UAV Systems Contractor:</text>
+  <text x="60" y="330" font-family="monospace" font-size="56" font-weight="bold" fill="#FF5F1F" letter-spacing="2">From Simulation</text>
+  <text x="60" y="400" font-family="monospace" font-size="56" font-weight="bold" fill="#00FF41" letter-spacing="2">to Maiden Flight.</text>
+  <!-- Subtitle -->
+  <text x="60" y="460" font-family="monospace" font-size="16" fill="#888888" letter-spacing="1">FAA Part 107 · MS ECE · Sr. FPGA Engineer · PX4 · ROS2 · Computer Vision</text>
+  <!-- Bottom bar -->
+  <line x1="60" y1="520" x2="1140" y2="520" stroke="#222222" stroke-width="1"/>
+  <text x="60" y="550" font-family="monospace" font-size="14" fill="#FF5F1F" letter-spacing="4">AJ//DRONE_SYS</text>
+  <text x="1000" y="550" font-family="monospace" font-size="12" fill="#888888" letter-spacing="2">AUSTIN, TX</text>
+  <!-- HUD corners -->
+  <path d="M 40 40 L 40 60 M 40 40 L 60 40" stroke="#00FF41" stroke-width="2" fill="none" opacity="0.5"/>
+  <path d="M 1160 590 L 1160 570 M 1160 590 L 1140 590" stroke="#00FF41" stroke-width="2" fill="none" opacity="0.5"/>
+</svg>
