@@ -17,7 +17,7 @@ export default function Navbar() {
   const pathname = usePathname();
 
   function isActive(href: string) {
-    const norm = (p: string) => p.replace(/^\/aj-build-drone\.github\.io/, "").replace(/\/+$/, "") || "/";
+    const norm = (p: string) => p.replace(/\/+$/, "") || "/";
     const current = norm(pathname);
     if (href === "/") return current === "/";
     return current.startsWith(href);
