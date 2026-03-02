@@ -211,6 +211,7 @@ export default function ContactPage() {
                   <select
                     name="service"
                     required
+                    aria-label="Service required"
                     value={formData.service}
                     onChange={handleChange}
                     className="w-full bg-background border border-border-dim rounded px-4 py-3 font-mono text-sm text-foreground focus:outline-none focus:border-accent-orange transition-colors appearance-none cursor-pointer"
@@ -229,6 +230,7 @@ export default function ContactPage() {
                   </label>
                   <select
                     name="budget"
+                    aria-label="Budget range"
                     value={formData.budget}
                     onChange={handleChange}
                     className="w-full bg-background border border-border-dim rounded px-4 py-3 font-mono text-sm text-foreground focus:outline-none focus:border-accent-orange transition-colors appearance-none cursor-pointer"
@@ -247,6 +249,7 @@ export default function ContactPage() {
                   </label>
                   <select
                     name="timeline"
+                    aria-label="Timeline"
                     value={formData.timeline}
                     onChange={handleChange}
                     className="w-full bg-background border border-border-dim rounded px-4 py-3 font-mono text-sm text-foreground focus:outline-none focus:border-accent-orange transition-colors appearance-none cursor-pointer"

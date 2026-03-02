@@ -134,6 +134,7 @@ test.describe("CSS — Responsive: Mobile", () => {
   });
 
   test("hero headline fits within viewport", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
     await page.goto("/");
     await page.waitForLoadState("networkidle");
     const h1 = page.locator("h1");

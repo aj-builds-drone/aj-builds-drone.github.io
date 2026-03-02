@@ -49,10 +49,10 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
       {/* Card Body */}
       <div className="p-5">
         {/* Title */}
-        <h3 className="font-mono text-lg font-bold text-foreground tracking-wide mb-1 group-hover:text-accent-orange transition-colors">
+        <h2 className="font-mono text-lg font-bold text-foreground tracking-wide mb-1 group-hover:text-accent-orange transition-colors">
           {project.title}
-        </h3>
-        <p className="font-mono text-xs text-accent-orange/80 tracking-wider mb-3">
+        </h2>
+        <p className="font-mono text-xs text-accent-orange tracking-wider mb-3">
           {project.subtitle}
         </p>
 
@@ -77,9 +77,9 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
 
         {/* BOM Section */}
         <div className="mb-4">
-          <h4 className="font-mono text-xs tracking-widest text-accent-orange mb-2">
+          <h3 className="font-mono text-xs tracking-widest text-accent-orange mb-2">
             // BILL OF MATERIALS
-          </h4>
+          </h3>
           <ul className="space-y-1">
             {project.bom.map((item, i) => (
               <li key={i} className="flex items-start gap-2 text-xs text-text-secondary font-mono">
@@ -92,9 +92,9 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
 
         {/* Software Stack Tags */}
         <div>
-          <h4 className="font-mono text-xs tracking-widest text-accent-orange mb-2">
+          <h3 className="font-mono text-xs tracking-widest text-accent-orange mb-2">
             // SOFTWARE STACK
-          </h4>
+          </h3>
           <div className="flex flex-wrap gap-1.5">
             {project.softwareStack.map((tech) => (
               <span

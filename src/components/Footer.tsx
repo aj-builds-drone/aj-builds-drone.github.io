@@ -21,9 +21,9 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-mono text-xs tracking-widest text-accent-orange mb-4">
+            <h2 className="font-mono text-xs tracking-widest text-accent-orange mb-4">
               // NAVIGATION
-            </h3>
+            </h2>
             <div className="space-y-2">
               {[
                 { href: "/", label: "Home" },
@@ -44,9 +44,9 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="font-mono text-xs tracking-widest text-accent-orange mb-4">
+            <h2 className="font-mono text-xs tracking-widest text-accent-orange mb-4">
               // CONTACT
-            </h3>
+            </h2>
             <div className="space-y-2 text-sm text-text-secondary font-mono">
               <p>Austin, TX — Available Worldwide</p>
               <div className="space-y-1 mt-2">

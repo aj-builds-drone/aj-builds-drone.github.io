@@ -17,7 +17,7 @@ export default function Navbar() {
   const pathname = usePathname();
 
   function isActive(href: string) {
-    const norm = (p: string) => p.replace(/\/+$/, "") || "/";
+    const norm = (p: string) => p.replace(/^\/aj-build-drone\.github\.io/, "").replace(/\/+$/, "") || "/";
     const current = norm(pathname);
     if (href === "/") return current === "/";
     return current.startsWith(href);
@@ -56,7 +56,7 @@ export default function Navbar() {
                   <span
                     className={`mr-1 ${
                       active
-                        ? "text-accent-orange/60"
+                      ? "text-accent-orange"
                         : "text-border-bright group-hover:text-accent-orange/50"
                     }`}
                   >
@@ -116,7 +116,7 @@ export default function Navbar() {
                       : "text-text-secondary hover:text-accent-orange hover:bg-surface"
                   }`}
                 >
-                  <span className={isActive(link.href) ? "text-accent-orange/60 mr-2" : "text-border-bright mr-2"}>[{link.code}]</span>
+                  <span className={isActive(link.href) ? "text-accent-orange mr-2" : "text-border-bright mr-2"}>[{link.code}]</span>
                   {link.label}
                 </Link>
               ))}

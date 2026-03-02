@@ -175,9 +175,9 @@ export default function ServicesPage() {
                 <div className="md:flex gap-8">
                   {/* Left Column */}
                   <div className="md:w-1/2 mb-6 md:mb-0">
-                    <h3 className="font-mono text-xl font-bold tracking-wider mb-1">
+                    <h2 className="font-mono text-xl font-bold tracking-wider mb-1">
                       {service.title}
-                    </h3>
+                    </h2>
                     <p className="font-mono text-sm text-accent-orange tracking-wider mb-4">
                       {service.tagline}
                     </p>
@@ -187,9 +187,9 @@ export default function ServicesPage() {
 
                     {/* Tools */}
                     <div>
-                      <h4 className="font-mono text-xs text-accent-orange tracking-widest mb-2">
+                      <h3 className="font-mono text-xs text-accent-orange tracking-widest mb-2">
                         // TOOLS & FRAMEWORKS
-                      </h4>
+                      </h3>
                       <div className="flex flex-wrap gap-1.5">
                         {service.tools.map((tool) => (
                           <span
@@ -205,9 +205,9 @@ export default function ServicesPage() {
 
                   {/* Right Column - Deliverables */}
                   <div className="md:w-1/2">
-                    <h4 className="font-mono text-xs text-accent-orange tracking-widest mb-3">
+                    <h3 className="font-mono text-xs text-accent-orange tracking-widest mb-3">
                       // DELIVERABLES
-                    </h4>
+                    </h3>
                     <ul className="space-y-2">
                       {service.deliverables.map((item, i) => (
                         <li

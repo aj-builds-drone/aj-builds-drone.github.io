@@ -17,6 +17,7 @@
 /blob-report/
 /playwright/.cache/
 .playwright-mcp/
+.serve-root/
 
 # next.js
 /.next/

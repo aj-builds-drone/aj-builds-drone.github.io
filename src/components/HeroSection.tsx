@@ -30,7 +30,7 @@ export default function HeroSection() {
       {/* Grid fade overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
         {/* HUD top bar */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -55,7 +55,7 @@ export default function HeroSection() {
           transition={{ delay: 0.4, duration: 0.8 }}
           className="mb-8"
         >
-          <h1 className="font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
+          <h1 className="font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight break-words w-full max-w-full overflow-hidden">
             <span className="text-foreground">UAV Systems Contractor:</span>
             <br />
             <span className="text-accent-orange">From Simulation</span>

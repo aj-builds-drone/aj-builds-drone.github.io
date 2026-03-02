@@ -35,9 +35,9 @@ export default defineConfig({
     },
   ],
 
-  /* Serve the static export */
+  /* Serve the static export (no -s flag: each route has its own index.html) */
   webServer: {
-    command: `npx serve out -l ${PORT} -s`,
+    command: `npx serve out -l ${PORT}`,
     port: PORT,
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,
