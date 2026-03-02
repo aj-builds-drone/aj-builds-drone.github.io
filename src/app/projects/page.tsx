@@ -3,9 +3,26 @@ import ProjectGrid from "@/components/ProjectGrid";
 import { SectionHeader } from "@/components/HUDElements";
 
 export const metadata = {
-  title: "The Hangar — UAV Portfolio",
+  title: "The Hangar — UAV Portfolio | Custom Drone Builds",
   description:
-    "Portfolio of custom UAV builds: STM32 Return-to-Home drone, NXP HoverGames entries, PX4 simulations, aerial cinematography, and 3D-printed RC aircraft. By Ajaya Dahal.",
+    "Portfolio of custom UAV builds: STM32 Return-to-Home drone, NXP HoverGames entries, PX4 simulations, aerial cinematography, and 3D-printed RC aircraft. Full BOM & software stack included. By Ajaya Dahal, Austin TX.",
+  alternates: {
+    canonical: "https://aj-builds-drone.github.io/projects/",
+  },
+  openGraph: {
+    title: "The Hangar — UAV Portfolio | AJ Builds Drone",
+    description: "Custom drone builds with full bill of materials and software stack breakdowns. STM32 drones, NXP HoverGames, PX4 simulation, aerial cinematography.",
+    url: "https://aj-builds-drone.github.io/projects/",
+    siteName: "AJ Builds Drone",
+    type: "website",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "AJ Builds Drone — UAV Portfolio" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "The Hangar — UAV Portfolio | AJ Builds Drone",
+    description: "Custom drone builds with full BOM & software stack. STM32, NXP HoverGames, PX4, aerial cinematography.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default async function ProjectsPage() {

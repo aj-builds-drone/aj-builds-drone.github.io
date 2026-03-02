@@ -18,8 +18,8 @@ test.describe("Accessibility — axe-core", () => {
   for (const pg of PAGES) {
     test(`${pg.name} page has no critical a11y violations`, async ({ page }) => {
       await page.goto(pg.path);
-      // Wait for hydration / animations to settle
-      await page.waitForTimeout(1000);
+      // Wait for hydration + framer-motion animations (longest delay: 1s + 0.5s duration)
+      await page.waitForTimeout(2500);
 
       const results = await new AxeBuilder({ page })
         .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
@@ -50,7 +50,7 @@ test.describe("Accessibility — axe-core", () => {
 
     test(`${pg.name} page has no color-contrast violations`, async ({ page }) => {
       await page.goto(pg.path);
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(2500);
 
       const results = await new AxeBuilder({ page })
         .withRules(["color-contrast"])

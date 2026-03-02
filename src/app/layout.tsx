@@ -16,58 +16,65 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-const siteUrl = "https://ajayadesign.github.io/aj-builds-drone";
+const siteUrl = "https://aj-builds-drone.github.io";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "AJ Builds Drone | UAV Systems Contractor — Austin, TX",
+    default: "AJ Builds Drone | Custom UAV Systems Contractor — Austin, TX",
     template: "%s | AJ Builds Drone",
   },
   description:
-    "FAA Part 107 certified drone contractor & Sr. FPGA Engineer. Custom UAV builds, PX4/ArduPilot integration, computer vision, SLAM, aerial cinematography, and FPGA-based embedded systems. Austin TX — operating globally.",
+    "FAA Part 107 certified drone contractor & Sr. FPGA Engineer. Custom UAV builds, PX4/ArduPilot integration, computer vision & SLAM, Gazebo simulation, aerial cinematography, and FPGA-based embedded systems. Austin TX — operating globally. Request a free quote today.",
   keywords: [
     "drone contractor Austin TX",
+    "custom drone builder",
     "UAV systems engineer",
     "PX4 developer",
     "ArduPilot integrator",
-    "ROS2 drone",
-    "computer vision SLAM",
-    "Gazebo simulation",
-    "custom drone build",
-    "FAA Part 107 pilot",
-    "FPGA embedded systems",
-    "aerial photography Austin",
+    "ROS2 drone developer",
+    "computer vision SLAM drone",
+    "Gazebo simulation UAV",
+    "custom drone build service",
+    "FAA Part 107 certified pilot",
+    "FPGA embedded systems engineer",
+    "aerial photography Austin Texas",
+    "drone cinematography services",
+    "research drone prototyping",
+    "university drone lab setup",
     "NXP HoverGames",
     "STM32 flight controller",
-    "drone cinematography",
-    "research drone prototyping",
+    "drone consulting services",
+    "autonomous UAV development",
+    "hire drone engineer",
   ],
   authors: [{ name: "Ajaya Dahal", url: "https://ajayadahal.github.io" }],
   creator: "Ajaya Dahal",
+  publisher: "AJ Builds Drone",
+  category: "Technology",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: siteUrl,
     siteName: "AJ Builds Drone",
-    title: "AJ Builds Drone | UAV Systems Contractor",
+    title: "AJ Builds Drone | Custom UAV Systems Contractor — Austin, TX",
     description:
-      "FAA Part 107 certified. Custom UAV builds, PX4 integration, computer vision, FPGA embedded systems, and aerial cinematography. From simulation to maiden flight.",
+      "FAA Part 107 certified. Custom UAV builds, PX4 integration, computer vision & SLAM, FPGA embedded systems, and aerial cinematography. From simulation to maiden flight. Get a free quote.",
     images: [
       {
-        url: `${siteUrl}/og-image.png`,
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "AJ Builds Drone — UAV Systems Contractor",
+        alt: "AJ Builds Drone — Custom UAV Systems Contractor, Austin TX",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AJ Builds Drone | UAV Systems Contractor",
+    title: "AJ Builds Drone | Custom UAV Systems Contractor",
     description:
       "FAA Part 107 certified. Custom UAV builds, PX4, FPGA, aerial cinematography. Austin TX — operating globally.",
-    images: [`${siteUrl}/og-image.png`],
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -84,7 +91,16 @@ export const metadata: Metadata = {
     canonical: siteUrl,
   },
   icons: {
-    icon: `${siteUrl}/favicon.svg`,
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
+  verification: {
+    // Add Google Search Console verification when available
+    // google: "your-verification-code",
   },
 };
 
@@ -97,59 +113,122 @@ const jsonLd = {
       "@id": `${siteUrl}/#business`,
       name: "AJ Builds Drone",
       url: siteUrl,
+      logo: `${siteUrl}/og-image.png`,
+      image: `${siteUrl}/og-image.png`,
       description:
-        "Professional UAV systems contractor offering custom drone builds, FPGA integration, computer vision, and aerial cinematography.",
-      areaServed: "Worldwide",
+        "Professional UAV systems contractor offering custom drone builds, FPGA integration, computer vision & SLAM, Gazebo simulation, and aerial cinematography. FAA Part 107 certified. Austin TX — operating globally.",
+      areaServed: {
+        "@type": "Place",
+        name: "Worldwide",
+      },
       address: {
         "@type": "PostalAddress",
         addressLocality: "Austin",
         addressRegion: "TX",
         addressCountry: "US",
       },
-      founder: {
-        "@type": "Person",
-        name: "Ajaya Dahal",
-        jobTitle: "UAV Systems Contractor & Sr. FPGA Engineer",
-        url: "https://ajayadahal.github.io",
-        sameAs: [
-          "https://www.linkedin.com/in/ajaya-dahal-137b94108/",
-          "https://www.youtube.com/@ajayadahal6160",
-          "https://github.com/ajayadahal",
-          "https://www.hackster.io/ajaya",
-        ],
-        hasCredential: [
+      priceRange: "$$",
+      email: "ajayadesign@gmail.com",
+      founder: { "@id": `${siteUrl}/#person` },
+      serviceType: [
+        "Custom UAV Hardware Integration",
+        "Computer Vision & SLAM Development",
+        "Digital Twin & Gazebo Simulation",
+        "FPGA & Embedded Systems Design",
+        "Aerial Photography & Videography",
+        "Research Platform Prototyping",
+        "University Drone Lab Setup",
+        "Competition Team Consulting",
+      ],
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Drone Engineering Services",
+        itemListElement: [
           {
-            "@type": "EducationalOccupationalCredential",
-            credentialCategory: "license",
-            name: "FAA Part 107 Remote Pilot Certificate",
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Custom Hardware Integration",
+              description: "Complete UAV platform builds from component selection through maiden flight certification.",
+            },
           },
           {
-            "@type": "EducationalOccupationalCredential",
-            credentialCategory: "degree",
-            name: "M.S. Electrical & Computer Engineering",
-            recognizedBy: {
-              "@type": "CollegeOrUniversity",
-              name: "Mississippi State University",
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Computer Vision & SLAM",
+              description: "Visual perception pipelines for autonomous operation in GPS-denied environments.",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Gazebo Simulation & Digital Twin",
+              description: "High-fidelity simulation environments for safe, repeatable testing of autonomous flight algorithms.",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "FPGA & Embedded Systems",
+              description: "Custom FPGA and embedded system design for high-speed data processing and real-time control.",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Aerial Photography & Videography",
+              description: "FAA Part 107 certified professional aerial cinematography for real estate, events, and construction.",
             },
           },
         ],
-        knowsAbout: [
-          "Unmanned Aerial Vehicles",
-          "PX4 Autopilot",
-          "FPGA Design",
-          "Embedded Systems",
-          "Computer Vision",
-          "ROS2",
-          "Aerial Cinematography",
-        ],
       },
-      serviceType: [
-        "Custom UAV Hardware Integration",
-        "Computer Vision & SLAM",
-        "Digital Twin & Gazebo Simulation",
-        "FPGA & Embedded Systems",
-        "Aerial Photography & Videography",
-        "Research Platform Prototyping",
+    },
+    {
+      "@type": "Person",
+      "@id": `${siteUrl}/#person`,
+      name: "Ajaya Dahal",
+      jobTitle: "UAV Systems Contractor & Sr. FPGA Engineer",
+      url: "https://ajayadahal.github.io",
+      sameAs: [
+        "https://www.linkedin.com/in/ajaya-dahal-137b94108/",
+        "https://www.youtube.com/@ajayadahal6160",
+        "https://github.com/ajayadahal",
+        "https://www.hackster.io/ajayadahal",
+        "https://scholar.google.com/citations?user=86hOknYAAAAJ&hl=en&oi=ao",
+      ],
+      hasCredential: [
+        {
+          "@type": "EducationalOccupationalCredential",
+          credentialCategory: "license",
+          name: "FAA Part 107 Remote Pilot Certificate",
+        },
+        {
+          "@type": "EducationalOccupationalCredential",
+          credentialCategory: "degree",
+          name: "M.S. Electrical & Computer Engineering",
+          recognizedBy: {
+            "@type": "CollegeOrUniversity",
+            name: "Mississippi State University",
+          },
+        },
+      ],
+      knowsAbout: [
+        "Unmanned Aerial Vehicles",
+        "PX4 Autopilot",
+        "ArduPilot",
+        "FPGA Design",
+        "Embedded Systems",
+        "Computer Vision",
+        "SLAM Navigation",
+        "ROS2",
+        "Gazebo Simulation",
+        "Aerial Cinematography",
+        "SystemVerilog",
+        "PCB Design",
       ],
     },
     {
@@ -157,7 +236,18 @@ const jsonLd = {
       "@id": `${siteUrl}/#website`,
       url: siteUrl,
       name: "AJ Builds Drone",
+      description: "Custom UAV systems contractor — from simulation to maiden flight.",
       publisher: { "@id": `${siteUrl}/#business` },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${siteUrl}/#breadcrumb`,
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+        { "@type": "ListItem", position: 2, name: "Projects", item: `${siteUrl}/projects/` },
+        { "@type": "ListItem", position: 3, name: "Services", item: `${siteUrl}/services/` },
+        { "@type": "ListItem", position: 4, name: "Contact", item: `${siteUrl}/contact/` },
+      ],
     },
   ],
 };

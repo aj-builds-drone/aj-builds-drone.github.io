@@ -2,9 +2,26 @@ import { SectionHeader } from "@/components/HUDElements";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Services — Drone, FPGA & Aerial",
+  title: "Services — Drone, FPGA & Aerial Photography",
   description:
-    "Professional drone services: custom UAV hardware integration, FPGA & embedded systems, computer vision & SLAM, Gazebo simulation, and FAA Part 107 aerial photography. Austin TX — global operations.",
+    "Professional drone services: custom UAV hardware integration, FPGA & embedded systems, computer vision & SLAM, Gazebo simulation, and FAA Part 107 aerial photography. Austin TX — global operations. Request a free quote.",
+  alternates: {
+    canonical: "https://aj-builds-drone.github.io/services/",
+  },
+  openGraph: {
+    title: "Drone Engineering Services | AJ Builds Drone",
+    description: "Custom UAV builds, FPGA systems, computer vision, Gazebo simulation, aerial photography. FAA Part 107 certified. Austin TX.",
+    url: "https://aj-builds-drone.github.io/services/",
+    siteName: "AJ Builds Drone",
+    type: "website",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "AJ Builds Drone — Drone Engineering Services" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Drone Engineering Services | AJ Builds Drone",
+    description: "Custom UAV builds, FPGA systems, CV & SLAM, Gazebo simulation, aerial photography. FAA Part 107 certified.",
+    images: ["/og-image.png"],
+  },
 };
 
 const coreServices = [

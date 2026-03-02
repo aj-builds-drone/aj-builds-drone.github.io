@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ajayadesign.github.io/aj-builds-drone/sitemap.xml
+Sitemap: https://aj-builds-drone.github.io/sitemap.xml

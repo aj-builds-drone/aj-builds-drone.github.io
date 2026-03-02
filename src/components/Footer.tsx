@@ -21,9 +21,9 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h2 className="font-mono text-xs tracking-widest text-accent-orange mb-4">
+            <span className="font-mono text-xs tracking-widest text-accent-orange mb-4 block">
               // NAVIGATION
-            </h2>
+            </span>
             <div className="space-y-2">
               {[
                 { href: "/", label: "Home" },
@@ -44,15 +44,17 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h2 className="font-mono text-xs tracking-widest text-accent-orange mb-4">
-              // CONTACT
-            </h2>
+            <span className="font-mono text-xs tracking-widest text-accent-orange mb-4 block">
+              // CONNECT
+            </span>
             <div className="space-y-2 text-sm text-text-secondary font-mono">
               <p>Austin, TX — Available Worldwide</p>
+              <a href="mailto:ajayadesign@gmail.com" className="block hover:text-accent-orange transition-colors">→ ajayadesign@gmail.com</a>
               <div className="space-y-1 mt-2">
-                <a href="https://github.com/ajayadahal" target="_blank" rel="noopener noreferrer" className="block hover:text-accent-orange transition-colors">→ GitHub</a>
                 <a href="https://www.linkedin.com/in/ajaya-dahal-137b94108/" target="_blank" rel="noopener noreferrer" className="block hover:text-accent-orange transition-colors">→ LinkedIn</a>
+                <a href="https://github.com/ajayadahal" target="_blank" rel="noopener noreferrer" className="block hover:text-accent-orange transition-colors">→ GitHub</a>
                 <a href="https://www.youtube.com/@ajayadahal6160" target="_blank" rel="noopener noreferrer" className="block hover:text-accent-orange transition-colors">→ YouTube</a>
+                <a href="https://scholar.google.com/citations?user=86hOknYAAAAJ&hl=en&oi=ao" target="_blank" rel="noopener noreferrer" className="block hover:text-accent-orange transition-colors">→ Google Scholar</a>
                 <a href="https://www.hackster.io/ajayadahal" target="_blank" rel="noopener noreferrer" className="block hover:text-accent-orange transition-colors">→ Hackster.io</a>
                 <a href="https://ajayadahal.github.io" target="_blank" rel="noopener noreferrer" className="block hover:text-accent-orange transition-colors">→ Portfolio</a>
               </div>

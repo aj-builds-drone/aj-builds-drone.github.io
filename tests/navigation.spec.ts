@@ -7,8 +7,20 @@ import { test, expect } from "@playwright/test";
 async function openMenuIfMobile(page: import("@playwright/test").Page) {
   const hamburger = page.locator('button[aria-label="Toggle navigation"]');
   if (await hamburger.isVisible()) {
+    // Wait for React hydration before clicking
+    await page.waitForTimeout(800);
     await hamburger.click();
-    await page.waitForTimeout(400);
+    // Wait for framer-motion AnimatePresence to reveal the menu
+    const mobileLink = page.locator('nav a', { hasText: 'HOME' }).first();
+    try {
+      await mobileLink.waitFor({ state: 'visible', timeout: 3000 });
+    } catch {
+      // Retry once if hydration was slow
+      await hamburger.click();
+      await page.waitForTimeout(300);
+      await hamburger.click();
+      await mobileLink.waitFor({ state: 'visible', timeout: 3000 });
+    }
   }
 }
 

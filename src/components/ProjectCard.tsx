@@ -1,11 +1,19 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import type { Project } from "@/lib/getProjects";
 
 interface ProjectCardProps {
   project: Project;
   index: number;
+}
+
+/** Extract YouTube video ID from a standard watch URL */
+function getYouTubeId(url?: string): string | null {
+  if (!url) return null;
+  const m = url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -27,6 +35,11 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default function ProjectCard({ project, index }: ProjectCardProps) {
+  const ytId = getYouTubeId(project.links?.youtube);
+  const thumbUrl = ytId
+    ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`
+    : null;
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 30 }}
@@ -45,6 +58,26 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
         </div>
         <StatusBadge status={project.status} />
       </div>
+
+      {/* Thumbnail Image */}
+      {thumbUrl && (
+        <div className="relative w-full aspect-video bg-elevated overflow-hidden border-b border-border-dim">
+          <Image
+            src={thumbUrl}
+            alt={`${project.title} — ${project.subtitle}`}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+            unoptimized
+          />
+          {/* Scanline overlay on thumbnail */}
+          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+          <div className="absolute bottom-2 right-2 flex items-center gap-1.5 bg-background/80 backdrop-blur-sm px-2 py-0.5 rounded border border-border-dim">
+            <span className="w-1 h-1 rounded-full bg-accent-green pulse-green" />
+            <span className="font-mono text-[9px] tracking-widest text-accent-green">FEED LIVE</span>
+          </div>
+        </div>
+      )}
 
       {/* Card Body */}
       <div className="p-5">
