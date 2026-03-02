@@ -67,6 +67,7 @@ export default function ContactPage() {
 
     // Build FormSubmit payload
     const payload = new FormData();
+    payload.append("Reference", ref);
     payload.append("name", formData.name);
     payload.append("email", formData.email);
     payload.append("organization", formData.org);
