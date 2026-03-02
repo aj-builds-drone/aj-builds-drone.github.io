@@ -80,6 +80,10 @@ export default function ContactPage() {
     );
     payload.append("_captcha", "false");
     payload.append("_template", "box");
+    payload.append(
+      "_autoresponse",
+      `Thank you for contacting AJ Builds Drone!\n\nYour RFQ (REF: ${ref}) has been received. We'll review your project requirements and respond within 24 hours with a preliminary scope assessment.\n\nIn the meantime, feel free to check out our recent builds at https://aj-builds-drone.github.io/projects/\n\n— AJ Builds Drone | aj-builds-drone.github.io`
+    );
 
     try {
       const res = await fetch(FORMSUBMIT_URL, {
