@@ -39,6 +39,11 @@
 
 html { scroll-behavior: smooth; }
 
+/* ── Theme Transition ── */
+:root {
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
 body {
   background: var(--bg-base);
   color: var(--text-primary);
@@ -50,6 +55,14 @@ body {
   background: var(--accent-orange);
   color: #000;
 }
+
+/* ── Mobile SVG drone float ── */
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-8px) rotate(1deg); }
+  75% { transform: translateY(4px) rotate(-1deg); }
+}
+.animate-float-gentle { animation: float-gentle 4s ease-in-out infinite; }
 
 /* ── Scanline Overlay ── */
 .scanline-overlay {

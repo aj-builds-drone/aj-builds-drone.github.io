@@ -14,13 +14,13 @@ export const metadata: Metadata = {
     url: "https://aj-builds-drone.github.io/contact/",
     siteName: "AJ Builds Drone",
     type: "website",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "AJ Builds Drone — Request a Quote" }],
+    images: [{ url: "/og-contact.jpg", width: 1200, height: 630, alt: "AJ Builds Drone — Request a Quote" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Request a Quote | AJ Builds Drone",
     description: "Get a free drone engineering quote within 24 hours. Custom builds, FPGA, CV, simulation, aerial photography.",
-    images: ["/og-image.png"],
+    images: ["/og-contact.jpg"],
   },
 };
 

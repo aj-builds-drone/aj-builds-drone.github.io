@@ -3,6 +3,10 @@ import ServiceMatrix from "@/components/ServiceMatrix";
 import CredentialsSection from "@/components/CredentialsSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import FlightLog from "@/components/FlightLog";
+import TelemetryDashboard from "@/components/Telemetry/TelemetryDashboard";
+import GitHubActivity from "@/components/GitHubActivity";
+import DroneBuilder from "@/components/DroneBuilder/DroneBuilder";
+import VideoBackground from "@/components/VideoBackground";
 import { getProjects } from "@/lib/getProjects";
 import ProjectCard from "@/components/ProjectCard";
 import Link from "next/link";
@@ -65,14 +69,30 @@ export default async function Home() {
       {/* Flight Log — Embedded YouTube reel */}
       <FlightLog />
 
+      {/* Live Telemetry Dashboard */}
+      <section className="relative overflow-hidden">
+        <VideoBackground mp4="/videos/search-rescue.mp4" webm="/videos/search-rescue.webm" poster="/videos/posters/search-rescue.jpg" opacity={0.06} />
+        <TelemetryDashboard />
+      </section>
+
       {/* Service Matrix */}
       <ServiceMatrix />
+
+      {/* GitHub Activity */}
+      <GitHubActivity />
+
+      {/* Interactive Drone Builder */}
+      <section className="relative overflow-hidden">
+        <VideoBackground mp4="/videos/inspection.mp4" webm="/videos/inspection.webm" poster="/videos/posters/inspection.jpg" opacity={0.05} />
+        <DroneBuilder />
+      </section>
 
       {/* Testimonials — Signal Intercepts */}
       <TestimonialsSection />
 
       {/* CTA Section */}
       <section className="py-24 grid-bg relative">
+        <VideoBackground mp4="/videos/night-ops.mp4" webm="/videos/night-ops.webm" poster="/videos/posters/night-ops.jpg" opacity={0.1} />
         <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
         <div className="relative z-10 max-w-3xl mx-auto px-4 text-center">
           <div className="font-mono text-[10px] tracking-[0.3em] text-accent-green mb-6">

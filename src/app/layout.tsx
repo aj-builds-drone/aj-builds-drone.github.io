@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ClientOverlays from "@/components/ClientOverlays";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -62,7 +63,7 @@ export const metadata: Metadata = {
       "FAA Part 107 certified. Custom UAV builds, PX4 integration, computer vision & SLAM, FPGA embedded systems, and aerial cinematography. From simulation to maiden flight. Get a free quote.",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-home.jpg",
         width: 1200,
         height: 630,
         alt: "AJ Builds Drone — Custom UAV Systems Contractor, Austin TX",
@@ -74,7 +75,7 @@ export const metadata: Metadata = {
     title: "AJ Builds Drone | Custom UAV Systems Contractor",
     description:
       "FAA Part 107 certified. Custom UAV builds, PX4, FPGA, aerial cinematography. Austin TX — operating globally.",
-    images: ["/og-image.png"],
+    images: ["/og-home.jpg"],
   },
   robots: {
     index: true,
@@ -99,8 +100,7 @@ export const metadata: Metadata = {
   },
   manifest: "/site.webmanifest",
   verification: {
-    // Add Google Search Console verification when available
-    // google: "your-verification-code",
+    google: "J-Ig1JWNUfSvaqwT4jU-zAmoVk3K8OTGa4V8nf3LJ4w",
   },
 };
 
@@ -260,6 +260,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
+        <link rel="dns-prefetch" href="https://api.github.com" />
+        <link rel="preconnect" href="https://api.github.com" crossOrigin="anonymous" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -272,6 +274,7 @@ export default function RootLayout({
           SKIP TO CONTENT
         </a>
         <div className="scanline-overlay" aria-hidden="true" />
+        <ClientOverlays />
         <Navbar />
         <main id="main" className="min-h-screen">{children}</main>
         <Footer />

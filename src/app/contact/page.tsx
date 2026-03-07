@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SectionHeader } from "@/components/HUDElements";
+import VideoBackground from "@/components/VideoBackground";
 
 const FORMSUBMIT_URL =
   "https://formsubmit.co/ajax/9dc23f5c5eb6fba941487190ff80294b";
@@ -104,7 +105,8 @@ export default function ContactPage() {
     <div className="pt-24 pb-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Page Header */}
-        <div className="mb-6">
+        <div className="mb-6 relative overflow-hidden rounded-lg">
+          <VideoBackground mp4="/videos/drone-closeup.mp4" webm="/videos/drone-closeup.webm" poster="/videos/posters/drone-closeup.jpg" opacity={0.06} />
           <div className="font-mono text-xs tracking-[0.3em] text-accent-green mb-4">
             ▸ SECURE CHANNEL OPEN
           </div>

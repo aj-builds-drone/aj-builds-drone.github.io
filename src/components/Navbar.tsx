@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import ThemeToggle from "./ThemeToggle";
 
 const navLinks = [
   { href: "/", label: "HOME", code: "00" },
@@ -73,10 +74,13 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* Status Indicator */}
-          <div className="hidden md:flex items-center gap-2 font-mono text-xs tracking-wider">
-            <div className="w-1.5 h-1.5 rounded-full bg-accent-green pulse-green" />
-            <span className="text-accent-green">SYS ONLINE</span>
+          {/* Status Indicator + Theme Toggle */}
+          <div className="hidden md:flex items-center gap-4 font-mono text-xs tracking-wider">
+            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-accent-green pulse-green" />
+              <span className="text-accent-green">SYS ONLINE</span>
+            </div>
           </div>
 
           {/* Mobile Toggle */}

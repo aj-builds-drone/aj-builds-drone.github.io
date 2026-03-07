@@ -1,0 +1,196 @@
+{
+  "frames": [
+    {
+      "id": "frame-5inch",
+      "name": "5\" FPV Racing Frame",
+      "category": "frame",
+      "weight": 120,
+      "price": 45,
+      "motorMounts": 4,
+      "description": "Carbon fiber 5-inch racing frame, X-config",
+      "specs": { "material": "3K Carbon Fiber", "wheelbase": 220, "armThickness": 5 }
+    },
+    {
+      "id": "frame-7inch",
+      "name": "7\" Long Range Frame",
+      "category": "frame",
+      "weight": 180,
+      "price": 65,
+      "motorMounts": 4,
+      "description": "Stretched X long-range platform, 7-inch props",
+      "specs": { "material": "3K Carbon Fiber", "wheelbase": 295, "armThickness": 5 }
+    },
+    {
+      "id": "frame-10inch",
+      "name": "10\" Cinelifter Frame",
+      "category": "frame",
+      "weight": 400,
+      "price": 120,
+      "motorMounts": 4,
+      "description": "Heavy-lift cinelifter, 10-inch prop clearance",
+      "specs": { "material": "3K Carbon Fiber", "wheelbase": 450, "armThickness": 6 }
+    },
+    {
+      "id": "frame-hex",
+      "name": "Hexacopter Survey Frame",
+      "category": "frame",
+      "weight": 650,
+      "price": 280,
+      "motorMounts": 6,
+      "description": "6-arm hex platform for mapping and survey payloads",
+      "specs": { "material": "3K Carbon Fiber", "wheelbase": 550, "armThickness": 4 }
+    }
+  ],
+  "flightControllers": [
+    {
+      "id": "fc-f405",
+      "name": "STM32 F405 FC",
+      "category": "fc",
+      "weight": 8,
+      "price": 35,
+      "description": "Budget F4 flight controller, Betaflight compatible",
+      "specs": { "processor": "STM32F405", "gyro": "BMI270", "uarts": 4, "firmware": "Betaflight" }
+    },
+    {
+      "id": "fc-f722",
+      "name": "STM32 F722 FC",
+      "category": "fc",
+      "weight": 10,
+      "price": 55,
+      "description": "Mid-range F7 with barometer, DJI ready",
+      "specs": { "processor": "STM32F722", "gyro": "ICM42688-P", "uarts": 6, "firmware": "Betaflight / iNav" }
+    },
+    {
+      "id": "fc-h743",
+      "name": "STM32 H743 FC",
+      "category": "fc",
+      "weight": 12,
+      "price": 80,
+      "description": "Top-tier H7 with dual IMU, full ArduPilot support",
+      "specs": { "processor": "STM32H743", "gyro": "Dual ICM42688-P", "uarts": 8, "firmware": "ArduPilot / PX4" }
+    },
+    {
+      "id": "fc-pixhawk",
+      "name": "Pixhawk 6C Mini",
+      "category": "fc",
+      "weight": 25,
+      "price": 200,
+      "description": "Professional autopilot, triple redundancy, GPS/MAG",
+      "specs": { "processor": "STM32H753", "gyro": "Triple IMU", "uarts": 8, "firmware": "PX4 / ArduPilot" }
+    }
+  ],
+  "motors": [
+    {
+      "id": "motor-2306-1750",
+      "name": "2306 1750KV Motor",
+      "category": "motor",
+      "weight": 33,
+      "price": 18,
+      "description": "Efficient long-range motor, 7-inch prop compatible",
+      "specs": { "kv": 1750, "stator": "2306", "maxThrust": 980, "propSize": "6-7\"" }
+    },
+    {
+      "id": "motor-2306-2450",
+      "name": "2306 2450KV Motor",
+      "category": "motor",
+      "weight": 30,
+      "price": 22,
+      "description": "Race-spec 5-inch motor, high RPM",
+      "specs": { "kv": 2450, "stator": "2306", "maxThrust": 1350, "propSize": "5\"" }
+    },
+    {
+      "id": "motor-2812-900",
+      "name": "2812 900KV Motor",
+      "category": "motor",
+      "weight": 68,
+      "price": 35,
+      "description": "Cinelifter motor, 10-inch props, high torque",
+      "specs": { "kv": 900, "stator": "2812", "maxThrust": 2200, "propSize": "9-10\"" }
+    },
+    {
+      "id": "motor-4010-370",
+      "name": "4010 370KV Motor",
+      "category": "motor",
+      "weight": 120,
+      "price": 55,
+      "description": "Heavy-lift mapping motor, 15-inch prop compatible",
+      "specs": { "kv": 370, "stator": "4010", "maxThrust": 3500, "propSize": "13-15\"" }
+    }
+  ],
+  "batteries": [
+    {
+      "id": "batt-4s-1300",
+      "name": "4S 1300mAh LiPo",
+      "category": "battery",
+      "weight": 160,
+      "price": 25,
+      "description": "Race pack, high C rating",
+      "specs": { "cells": 4, "voltage": 14.8, "capacity": 1300, "cRating": 100, "wh": 19.2 }
+    },
+    {
+      "id": "batt-6s-1100",
+      "name": "6S 1100mAh LiPo",
+      "category": "battery",
+      "weight": 175,
+      "price": 32,
+      "description": "6S race/freestyle pack",
+      "specs": { "cells": 6, "voltage": 22.2, "capacity": 1100, "cRating": 100, "wh": 24.4 }
+    },
+    {
+      "id": "batt-6s-3000",
+      "name": "6S 3000mAh LiPo",
+      "category": "battery",
+      "weight": 470,
+      "price": 65,
+      "description": "Long-range/cinelifter pack",
+      "specs": { "cells": 6, "voltage": 22.2, "capacity": 3000, "cRating": 40, "wh": 66.6 }
+    },
+    {
+      "id": "batt-6s-8000",
+      "name": "6S 8000mAh LiPo",
+      "category": "battery",
+      "weight": 1050,
+      "price": 140,
+      "description": "Mapping/survey endurance pack",
+      "specs": { "cells": 6, "voltage": 22.2, "capacity": 8000, "cRating": 25, "wh": 177.6 }
+    }
+  ],
+  "cameras": [
+    {
+      "id": "cam-analog",
+      "name": "Analog FPV Camera",
+      "category": "camera",
+      "weight": 8,
+      "price": 20,
+      "description": "600TVL analog camera, ultra-low latency",
+      "specs": { "type": "FPV", "resolution": "600TVL", "latency": "~5ms", "fov": 160 }
+    },
+    {
+      "id": "cam-dji-o3",
+      "name": "DJI O3 Air Unit",
+      "category": "camera",
+      "weight": 36,
+      "price": 230,
+      "description": "DJI HD digital FPV system, 4K recording",
+      "specs": { "type": "Digital FPV", "resolution": "4K", "latency": "~28ms", "fov": 155 }
+    },
+    {
+      "id": "cam-gopro",
+      "name": "GoPro Hero 12 (Action)",
+      "category": "camera",
+      "weight": 154,
+      "price": 350,
+      "description": "Action camera for cinematic footage",
+      "specs": { "type": "Action Camera", "resolution": "5.3K", "latency": "N/A", "fov": 156 }
+    },
+    {
+      "id": "cam-sony-a7",
+      "name": "Sony A7C II (Cinema)",
+      "category": "camera",
+      "weight": 514,
+      "price": 2200,
+      "description": "Full-frame cinema camera for cinelifter builds",
+      "specs": { "type": "Cinema", "resolution": "4K 120fps", "latency": "N/A", "fov": "Lens dependent" }
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 import { SectionHeader } from "@/components/HUDElements";
 import Link from "next/link";
+import VideoBackground from "@/components/VideoBackground";
+import PricingCalculator from "@/components/PricingCalculator";
 
 export const metadata = {
   title: "Services — Drone, FPGA & Aerial Photography",
@@ -14,13 +16,13 @@ export const metadata = {
     url: "https://aj-builds-drone.github.io/services/",
     siteName: "AJ Builds Drone",
     type: "website",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "AJ Builds Drone — Drone Engineering Services" }],
+    images: [{ url: "/og-services.jpg", width: 1200, height: 630, alt: "AJ Builds Drone — Drone Engineering Services" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Drone Engineering Services | AJ Builds Drone",
     description: "Custom UAV builds, FPGA systems, CV & SLAM, Gazebo simulation, aerial photography. FAA Part 107 certified.",
-    images: ["/og-image.png"],
+    images: ["/og-services.jpg"],
   },
 };
 
@@ -156,7 +158,8 @@ export default function ServicesPage() {
     <div className="pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-6 relative overflow-hidden">
+          <VideoBackground mp4="/videos/ag-survey.mp4" webm="/videos/ag-survey.webm" poster="/videos/posters/ag-survey.jpg" opacity={0.06} />
           <div className="font-mono text-xs tracking-[0.3em] text-accent-green mb-4">
             ▸ SERVICE MANIFEST LOADED
           </div>
@@ -246,7 +249,8 @@ export default function ServicesPage() {
         </div>
 
         {/* University Section */}
-        <div className="mb-16">
+        <div className="mb-16 relative overflow-hidden">
+          <VideoBackground mp4="/videos/mapping.mp4" webm="/videos/mapping.webm" poster="/videos/posters/mapping.jpg" opacity={0.05} />
           <SectionHeader
             code="UNI"
             title="UNIVERSITY & RESEARCH"
@@ -293,8 +297,12 @@ export default function ServicesPage() {
           </div>
         </div>
 
+        {/* Pricing Calculator */}
+        <PricingCalculator />
+
         {/* Engagement CTA */}
-        <div className="text-center py-12 border-t border-border-dim">
+        <div className="text-center py-12 border-t border-border-dim relative overflow-hidden">
+          <VideoBackground mp4="/videos/tech-assembly.mp4" webm="/videos/tech-assembly.webm" poster="/videos/posters/tech-assembly.jpg" opacity={0.08} />
           <p className="font-mono text-xs text-text-secondary tracking-wider mb-6">
             ALL SERVICES AVAILABLE FOR REMOTE & ON-SITE ENGAGEMENT
           </p>

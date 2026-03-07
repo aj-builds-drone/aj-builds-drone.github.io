@@ -1,12 +1,16 @@
 import Link from "next/link";
+import VideoBackground from "@/components/VideoBackground";
 
 export const metadata = {
   title: "404 — Signal Lost",
+  description:
+    "The requested page was not found. Navigate back to AJ Builds Drone for custom UAV builds, aerial cinematography, and drone engineering services in Austin TX.",
 };
 
 export default function NotFound() {
   return (
     <div className="min-h-screen flex items-center justify-center grid-bg relative">
+      <VideoBackground mp4="/videos/drone-loop.mp4" webm="/videos/drone-loop.webm" poster="/videos/posters/drone-loop.jpg" opacity={0.12} />
       <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
       <div className="relative z-10 text-center px-4">
         {/* Error Code */}

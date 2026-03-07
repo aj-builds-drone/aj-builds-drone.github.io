@@ -45,3 +45,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# upgrade plan (working doc)
+UPGRADE_PLAN.md
+
+# empty placeholder dirs
+/public/models/
+
+# raw uncompressed video sources (keep only compressed)
+public/videos/*-raw.mp4

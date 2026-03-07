@@ -1,8 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import Link from "next/link";
+
+const DroneScene = dynamic(() => import("./DroneModel/DroneScene"), {
+  ssr: false,
+  loading: () => (
+    <div className="absolute inset-0 z-0 flex items-center justify-center" aria-hidden="true">
+      <div className="flex flex-col items-center gap-3 opacity-60">
+        <div className="relative w-12 h-12">
+          <div className="absolute inset-0 border border-accent-green/30 rounded-full" />
+          <div className="absolute inset-0 border-2 border-accent-green border-t-transparent rounded-full animate-spin" />
+        </div>
+        <span className="font-mono text-[10px] tracking-[0.2em] text-accent-green/50 animate-pulse">LOADING 3D</span>
+      </div>
+    </div>
+  ),
+});
 
 const capabilities = [
   { label: "PX4 AUTOPILOT", status: "CERTIFIED" },
@@ -24,13 +40,31 @@ export default function HeroSection() {
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden grid-bg">
+      {/* AI-generated video background (add your video files to public/videos/) */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover opacity-20 z-0"
+        poster="/videos/posters/hero-drone.jpg"
+      >
+        <source src="/videos/hero-drone.webm" type="video/webm" />
+        <source src="/videos/hero-drone.mp4" type="video/mp4" />
+      </video>
+
+      {/* 3D Drone Model */}
+      <DroneScene />
+
       {/* Scanning effect */}
-      <div className="absolute inset-0 scan-sweep overflow-hidden" />
+      <div className="absolute inset-0 scan-sweep overflow-hidden z-[1]" />
 
       {/* Grid fade overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background z-[1]" />
 
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16" style={{ pointerEvents: "none" }}>
         {/* HUD top bar */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -86,12 +120,14 @@ export default function HeroSection() {
           <Link
             href="/contact"
             className="btn-glitch inline-flex items-center justify-center gap-2 px-8 py-4 bg-accent-orange text-black font-mono text-sm tracking-widest font-bold rounded hover:bg-accent-orange/90 transition-colors"
+            style={{ pointerEvents: "auto" }}
           >
             <span>▶</span> REQUEST FOR QUOTE
           </Link>
           <Link
             href="/projects"
             className="btn-glitch inline-flex items-center justify-center gap-2 px-8 py-4 border border-accent-green text-accent-green font-mono text-sm tracking-widest rounded hover:bg-accent-green/10 transition-colors"
+            style={{ pointerEvents: "auto" }}
           >
             <span>◈</span> VIEW HANGAR
           </Link>
