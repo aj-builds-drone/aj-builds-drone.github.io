@@ -1,0 +1,52 @@
+{
+  "version": "2.1-ajayadesign-protected",
+  "defaults": {
+    "client_name": "Anita",
+    "client_email": "mackmagnets@gmail.com",
+    "project_name": "Mack Magnets — E-Commerce Upgrade & Admin System",
+    "project_description": "Full e-commerce implementation and custom Admin Command Center to eliminate platform fees.",
+    "total_amount": 5000,
+    "deposit_amount": 1000,
+    "payment_method": "zelle",
+    "payment_terms": "Non-refundable deposit of $1,000.00 due to initiate. Balance of $4,000.00 paid in 8 monthly installments of $500.00.",
+    "project_start_date": "2026-03-13",
+    "project_completion_date": "2026-03-22"
+  },
+  "clauses": [
+    {
+      "id": "payment-terms-protected",
+      "title": "Payment Terms & Security",
+      "body": "• Deposit: $1,000.00 non-refundable deposit due 03/13/2026 to secure project slot.\n• Installments: 8 payments of $500.00 due on the 13th of each month (Starting 04/13/2026).\n• Service Suspension: If any installment is more than 15 days late, Provider reserves the right to suspend website access, API integrations, and the Admin Dashboard until the account is brought current.\n• Early Buyout: Client may settle the remaining balance at any time. A 5% discount applies if paid in full before 06/13/2026.",
+      "category": "core",
+      "enabled": true
+    },
+    {
+      "id": "ownership-ip-rights",
+      "title": "IP Ownership & Licensing",
+      "body": "• Client Assets: Upon final payment, Client owns all custom branding, product data, and customer records.\n• Provider Intellectual Property: Provider (AjayaDesign) retains all rights to the underlying source code, database architecture, and Admin Dashboard framework. Client is granted a perpetual, non-transferable license to use this code for Mack Magnets only.\n• Usage Restriction: Client may not resell, sub-license, or distribute the Provider's proprietary code or dashboard logic to third parties.",
+      "category": "legal",
+      "enabled": true
+    },
+    {
+      "id": "third-party-disclaimer",
+      "title": "Third-Party Service Liability",
+      "body": "Provider utilizes free-tier services (Firebase, GitHub, Google Drive) to minimize Client costs. Provider is not responsible for: \n1. Service outages by third-party providers (Stripe, Google, GitHub).\n2. Changes in third-party pricing or free-tier eligibility.\n3. Data loss resulting from Client's mismanagement of API keys or login credentials.",
+      "category": "legal",
+      "enabled": true
+    },
+    {
+      "id": "termination-protection",
+      "title": "Termination & Kill Fee",
+      "body": "• Termination by Client: If Client terminates for convenience, the $1,000 deposit is forfeited. Additionally, Client shall pay for all work hours completed beyond the deposit value at a rate of $125/hour.\n• Work Product: Upon termination and full payment of outstanding 'work-to-date' fees, Provider will hand over the current state of the code. No further support will be provided.",
+      "category": "legal",
+      "enabled": true
+    },
+    {
+      "id": "warranty-limitation",
+      "title": "30-Day Launch Warranty",
+      "body": "Provider offers a 30-day bug-fix warranty starting from the Go-Live date (03/22/2026). This covers functional defects in the custom code. It does not cover new feature requests, changes to third-party APIs, or issues caused by Client-side modifications to the source code.",
+      "category": "support",
+      "enabled": true
+    }
+  ]
+}

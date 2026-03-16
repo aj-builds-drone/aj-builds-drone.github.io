@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AJ Builds Drone — Command Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter','system-ui','-apple-system','sans-serif'], mono: ['JetBrains Mono','monospace'] },
+          colors: {
+            drone: { 50:'#eef7ff',100:'#d9edff',200:'#bce0ff',300:'#8eccff',400:'#55b0ff',500:'#2b8dff',600:'#0b6df5',700:'#0957d4',800:'#0e48ab',900:'#123e86',950:'#0e2752' },
+            carbon: { 900:'#0d1117',800:'#161b22',700:'#21262d',600:'#30363d',500:'#484f58' },
+            neon: { blue:'#00D4FF', green:'#00FF88', yellow:'#FFD600', orange:'#FF8A00', red:'#FF6B6B', purple:'#A855F7', pink:'#EC4899' },
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #0d1117; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .glass { background: rgba(22,27,34,0.85); backdrop-filter: blur(16px); border: 1px solid rgba(48,54,61,0.6); }
+    .glass-hover:hover { border-color: rgba(0,212,255,0.3); box-shadow: 0 0 20px rgba(0,212,255,0.05); }
+    .stat-card { transition: transform 0.15s, box-shadow 0.15s; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+    .tier-hot { color: #f97316; } .tier-warm { color: #eab308; } .tier-cold { color: #3b82f6; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .tab-btn { transition: all 0.2s; border: 1px solid transparent; }
+    .tab-btn.active { background: linear-gradient(135deg, #0b6df5, #0957d4); color: white; border-color: rgba(43,141,255,0.4); box-shadow: 0 0 15px rgba(11,109,245,0.2); }
+    #map { border-radius: 12px; z-index: 1; }
+    .leaflet-popup-content-wrapper { background: #161b22; color: #c9d1d9; border: 1px solid #30363d; border-radius: 8px; }
+    .leaflet-popup-tip { background: #161b22; }
+    .leaflet-control-zoom a { background: #21262d !important; color: #c9d1d9 !important; border-color: #30363d !important; }
+    ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #0d1117; } ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulseNeon { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .fade-in { animation: fadeIn 0.3s ease-out; }
+    .slide-up { animation: slideUp 0.4s ease-out; }
+    .funnel-bar { transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+    .modal-backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+    .pulse-dot { animation: pulseNeon 2s infinite; }
+    .discover-btn { transition: all 0.2s; position: relative; overflow: hidden; }
+    .discover-btn:hover { transform: scale(1.02); }
+    .discover-btn:active { transform: scale(0.98); }
+    .discover-btn.running { pointer-events: none; opacity: 0.7; }
+    .discover-btn.running::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { 100% { left: 100%; } }
+    .kpi-value { font-family: 'JetBrains Mono', monospace; }
+    .tab-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+    .tab-scroll::-webkit-scrollbar { display: none; }
+    .agent-card { position: relative; overflow: hidden; }
+    .agent-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, currentColor, transparent); opacity: 0.3; }
+    @media (max-width: 768px) {
+      .desktop-tabs { display: none; }
+      .mobile-nav { display: flex; }
+      .main-content { padding-bottom: 70px; }
+    }
+    @media (min-width: 769px) { .mobile-nav { display: none; } }
+  </style>
+</head>
+<body class="text-gray-300 min-h-screen">
+
+<!-- Top Nav -->
+<nav class="glass sticky top-0 z-50 px-4 md:px-6 py-3 flex items-center justify-between">
+  <div class="flex items-center gap-3">
+    <div class="w-8 h-8 bg-gradient-to-br from-drone-500 to-drone-700 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-drone-600/20">&#10022;</div>
+    <div>
+      <h1 class="text-base md:text-lg font-semibold text-white tracking-tight">AJ Builds Drone &mdash; Outreach Command Center</h1>
+      <p class="text-[10px] text-gray-500 hidden md:block">Drone professional outreach pipeline</p>
+    </div>
+    <span id="version-badge" class="text-[10px] font-mono bg-drone-600/20 text-drone-400 px-2 py-0.5 rounded-full border border-drone-600/30">v4.0</span>
+  </div>
+  <div class="flex items-center gap-3">
+    <div id="api-status" class="flex items-center gap-1.5 text-xs">
+      <span class="status-dot bg-gray-500" id="api-dot"></span>
+      <span class="text-gray-500 hidden md:inline text-[10px] font-mono" id="api-label">Connecting...</span>
+    </div>
+    <div id="agent-indicator" class="flex items-center gap-1.5 text-xs">
+      <span class="status-dot bg-green-500 pulse-dot"></span>
+      <span class="font-mono"><span id="agent-count">0</span> agents</span>
+    </div>
+    <button onclick="refreshAll()" class="text-xs bg-carbon-700 hover:bg-carbon-600 border border-carbon-600 px-3 py-1.5 rounded-lg transition flex items-center gap-1">
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      <span class="hidden md:inline">Refresh</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Main Layout -->
+<div class="main-content max-w-[1600px] mx-auto px-4 md:px-6 py-4 md:py-6 space-y-5">
+
+  <!-- Desktop Tab Navigation -->
+  <div class="desktop-tabs flex gap-1.5 overflow-x-auto tab-scroll pb-1">
+    <button class="tab-btn active px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap" data-tab="overview" onclick="showTab('overview',this)">&#x1F4CA; Overview</button>
+    <button class="tab-btn px-3 py-2 rounded-lg text-xs font-medium bg-carbon-700 hover:bg-carbon-600 whitespace-nowrap" data-tab="discovery" onclick="showTab('discovery',this)">&#x1F50D; Discovery</button>
+    <button class="tab-btn px-3 py-2 rounded-lg text-xs font-medium bg-carbon-700 hover:bg-carbon-600 whitespace-nowrap" data-tab="prospects" onclick="showTab('prospects',this)">&#x1F3AF; Prospects</button>
+    <button class="tab-btn px-3 py-2 rounded-lg text-xs font-medium bg-carbon-700 hover:bg-carbon-600 whitespace-nowrap" data-tab="queue" onclick="showTab('queue',this)">&#x1F4EC; Email Queue</button>
+    <button class="tab-btn px-3 py-2 rounded-lg text-xs font-medium bg-carbon-700 hover:bg-carbon-600 whitespace-nowrap" data-tab="map" onclick="showTab('map',this)">&#x1F5FA; Map</button>
+    <button class="tab-btn px-3 py-2 rounded-lg text-xs font-medium bg-carbon-700 hover:bg-carbon-600 whitespace-nowrap" data-tab="analytics" onclick="showTab('analytics',this)">&#x1F4C8; Analytics</button>
+    <button class="tab-btn px-3 py-2 rounded-lg text-xs font-medium bg-carbon-700 hover:bg-carbon-600 whitespace-nowrap" data-tab="ab-tests" onclick="showTab('ab-tests',this)">&#x1F9EA; A/B Tests</button>
+    <button class="tab-btn px-3 py-2 rounded-lg text-xs font-medium bg-carbon-700 hover:bg-carbon-600 whitespace-nowrap" data-tab="agents" onclick="showTab('agents',this)">&#x1F916; Agents</button>
+  </div>
+
+  <!-- TAB: Overview -->
+  <div id="tab-overview" class="tab-content space-y-5 slide-up">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-3" id="kpi-cards"></div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div class="lg:col-span-2 glass glass-hover rounded-xl p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-white font-semibold text-sm">Pipeline Funnel</h2>
+          <span class="text-[10px] text-gray-500 font-mono" id="funnel-total"></span>
+        </div>
+        <div id="funnel-bars" class="space-y-2.5"></div>
+      </div>
+      <div class="glass glass-hover rounded-xl p-5">
+        <h2 class="text-white font-semibold text-sm mb-4">Recent Activity</h2>
+        <div id="activity-feed" class="space-y-2.5 max-h-[400px] overflow-y-auto pr-1"></div>
+      </div>
+    </div>
+    <div class="glass glass-hover rounded-xl p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-white font-semibold text-sm">Top Prospects</h2>
+        <button onclick="showTab('prospects', document.querySelector('[data-tab=prospects]'))" class="text-xs text-drone-400 hover:text-drone-300">View all &rarr;</button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs">
+          <thead class="text-gray-500 border-b border-carbon-600 uppercase tracking-wider">
+            <tr><th class="text-left py-2 px-3">Name</th><th class="text-left py-2 px-3">Organization</th><th class="text-left py-2 px-3">Department</th><th class="text-left py-2 px-3">Lab</th><th class="text-center py-2 px-3">H-Index</th><th class="text-center py-2 px-3">Score</th><th class="text-center py-2 px-3">Tier</th><th class="text-left py-2 px-3">Status</th><th class="text-left py-2 px-3">Source</th></tr>
+          </thead>
+          <tbody id="top-prospects-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: Discovery -->
+  <div id="tab-discovery" class="tab-content hidden space-y-5">
+    <div class="glass glass-hover rounded-xl p-5">
+      <div class="flex items-center justify-between mb-4">
+        <div><h2 class="text-white font-semibold text-sm">Discovery Crawlers</h2><p class="text-[10px] text-gray-500 mt-0.5">Click to trigger a crawl. Results feed into the prospect pipeline.</p></div>
+        <button onclick="triggerSeedBatch()" class="discover-btn text-xs bg-gradient-to-r from-green-500/20 to-cyan-500/20 border border-green-500/30 text-green-400 hover:border-green-500/50 px-4 py-2 rounded-lg font-medium" id="btn-seed">&#x26A1; Seed All Sources</button>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <button onclick="triggerCrawl('scholar','btn-scholar')" id="btn-scholar" class="discover-btn glass rounded-lg p-4 text-center hover:border-green-500/30 group"><div class="text-2xl mb-1">&#x1F393;</div><div class="text-xs font-medium text-white group-hover:text-green-400">Scholar Crawl</div><div class="text-[10px] text-gray-500 mt-0.5">Google Scholar</div></button>
+        <button onclick="triggerCrawl('nsf','btn-nsf')" id="btn-nsf" class="discover-btn glass rounded-lg p-4 text-center hover:border-blue-500/30 group"><div class="text-2xl mb-1">&#x1F3DB;</div><div class="text-xs font-medium text-white group-hover:text-blue-400">NSF Awards</div><div class="text-[10px] text-gray-500 mt-0.5">Grant funding</div></button>
+        <button onclick="triggerCrawl('faculty','btn-faculty')" id="btn-faculty" class="discover-btn glass rounded-lg p-4 text-center hover:border-purple-500/30 group"><div class="text-2xl mb-1">&#x1F3EB;</div><div class="text-xs font-medium text-white group-hover:text-purple-400">Faculty Pages</div><div class="text-[10px] text-gray-500 mt-0.5">University sites</div></button>
+        <button onclick="triggerCrawl('arxiv','btn-arxiv')" id="btn-arxiv" class="discover-btn glass rounded-lg p-4 text-center hover:border-orange-500/30 group"><div class="text-2xl mb-1">&#x1F4C4;</div><div class="text-xs font-medium text-white group-hover:text-orange-400">arXiv Papers</div><div class="text-[10px] text-gray-500 mt-0.5">Research papers</div></button>
+        <button onclick="triggerCrawl('github','btn-github')" id="btn-github" class="discover-btn glass rounded-lg p-4 text-center hover:border-gray-400/30 group"><div class="text-2xl mb-1">&#x1F419;</div><div class="text-xs font-medium text-white group-hover:text-gray-300">GitHub</div><div class="text-[10px] text-gray-500 mt-0.5">PX4 / ArduPilot / ROS2</div></button>
+        <button onclick="triggerCrawl('sam-gov','btn-sam')" id="btn-sam" class="discover-btn glass rounded-lg p-4 text-center hover:border-red-500/30 group"><div class="text-2xl mb-1">&#x1F3DB;</div><div class="text-xs font-medium text-white group-hover:text-red-400">SAM.gov</div><div class="text-[10px] text-gray-500 mt-0.5">Govt drone RFPs</div></button>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div class="glass glass-hover rounded-xl p-5">
+        <h3 class="text-white font-semibold text-sm mb-3">Processing</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="triggerCrawl('dedup','btn-dedup')" id="btn-dedup" class="discover-btn glass rounded-lg p-3 text-center hover:border-cyan-500/30"><div class="text-lg mb-1">&#x1F517;</div><div class="text-xs font-medium text-white">De-duplicate</div></button>
+          <button onclick="triggerBatchScore()" id="btn-score" class="discover-btn glass rounded-lg p-3 text-center hover:border-yellow-500/30"><div class="text-lg mb-1">&#x26A1;</div><div class="text-xs font-medium text-white">Batch Score</div></button>
+        </div>
+      </div>
+      <div class="glass glass-hover rounded-xl p-5">
+        <h3 class="text-white font-semibold text-sm mb-3">Crawl Log</h3>
+        <div id="crawl-log" class="space-y-2 max-h-[200px] overflow-y-auto font-mono text-[11px]"><p class="text-gray-500">No crawls triggered yet this session.</p></div>
+      </div>
+    </div>
+    <div class="glass glass-hover rounded-xl p-5">
+      <h3 class="text-white font-semibold text-sm mb-4">Source Performance</h3>
+      <div id="source-perf" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3"><p class="text-gray-500 text-xs col-span-full">Loading...</p></div>
+    </div>
+  </div>
+
+  <!-- TAB: Prospects -->
+  <div id="tab-prospects" class="tab-content hidden space-y-4">
+    <div class="glass glass-hover rounded-xl p-5">
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <h2 class="text-white font-semibold text-sm">All Prospects</h2>
+        <div class="flex gap-2 flex-wrap items-center">
+          <select id="filter-tier" onchange="loadProspects()" class="text-xs bg-carbon-700 border border-carbon-600 text-gray-300 rounded-lg px-2 py-1.5"><option value="">All Tiers</option><option value="hot">Hot</option><option value="warm">Warm</option><option value="cold">Cold</option></select>
+          <select id="filter-source" onchange="loadProspects()" class="text-xs bg-carbon-700 border border-carbon-600 text-gray-300 rounded-lg px-2 py-1.5"><option value="">All Sources</option><option value="scholar">Scholar</option><option value="nsf">NSF</option><option value="faculty_page">Faculty</option><option value="arxiv">arXiv</option><option value="github">GitHub</option><option value="sam_gov">SAM.gov</option></select>
+          <input id="filter-search" type="text" placeholder="Search name, org, email..." onkeyup="debounceSearch()" class="text-xs bg-carbon-700 border border-carbon-600 text-gray-300 rounded-lg px-3 py-1.5 w-48" />
+          <button onclick="exportCSV()" class="text-xs bg-carbon-700 hover:bg-carbon-600 border border-carbon-600 px-3 py-1.5 rounded-lg flex items-center gap-1">&#x1F4E5; Export CSV</button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs">
+          <thead class="text-gray-500 border-b border-carbon-600 uppercase tracking-wider">
+            <tr><th class="text-left py-2 px-3 cursor-pointer hover:text-gray-300" onclick="sortBy('name')">Name</th><th class="text-left py-2 px-3">Organization</th><th class="text-left py-2 px-3">Department</th><th class="text-left py-2 px-3">Lab</th><th class="text-center py-2 px-3 cursor-pointer hover:text-gray-300" onclick="sortBy('h_index')">H-Index</th><th class="text-center py-2 px-3 cursor-pointer hover:text-gray-300" onclick="sortBy('priority_score')">Score</th><th class="text-center py-2 px-3">Tier</th><th class="text-left py-2 px-3">Status</th><th class="text-left py-2 px-3">Source</th></tr>
+          </thead>
+          <tbody id="prospects-table"></tbody>
+        </table>
+      </div>
+      <div class="flex justify-between items-center mt-4">
+        <span id="prospects-count" class="text-[10px] text-gray-500 font-mono"></span>
+        <div class="flex gap-2 items-center">
+          <button onclick="prevPage()" class="text-xs bg-carbon-700 hover:bg-carbon-600 border border-carbon-600 px-3 py-1.5 rounded-lg">&larr; Prev</button>
+          <span id="page-num" class="text-xs text-gray-400 font-mono py-1.5"></span>
+          <button onclick="nextPage()" class="text-xs bg-carbon-700 hover:bg-carbon-600 border border-carbon-600 px-3 py-1.5 rounded-lg">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: Email Queue -->
+  <div id="tab-queue" class="tab-content hidden space-y-4">
+    <div class="glass glass-hover rounded-xl p-5">
+      <div class="flex items-center justify-between mb-4">
+        <div><h2 class="text-white font-semibold text-sm">Emails Awaiting Approval</h2><p class="text-[10px] text-gray-500 mt-0.5">Human-in-the-loop &mdash; no email sends without your approval.</p></div>
+        <div class="flex gap-2">
+          <button onclick="batchApprove()" class="text-xs bg-green-600/80 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg transition">&#10003; Approve All</button>
+          <button onclick="loadQueue()" class="text-xs bg-carbon-700 hover:bg-carbon-600 border border-carbon-600 px-3 py-1.5 rounded-lg">&#x21BB;</button>
+        </div>
+      </div>
+      <div id="email-queue" class="space-y-3"></div>
+      <p id="queue-empty" class="text-gray-500 text-xs text-center py-8 hidden">No emails pending approval.</p>
+    </div>
+  </div>
+
+  <!-- TAB: University Map -->
+  <div id="tab-map" class="tab-content hidden space-y-4">
+    <div class="glass glass-hover rounded-xl p-4">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-white font-semibold text-sm">University Scatter Map</h2>
+        <div class="flex gap-3 text-[10px]">
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span> Hot</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span> Warm</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Cold</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-gray-500"></span> Unscored</span>
+        </div>
+      </div>
+      <div id="map" style="height: 550px;"></div>
+      <p class="text-[10px] text-gray-500 mt-2 font-mono" id="map-count">Loading markers...</p>
+    </div>
+  </div>
+
+  <!-- TAB: Campaign Analytics -->
+  <div id="tab-analytics" class="tab-content hidden space-y-5">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div class="glass glass-hover rounded-xl p-5"><h3 class="text-white font-semibold text-sm mb-4">Open Rate by Organization Type</h3><div style="height:260px"><canvas id="chart-org-open"></canvas></div></div>
+      <div class="glass glass-hover rounded-xl p-5"><h3 class="text-white font-semibold text-sm mb-4">Performance by Sequence Step</h3><div style="height:260px"><canvas id="chart-step"></canvas></div></div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div class="glass glass-hover rounded-xl p-5"><h3 class="text-white font-semibold text-sm mb-4">Template Performance</h3><div style="height:260px"><canvas id="chart-template"></canvas></div></div>
+      <div class="glass glass-hover rounded-xl p-5"><h3 class="text-white font-semibold text-sm mb-4">Daily Send Volume (30 days)</h3><div style="height:260px"><canvas id="chart-daily"></canvas></div></div>
+    </div>
+    <div class="glass glass-hover rounded-xl p-5">
+      <h3 class="text-white font-semibold text-sm mb-4">Campaign Breakdown</h3>
+      <table class="w-full text-xs">
+        <thead class="text-gray-500 border-b border-carbon-600 uppercase tracking-wider"><tr><th class="text-left py-2 px-3">Segment</th><th class="text-right py-2 px-3">Sent</th><th class="text-right py-2 px-3">Opened</th><th class="text-right py-2 px-3">Clicked</th><th class="text-right py-2 px-3">Replied</th><th class="text-right py-2 px-3">Open %</th><th class="text-right py-2 px-3">Click %</th><th class="text-right py-2 px-3">Reply %</th></tr></thead>
+        <tbody id="analytics-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: A/B Tests -->
+  <div id="tab-ab-tests" class="tab-content hidden space-y-5">
+    <div class="glass glass-hover rounded-xl p-5">
+      <div class="flex items-center justify-between mb-4">
+        <div><h2 class="text-white font-semibold text-sm">Active Experiments</h2><p class="text-[10px] text-gray-500 mt-0.5">Deterministic A/B variant assignment via SHA-256 hashing</p></div>
+      </div>
+      <div id="ab-experiments" class="grid grid-cols-1 md:grid-cols-2 gap-4"><p class="text-gray-500 text-xs">Loading experiments...</p></div>
+    </div>
+    <div class="glass glass-hover rounded-xl p-5">
+      <h3 class="text-white font-semibold text-sm mb-4">Experiment Results</h3>
+      <div id="ab-results" class="space-y-4"><p class="text-gray-500 text-xs">Loading results...</p></div>
+    </div>
+    <div class="glass glass-hover rounded-xl p-5">
+      <div class="flex items-center justify-between mb-4">
+        <div><h2 class="text-white font-semibold text-sm">Scoring Weight Optimizer</h2><p class="text-[10px] text-gray-500 mt-0.5">Feature correlation with reply rates &mdash; data-driven weight suggestions</p></div>
+        <button onclick="loadOptimizer()" class="text-xs bg-carbon-700 hover:bg-carbon-600 border border-carbon-600 px-3 py-1.5 rounded-lg">&#x21BB; Refresh</button>
+      </div>
+      <div id="optimizer-results" class="space-y-3"><p class="text-gray-500 text-xs">Loading...</p></div>
+    </div>
+  </div>
+
+  <!-- TAB: Agents -->
+  <div id="tab-agents" class="tab-content hidden space-y-5">
+    <div class="glass glass-hover rounded-xl p-5">
+      <div class="flex items-center justify-between mb-4">
+        <div><h2 class="text-white font-semibold text-sm">Agent Scheduler</h2><p class="text-[10px] text-gray-500 mt-0.5">13 autonomous agents running on staggered intervals</p></div>
+        <button onclick="loadAgents()" class="text-xs bg-carbon-700 hover:bg-carbon-600 border border-carbon-600 px-3 py-1.5 rounded-lg">&#x21BB; Refresh</button>
+      </div>
+      <div id="agents-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"><p class="text-gray-500 text-xs">Loading agents...</p></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Mobile Bottom Nav -->
+<div class="mobile-nav fixed bottom-0 left-0 right-0 z-50 glass border-t border-carbon-600 px-2 py-2 justify-around hidden">
+  <button onclick="showTab('overview',this)" class="flex flex-col items-center text-[10px] text-gray-400 px-2 py-1" data-tab="overview"><span class="text-base">&#x1F4CA;</span>Overview</button>
+  <button onclick="showTab('discovery',this)" class="flex flex-col items-center text-[10px] text-gray-400 px-2 py-1" data-tab="discovery"><span class="text-base">&#x1F50D;</span>Discover</button>
+  <button onclick="showTab('prospects',this)" class="flex flex-col items-center text-[10px] text-gray-400 px-2 py-1" data-tab="prospects"><span class="text-base">&#x1F3AF;</span>Prospects</button>
+  <button onclick="showTab('queue',this)" class="flex flex-col items-center text-[10px] text-gray-400 px-2 py-1" data-tab="queue"><span class="text-base">&#x1F4EC;</span>Queue</button>
+  <button onclick="showTab('analytics',this)" class="flex flex-col items-center text-[10px] text-gray-400 px-2 py-1" data-tab="analytics"><span class="text-base">&#x1F4C8;</span>Analytics</button>
+  <button onclick="showTab('agents',this)" class="flex flex-col items-center text-[10px] text-gray-400 px-2 py-1" data-tab="agents"><span class="text-base">&#x1F916;</span>Agents</button>
+</div>
+
+<!-- Prospect Detail Modal -->
+<div id="prospect-modal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+  <div class="glass rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6">
+    <div class="flex justify-between items-start mb-6">
+      <div><h2 id="modal-name" class="text-xl font-bold text-white"></h2><p id="modal-org" class="text-xs text-gray-400 mt-0.5"></p></div>
+      <button onclick="closeModal()" class="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
+    </div>
+    <div id="modal-content" class="space-y-5"></div>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin;
+let currentPage = 0;
+const PAGE_SIZE = 50;
+let searchTimer = null;
+let leafletMap = null;
+let markerLayer = null;
+let charts = {};
+let crawlLogEntries = [];
+let currentSort = 'priority_score';
+let sortOrder = 'desc';
+
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.add('hidden'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); b.classList.add('bg-carbon-700'); });
+  var content = document.getElementById('tab-' + name);
+  if (content) { content.classList.remove('hidden'); content.classList.add('slide-up'); }
+  if (btn) { btn.classList.add('active'); btn.classList.remove('bg-carbon-700'); }
+  document.querySelectorAll('.desktop-tabs [data-tab="' + name + '"]').forEach(function(b) { b.classList.add('active'); b.classList.remove('bg-carbon-700'); });
+  if (name === 'map' && !leafletMap) initMap();
+  if (name === 'analytics') loadAnalytics();
+  if (name === 'queue') loadQueue();
+  if (name === 'prospects') loadProspects();
+  if (name === 'ab-tests') { loadABTests(); loadOptimizer(); }
+  if (name === 'agents') loadAgents();
+  if (name === 'discovery') loadSourcePerf();
+}
+
+async function api(path) {
+  try { var resp = await fetch(API + path); if (!resp.ok) throw new Error(resp.statusText); return await resp.json(); }
+  catch (e) { console.error('API error:', path, e); return null; }
+}
+async function apiPost(path, body) {
+  try { var resp = await fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined }); return await resp.json(); }
+  catch (e) { console.error('API error:', path, e); return null; }
+}
+
+// === Overview ===
+async function loadOverview() {
+  var results = await Promise.all([api('/outreach/stats'), api('/outreach/funnel'), api('/outreach/top-prospects?limit=20'), api('/outreach/agents/status')]);
+  var stats = results[0], funnel = results[1], top = results[2], agents = results[3];
+  var apiDot = document.getElementById('api-dot'), apiLabel = document.getElementById('api-label');
+  if (stats) { apiDot.className = 'status-dot bg-green-500 pulse-dot'; apiLabel.textContent = 'API Connected'; apiLabel.className = 'text-green-400 hidden md:inline text-[10px] font-mono'; }
+  else { apiDot.className = 'status-dot bg-red-500'; apiLabel.textContent = 'API Offline'; apiLabel.className = 'text-red-400 hidden md:inline text-[10px] font-mono'; }
+  if (stats) renderKPIs(stats);
+  if (funnel) renderFunnel(funnel);
+  if (top) renderTopProspects(top);
+  if (agents) renderAgentStatus(agents);
+  loadActivityFeed();
+}
+
+function renderKPIs(s) {
+  var cards = [
+    { label: 'TOTAL PROSPECTS', value: s.total_prospects, bg: 'from-blue-500/10 to-cyan-500/10', color: 'text-cyan-400' },
+    { label: 'HOT', value: (s.by_tier && s.by_tier.hot) || 0, bg: 'from-orange-500/10 to-red-500/10', color: 'text-orange-400' },
+    { label: 'WARM', value: (s.by_tier && s.by_tier.warm) || 0, bg: 'from-yellow-500/10 to-amber-500/10', color: 'text-yellow-400' },
+    { label: 'COLD', value: (s.by_tier && s.by_tier.cold) || 0, bg: 'from-blue-500/10 to-indigo-500/10', color: 'text-blue-400' },
+    { label: 'EMAILS SENT', value: s.emails_sent, bg: 'from-purple-500/10 to-violet-500/10', color: 'text-purple-400' },
+    { label: 'OPENED', value: s.emails_opened || 0, bg: 'from-cyan-500/10 to-teal-500/10', color: 'text-cyan-400' },
+    { label: 'OPEN RATE', value: s.open_rate + '%', bg: 'from-green-500/10 to-emerald-500/10', color: 'text-green-400' },
+    { label: 'REPLY RATE', value: s.reply_rate + '%', bg: 'from-green-500/10 to-lime-500/10', color: 'text-green-400' },
+  ];
+  document.getElementById('kpi-cards').innerHTML = cards.map(function(c) {
+    return '<div class="glass stat-card rounded-xl p-3 bg-gradient-to-br ' + c.bg + '"><div class="' + c.color + ' text-xl md:text-2xl font-bold kpi-value text-center">' + c.value + '</div><p class="text-[9px] text-gray-500 uppercase tracking-wider text-center mt-1">' + c.label + '</p></div>';
+  }).join('');
+}
+
+function renderFunnel(data) {
+  var el = document.getElementById('funnel-bars');
+  var vals = Object.values(data.funnel);
+  var max = Math.max.apply(null, vals.concat([1]));
+  var total = vals.reduce(function(a,b){return a+b;}, 0);
+  document.getElementById('funnel-total').textContent = total + ' total';
+  var colors = { discovered:'bg-gray-500',enriched:'bg-blue-600',audited:'bg-cyan-500',contacted:'bg-yellow-500',opened:'bg-orange-500',replied:'bg-green-500',meeting:'bg-purple-500',converted:'bg-pink-500' };
+  el.innerHTML = data.stages.map(function(s) {
+    var count = data.funnel[s] || 0;
+    var width = Math.max((count / max) * 100, 2);
+    return '<div class="flex items-center gap-3"><span class="text-[10px] text-gray-500 w-20 text-right capitalize font-mono">' + s + '</span><div class="flex-1 bg-carbon-700 rounded-full h-5 overflow-hidden"><div class="funnel-bar ' + (colors[s]||'bg-gray-500') + ' h-full rounded-full flex items-center justify-end px-2" style="width:' + width + '%"><span class="text-[10px] font-mono font-bold text-white">' + count + '</span></div></div></div>';
+  }).join('');
+}
+
+function renderTopProspects(prospects) {
+  var el = document.getElementById('top-prospects-table');
+  if (!prospects.length) { el.innerHTML = '<tr><td colspan="9" class="py-8 text-center text-gray-500 text-xs">No prospects yet. Run a crawler to get started.</td></tr>'; return; }
+  el.innerHTML = prospects.map(function(p) {
+    return '<tr class="border-b border-carbon-700/50 hover:bg-carbon-800/50 transition cursor-pointer" onclick="openProspect(\'' + p.id + '\')"><td class="py-2 px-3"><span class="text-white font-medium">' + esc(p.name) + '</span><br/><span class="text-[10px] text-gray-500">' + esc(p.title||'') + '</span></td><td class="py-2 px-3">' + esc(p.organization||'') + '</td><td class="py-2 px-3 text-gray-400">' + esc(p.department||'') + '</td><td class="py-2 px-3 text-gray-400">' + esc(p.lab_name||'') + '</td><td class="py-2 px-3 text-center font-mono text-gray-300">' + (p.h_index!=null?p.h_index:'&mdash;') + '</td><td class="py-2 px-3 text-center font-mono text-white font-bold">' + (p.priority_score!=null?p.priority_score:'&mdash;') + '</td><td class="py-2 px-3 text-center"><span class="tier-' + (p.tier||'') + ' text-[10px] font-bold uppercase tracking-wider">' + (p.tier||'&mdash;') + '</span></td><td class="py-2 px-3"><span class="px-2 py-0.5 rounded-full text-[10px] ' + statusClass(p.status) + '">' + (p.status||'&mdash;') + '</span></td><td class="py-2 px-3 text-[10px] text-gray-500 font-mono">' + (p.source||'&mdash;') + '</td></tr>';
+  }).join('');
+}
+
+function renderAgentStatus(data) {
+  var agents = data.agents || [];
+  document.getElementById('agent-count').textContent = agents.filter(function(a){return a.is_running;}).length;
+}
+
+async function loadActivityFeed() {
+  var data = await api('/dashboard/activity-feed?limit=30');
+  var el = document.getElementById('activity-feed');
+  if (!data || !data.activities || !data.activities.length) { el.innerHTML = '<p class="text-gray-500 text-xs text-center py-4">No activity yet.</p>'; return; }
+  el.innerHTML = data.activities.map(function(a) {
+    return '<div class="flex gap-2.5 text-xs"><span class="text-base flex-shrink-0">' + (a.icon||'&#x1F4CB;') + '</span><div class="flex-1 min-w-0"><p class="text-gray-300 truncate">' + esc(a.description||a.action) + '</p><p class="text-[10px] text-gray-600 mt-0.5 font-mono">' + timeAgo(a.created_at) + '</p></div></div>';
+  }).join('');
+}
+
+// === Discovery ===
+var crawlEndpoints = { scholar:'/outreach/discover/scholar', nsf:'/outreach/discover/nsf', faculty:'/outreach/discover/faculty', arxiv:'/outreach/discover/arxiv', github:'/outreach/discover/github', 'sam-gov':'/outreach/discover/sam-gov', dedup:'/outreach/discover/dedup' };
+
+async function triggerCrawl(source, btnId) {
+  var btn = document.getElementById(btnId);
+  if (btn) btn.classList.add('running');
+  addCrawlLog('Startng ' + source + ' crawl...', 'text-yellow-400');
+  var result = await apiPost(crawlEndpoints[source] || ('/outreach/discover/' + source));
+  if (btn) btn.classList.remove('running');
+  if (result) {
+    var found = result.prospects_found != null ? result.prospects_found : (result.merged != null ? result.merged : '?');
+    var newP = result.prospects_new != null ? result.prospects_new : '';
+    addCrawlLog(source + ': ' + found + ' found' + (newP ? ', ' + newP + ' new' : ''), 'text-green-400');
+  } else { addCrawlLog(source + ': failed', 'text-red-400'); }
+}
+
+async function triggerBatchScore() {
+  var btn = document.getElementById('btn-score');
+  if (btn) btn.classList.add('running');
+  addCrawlLog('Running batch score...', 'text-yellow-400');
+  var result = await apiPost('/outreach/batch/score');
+  if (btn) btn.classList.remove('running');
+  if (result) { addCrawlLog('Scored ' + (result.scored||'?') + ' prospects', 'text-green-400'); }
+  else { addCrawlLog('Batch score failed', 'text-red-400'); }
+}
+
+async function triggerSeedBatch() {
+  var btn = document.getElementById('btn-seed');
+  if (btn) btn.classList.add('running');
+  addCrawlLog('Seeding ALL sources...', 'text-cyan-400');
+  var result = await apiPost('/outreach/discover/seed-batch', {});
+  if (btn) btn.classList.remove('running');
+  if (result) { addCrawlLog('Seed complete: ' + result.sources_run + ' sources, ' + result.total_new + ' new prospects', 'text-green-400'); }
+  else { addCrawlLog('Seed batch failed', 'text-red-400'); }
+}
+
+function addCrawlLog(msg, colorClass) {
+  var ts = new Date().toLocaleTimeString();
+  crawlLogEntries.unshift({ ts: ts, msg: msg, color: colorClass });
+  if (crawlLogEntries.length > 50) crawlLogEntries.pop();
+  document.getElementById('crawl-log').innerHTML = crawlLogEntries.map(function(e) {
+    return '<div class="' + e.color + '"><span class="text-gray-600">[' + e.ts + ']</span> ' + esc(e.msg) + '</div>';
+  }).join('');
+}
+
+async function loadSourcePerf() {
+  var data = await api('/outreach/optimizer/sources');
+  var el = document.getElementById('source-perf');
+  if (!data || data.error) { el.innerHTML = '<p class="text-gray-500 text-xs col-span-full">Not enough data yet. Run some crawlers first.</p>'; return; }
+  var icons = { scholar:'&#x1F393;', nsf:'&#x1F3DB;', faculty_page:'&#x1F3EB;', arxiv:'&#x1F4C4;', github:'&#x1F419;', sam_gov:'&#x1F3DB;' };
+  var colors = { scholar:'green', nsf:'blue', faculty_page:'purple', arxiv:'orange', github:'gray', sam_gov:'red' };
+  el.innerHTML = Object.entries(data).map(function(entry) {
+    var src = entry[0], stats = entry[1];
+    return '<div class="glass rounded-lg p-3 text-center"><div class="text-xl mb-1">' + (icons[src]||'&#x1F4CA;') + '</div><div class="text-xs font-medium text-white capitalize">' + src.replace('_',' ') + '</div><div class="text-lg font-bold font-mono text-' + (colors[src]||'gray') + '-400 mt-1">' + (stats.total_discovered||0) + '</div><div class="text-[10px] text-gray-500">discovered</div>' + (stats.reply_rate!=null ? '<div class="text-[10px] text-green-400 mt-1">' + stats.reply_rate + '% reply</div>' : '') + '</div>';
+  }).join('');
+}
+
+// === Map ===
+function initMap() {
+  leafletMap = L.map('map', { zoomControl: true }).setView([39.5, -98.0], 4);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', maxZoom: 18 }).addTo(leafletMap);
+  markerLayer = L.layerGroup().addTo(leafletMap);
+  loadMapData();
+}
+async function loadMapData() {
+  var data = await api('/dashboard/map-data');
+  if (!data) return;
+  markerLayer.clearLayers();
+  var tierColors = { hot:'#f97316', warm:'#eab308', cold:'#3b82f6', unscored:'#6b7280' };
+  data.markers.forEach(function(m) {
+    var color = tierColors[m.tier] || '#6b7280';
+    var radius = m.score ? Math.max(5, Math.min(12, m.score / 10)) : 5;
+    var circle = L.circleMarker([m.lat, m.lng], { radius:radius, fillColor:color, color:color, weight:1, opacity:0.8, fillOpacity:0.6 });
+    circle.bindPopup('<div class="text-sm"><strong class="text-white">' + esc(m.name) + '</strong><br/><span class="text-gray-400">' + esc(m.org||'') + (m.dept ? ' &mdash; ' + esc(m.dept) : '') + '</span><br/><span class="text-gray-400">' + esc(m.city||'') + (m.state?', '+m.state:'') + '</span><br/><span style="color:' + color + '" class="font-medium">' + (m.tier||'').toUpperCase() + '</span>' + (m.score ? ' &middot; Score: ' + m.score : '') + '<br/><a href="#" onclick="closeMapPopup();openProspect(\'' + m.id + '\');return false;" class="text-blue-400 hover:underline">View Detail &rarr;</a></div>');
+    markerLayer.addLayer(circle);
+  });
+  document.getElementById('map-count').textContent = data.total + ' prospects with coordinates';
+}
+function closeMapPopup() { if (leafletMap) leafletMap.closePopup(); }
+
+// === Analytics ===
+async function loadAnalytics() {
+  var data = await api('/dashboard/analytics/campaign');
+  if (!data) return;
+  var chartOpts = { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#9ca3af', font:{ family:'JetBrains Mono', size:10 } } } }, scales:{ x:{ ticks:{ color:'#6b7280', font:{ family:'JetBrains Mono', size:9 } }, grid:{ color:'rgba(48,54,61,0.3)' } }, y:{ ticks:{ color:'#6b7280', font:{ family:'JetBrains Mono', size:9 } }, grid:{ color:'rgba(48,54,61,0.3)' }, beginAtZero:true } } };
+  if (data.by_org_type && data.by_org_type.length) renderChart('chart-org-open','bar',{ labels:data.by_org_type.map(function(r){return r.org_type;}), datasets:[{ label:'Open %', data:data.by_org_type.map(function(r){return r.open_rate;}), backgroundColor:'rgba(0,212,255,0.7)' },{ label:'Click %', data:data.by_org_type.map(function(r){return r.click_rate;}), backgroundColor:'rgba(255,138,0,0.7)' },{ label:'Reply %', data:data.by_org_type.map(function(r){return r.reply_rate;}), backgroundColor:'rgba(0,255,136,0.7)' }] }, chartOpts);
+  if (data.by_step && data.by_step.length) renderChart('chart-step','bar',{ labels:data.by_step.map(function(r){return 'Step '+r.step;}), datasets:[{ label:'Open %', data:data.by_step.map(function(r){return r.open_rate;}), backgroundColor:'rgba(0,212,255,0.7)' },{ label:'Click %', data:data.by_step.map(function(r){return r.click_rate;}), backgroundColor:'rgba(255,138,0,0.7)' },{ label:'Reply %', data:data.by_step.map(function(r){return r.reply_rate;}), backgroundColor:'rgba(0,255,136,0.7)' }] }, chartOpts);
+  if (data.by_template && data.by_template.length) renderChart('chart-template','bar',{ labels:data.by_template.map(function(r){return r.template;}), datasets:[{ label:'Open %', data:data.by_template.map(function(r){return r.open_rate;}), backgroundColor:'rgba(168,85,247,0.7)' },{ label:'Reply %', data:data.by_template.map(function(r){return r.reply_rate;}), backgroundColor:'rgba(0,255,136,0.7)' }] }, chartOpts);
+  if (data.daily_volume && data.daily_volume.length) renderChart('chart-daily','line',{ labels:data.daily_volume.map(function(r){return r.date;}), datasets:[{ label:'Emails Sent', data:data.daily_volume.map(function(r){return r.count;}), borderColor:'rgba(0,212,255,0.9)', backgroundColor:'rgba(0,212,255,0.1)', fill:true, tension:0.4, pointRadius:2 }] }, chartOpts);
+  var tbody = document.getElementById('analytics-table');
+  if (data.by_org_type && data.by_org_type.length) {
+    tbody.innerHTML = data.by_org_type.map(function(r) {
+      return '<tr class="border-b border-carbon-700/50"><td class="py-2 px-3 capitalize">' + esc(r.org_type) + '</td><td class="py-2 px-3 text-right font-mono">' + r.sent + '</td><td class="py-2 px-3 text-right font-mono">' + r.opened + '</td><td class="py-2 px-3 text-right font-mono">' + r.clicked + '</td><td class="py-2 px-3 text-right font-mono">' + r.replied + '</td><td class="py-2 px-3 text-right font-mono text-cyan-400">' + r.open_rate + '%</td><td class="py-2 px-3 text-right font-mono text-orange-400">' + r.click_rate + '%</td><td class="py-2 px-3 text-right font-mono text-green-400">' + r.reply_rate + '%</td></tr>';
+    }).join('');
+  } else { tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-gray-500 text-xs">No email campaign data yet.</td></tr>'; }
+}
+
+function renderChart(canvasId, type, data, opts) {
+  if (charts[canvasId]) charts[canvasId].destroy();
+  var ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  charts[canvasId] = new Chart(ctx, { type:type, data:data, options:opts||{} });
+}
+
+// === Email Queue ===
+async function loadQueue() {
+  var data = await api('/outreach/email-queue');
+  var el = document.getElementById('email-queue');
+  var empty = document.getElementById('queue-empty');
+  if (!data || !data.length) { el.innerHTML = ''; empty.classList.remove('hidden'); return; }
+  empty.classList.add('hidden');
+  el.innerHTML = data.map(function(e) {
+    return '<div class="glass rounded-lg p-4 fade-in glass-hover"><div class="flex items-start justify-between gap-4"><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1 flex-wrap"><span class="text-white font-medium text-sm">' + esc(e.to_name||'Unknown') + '</span><span class="text-[10px] text-gray-500 font-mono">' + esc(e.to_email||'') + '</span><span class="px-1.5 py-0.5 rounded text-[10px] bg-carbon-600 font-mono">Step ' + e.sequence_step + '</span></div><p class="text-xs text-gray-400 mb-1">Subject: <span class="text-gray-200">' + esc(e.subject) + '</span></p><p class="text-[10px] text-gray-600 font-mono">Template: ' + esc(e.template_id||'') + '</p></div><div class="flex gap-2 flex-shrink-0"><button onclick="approveEmail(\'' + e.id + '\')" class="text-xs bg-green-600/80 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg transition">&#10003;</button><button onclick="rejectEmail(\'' + e.id + '\')" class="text-xs bg-red-600/80 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition">&times;</button></div></div></div>';
+  }).join('');
+}
+async function approveEmail(id) { await apiPost('/outreach/email-queue/' + id + '/approve'); loadQueue(); }
+async function rejectEmail(id) { await apiPost('/outreach/email-queue/' + id + '/reject'); loadQueue(); }
+async function batchApprove() { var data = await api('/outreach/email-queue'); var emails = data && data.pending ? data.pending : []; if (typeof _queueStepFilter !== 'undefined' && _queueStepFilter !== 'all') { emails = emails.filter(function(e){return e.sequence_step === _queueStepFilter;}); } if (!emails.length) return; if (!confirm('Approve ' + emails.length + ' emails?')) return; await apiPost('/outreach/email-queue/approve-batch', { email_ids: emails.map(function(e){return e.id;}) }); loadQueue(); }
+
+// === Prospects ===
+function sortBy(col) {
+  if (currentSort === col) sortOrder = sortOrder === 'desc' ? 'asc' : 'desc';
+  else { currentSort = col; sortOrder = 'desc'; }
+  currentPage = 0; loadProspects();
+}
+
+async function loadProspects() {
+  var tier = document.getElementById('filter-tier') ? document.getElementById('filter-tier').value : '';
+  var source = document.getElementById('filter-source') ? document.getElementById('filter-source').value : '';
+  var search = document.getElementById('filter-search') ? document.getElementById('filter-search').value : '';
+  var url = '/outreach/prospects?offset=' + (currentPage*PAGE_SIZE) + '&limit=' + PAGE_SIZE + '&sort=' + currentSort + '&order=' + sortOrder;
+  if (tier) url += '&tier=' + tier;
+  if (source) url += '&source=' + source;
+  if (search) url += '&search=' + encodeURIComponent(search);
+  var data = await api(url);
+  if (!data) return;
+  var prospects = data.prospects || data;
+  var total = data.total || prospects.length;
+  document.getElementById('prospects-count').textContent = total + ' total';
+  document.getElementById('page-num').textContent = 'Page ' + (currentPage + 1);
+  var el = document.getElementById('prospects-table');
+  if (!prospects.length) { el.innerHTML = '<tr><td colspan="9" class="py-8 text-center text-gray-500 text-xs">No prospects found.</td></tr>'; return; }
+  el.innerHTML = prospects.map(function(p) {
+    return '<tr class="border-b border-carbon-700/50 hover:bg-carbon-800/50 transition cursor-pointer" onclick="openProspect(\'' + p.id + '\')"><td class="py-2 px-3"><span class="text-white font-medium">' + esc(p.name) + '</span><br/><span class="text-[10px] text-gray-600">' + esc(p.title||'') + '</span></td><td class="py-2 px-3">' + esc(p.organization||'') + '</td><td class="py-2 px-3 text-gray-400">' + esc(p.department||'') + '</td><td class="py-2 px-3 text-gray-400">' + esc(p.lab_name||'') + '</td><td class="py-2 px-3 text-center font-mono text-gray-300">' + (p.h_index!=null?p.h_index:'&mdash;') + '</td><td class="py-2 px-3 text-center font-mono text-white font-bold">' + (p.priority_score!=null?p.priority_score:'&mdash;') + '</td><td class="py-2 px-3 text-center"><span class="tier-' + (p.tier||'') + ' text-[10px] font-bold uppercase tracking-wider">' + (p.tier||'&mdash;') + '</span></td><td class="py-2 px-3"><span class="px-2 py-0.5 rounded-full text-[10px] ' + statusClass(p.status) + '">' + (p.status||'&mdash;') + '</span></td><td class="py-2 px-3 text-[10px] text-gray-500 font-mono">' + (p.source||'&mdash;') + '</td></tr>';
+  }).join('');
+}
+
+function debounceSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(function() { currentPage = 0; loadProspects(); }, 300); }
+function nextPage() { currentPage++; loadProspects(); }
+function prevPage() { if (currentPage > 0) { currentPage--; loadProspects(); } }
+function exportCSV() { window.open(API + '/outreach/prospects/export', '_blank'); }
+
+// === A/B Tests ===
+async function loadABTests() {
+  var results = await Promise.all([api('/outreach/ab-tests/experiments'), api('/outreach/ab-tests')]);
+  var experiments = results[0], abResults = results[1];
+  var expEl = document.getElementById('ab-experiments');
+  if (experiments && Object.keys(experiments).length) {
+    expEl.innerHTML = Object.entries(experiments).map(function(entry) {
+      var name = entry[0], exp = entry[1];
+      return '<div class="glass rounded-lg p-4"><div class="flex items-center justify-between mb-3"><h4 class="text-white font-medium text-xs">' + esc(name) + '</h4><span class="text-[10px] px-2 py-0.5 rounded-full bg-green-600/20 text-green-400 border border-green-600/30">Active</span></div><div class="space-y-1.5 text-[11px]"><div class="flex justify-between"><span class="text-gray-500">Step</span><span class="text-gray-300 font-mono">' + exp.step + '</span></div><div class="flex justify-between"><span class="text-gray-500">Field</span><span class="text-gray-300 font-mono">' + exp.field + '</span></div><div class="mt-2"><span class="text-gray-500 text-[10px]">Variants:</span><div class="flex flex-wrap gap-1 mt-1">' + exp.variants.map(function(v,i) { return '<span class="px-2 py-0.5 rounded text-[10px] font-mono ' + (i===0 ? 'bg-blue-600/20 text-blue-300 border border-blue-600/30' : 'bg-purple-600/20 text-purple-300 border border-purple-600/30') + '">' + esc(v) + '</span>'; }).join('') + '</div></div></div></div>';
+    }).join('');
+  } else { expEl.innerHTML = '<p class="text-gray-500 text-xs col-span-full">No active experiments.</p>'; }
+
+  var resEl = document.getElementById('ab-results');
+  if (abResults && Object.keys(abResults).length) {
+    resEl.innerHTML = Object.entries(abResults).map(function(entry) {
+      var expName = entry[0], variants = entry[1];
+      var rows = Object.entries(variants).map(function(vEntry) {
+        var variant = vEntry[0], stats = vEntry[1];
+        return '<tr class="border-b border-carbon-700/50"><td class="py-2 px-3 font-mono text-white text-xs">' + esc(variant) + '</td><td class="py-2 px-3 text-right font-mono text-xs">' + (stats.sent||0) + '</td><td class="py-2 px-3 text-right font-mono text-xs">' + (stats.opened||0) + '</td><td class="py-2 px-3 text-right font-mono text-xs">' + (stats.replied||0) + '</td><td class="py-2 px-3 text-right font-mono text-xs text-cyan-400">' + (stats.open_rate||0) + '%</td><td class="py-2 px-3 text-right font-mono text-xs text-green-400">' + (stats.reply_rate||0) + '%</td></tr>';
+      }).join('');
+      return '<div class="glass rounded-lg p-4"><h4 class="text-white font-medium text-xs mb-3">' + esc(expName) + '</h4><table class="w-full text-xs"><thead class="text-gray-500 border-b border-carbon-600 uppercase tracking-wider"><tr><th class="text-left py-1 px-3">Variant</th><th class="text-right py-1 px-3">Sent</th><th class="text-right py-1 px-3">Opened</th><th class="text-right py-1 px-3">Replied</th><th class="text-right py-1 px-3">Open %</th><th class="text-right py-1 px-3">Reply %</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+    }).join('');
+  } else { resEl.innerHTML = '<p class="text-gray-500 text-xs">No A/B test results yet. Send some emails first.</p>'; }
+}
+
+// === Optimizer ===
+async function loadOptimizer() {
+  var data = await api('/outreach/optimizer/engagement');
+  var el = document.getElementById('optimizer-results');
+  if (!data || data.error) {
+    el.innerHTML = '<div class="text-center py-6"><div class="text-3xl mb-2">&#x1F4CA;</div><p class="text-gray-500 text-xs">' + esc(data && data.error ? data.error : 'Not enough data yet.') + '</p><p class="text-[10px] text-gray-600 mt-1">Need 20+ contacted prospects with 3+ replies to analyze.</p></div>';
+    return;
+  }
+  var html = '';
+  if (data.suggestions && data.suggestions.length) {
+    html += '<div class="space-y-2"><h4 class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">Weight Adjustment Suggestions</h4>';
+    data.suggestions.forEach(function(s) {
+      var isUp = s.indexOf('Increase') >= 0;
+      var isDown = s.indexOf('Decrease') >= 0;
+      html += '<div class="flex items-center gap-2 text-xs ' + (isUp?'text-green-400':isDown?'text-red-400':'text-gray-400') + '"><span>' + (isUp?'&uarr;':isDown?'&darr;':'&rarr;') + '</span><span>' + esc(s) + '</span></div>';
+    });
+    html += '</div>';
+  }
+  if (data.analysis) {
+    html += '<div class="mt-4"><h4 class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">Feature-Reply Correlation</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-2">';
+    Object.entries(data.analysis).forEach(function(entry) {
+      var feature = entry[0], stats = entry[1];
+      var lift = stats.lift || 0;
+      var color = lift > 20 ? 'text-green-400' : lift < -20 ? 'text-red-400' : 'text-gray-400';
+      html += '<div class="flex items-center justify-between text-[11px] px-3 py-1.5 glass rounded"><span class="text-gray-300 font-mono">' + feature + '</span><span class="' + color + ' font-mono font-bold">' + (lift>0?'+':'') + lift.toFixed(0) + '% lift</span></div>';
+    });
+    html += '</div></div>';
+  }
+  el.innerHTML = html || '<p class="text-gray-500 text-xs">No optimization data available.</p>';
+}
+
+// === Agents ===
+async function loadAgents() {
+  var data = await api('/outreach/agents/status');
+  var el = document.getElementById('agents-grid');
+  if (!data || !data.agents || !data.agents.length) { el.innerHTML = '<p class="text-gray-500 text-xs col-span-full">No agents registered.</p>'; return; }
+  var icons = { scholar_crawler:'&#x1F393;', nsf_crawler:'&#x1F3DB;', faculty_crawler:'&#x1F3EB;', arxiv_crawler:'&#x1F4C4;', batch_scorer:'&#x26A1;', deduplicator:'&#x1F517;', enrichment:'&#x1F52C;', lab_auditor:'&#x1F50E;', copywriter:'&#x270D;', cadence_sender:'&#x1F4E4;', prospect_enqueue:'&#x1F4CB;', github_crawler:'&#x1F419;', sam_gov_crawler:'&#x1F3DB;' };
+  el.innerHTML = data.agents.map(function(a) {
+    var icon = icons[a.name] || '&#x1F916;';
+    var running = a.is_running;
+    var interval = a.interval >= 3600 ? (a.interval/3600)+'h' : (a.interval/60)+'m';
+    var lastRan = a.last_ran ? timeAgo(a.last_ran) : 'never';
+    var lastResult = a.last_result ? JSON.stringify(a.last_result).slice(0,60) : '&mdash;';
+    return '<div class="agent-card glass glass-hover rounded-lg p-4" style="color:' + (running?'#00FF88':'#6b7280') + '"><div class="flex items-center justify-between mb-2"><div class="flex items-center gap-2"><span class="text-lg">' + icon + '</span><span class="text-xs font-medium text-white">' + esc(a.name) + '</span></div><span class="status-dot ' + (running?'bg-green-500 pulse-dot':'bg-gray-600') + '"></span></div><div class="space-y-1 text-[10px]"><div class="flex justify-between"><span class="text-gray-500">Interval</span><span class="text-gray-300 font-mono">' + interval + '</span></div><div class="flex justify-between"><span class="text-gray-500">Last ran</span><span class="text-gray-300 font-mono">' + lastRan + '</span></div><div class="flex justify-between"><span class="text-gray-500">Runs</span><span class="text-gray-300 font-mono">' + (a.run_count||0) + '</span></div><div class="truncate text-gray-600 font-mono mt-1" title="' + esc(lastResult) + '">' + lastResult + '</div></div><button onclick="triggerAgent(\'' + esc(a.name) + '\')" class="mt-2 w-full text-[10px] bg-carbon-700 hover:bg-carbon-600 border border-carbon-600 px-2 py-1 rounded transition">&#x25B6; Run Now</button></div>';
+  }).join('');
+}
+async function triggerAgent(name) { await apiPost('/outreach/agents/' + name + '/run'); setTimeout(loadAgents, 1000); }
+
+// === Prospect Modal ===
+async function openProspect(id) {
+  var data = await api('/dashboard/prospect/' + id);
+  if (!data) return;
+  var p = data.profile;
+  document.getElementById('modal-name').textContent = p.name || 'Unknown';
+  document.getElementById('modal-org').textContent = [p.title, p.department, p.organization].filter(Boolean).join(' &middot; ');
+  var html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+  html += profileCard('Identity', [['Email', p.email||'&mdash;'],['Phone', p.phone||'&mdash;'],['LinkedIn', p.linkedin_url?'<a href="'+esc(p.linkedin_url)+'" target="_blank" class="text-drone-400 hover:underline text-[10px]">Profile</a>':'&mdash;'],['Scholar', p.scholar_url?'<a href="'+esc(p.scholar_url)+'" target="_blank" class="text-drone-400 hover:underline text-[10px]">Profile</a>':'&mdash;'],['Lab', p.lab_name||'&mdash;'],['Location', [p.city,p.state,p.country].filter(Boolean).join(', ')||'&mdash;']]);
+  html += profileCard('Research', [['H-Index', p.h_index!=null?p.h_index:'&mdash;'],['Citations', p.total_citations!=null?p.total_citations:'&mdash;'],['Pub Rate', p.publication_rate?p.publication_rate+'/yr':'&mdash;'],['Areas', Array.isArray(p.research_areas)?p.research_areas.join(', '):'&mdash;'],['Grant $', p.total_grant_funding?'$'+Number(p.total_grant_funding).toLocaleString():'&mdash;']]);
+  html += profileCard('Scoring', [['Priority', '<span class="text-white font-bold text-base font-mono">'+(p.priority_score!=null?p.priority_score:'&mdash;')+'</span>'],['Tier', '<span class="tier-'+(p.tier||'cold')+' font-bold uppercase text-xs">'+(p.tier||'&mdash;')+'</span>'],['Need', p.need_score!=null?p.need_score:'&mdash;'],['Ability', p.ability_score!=null?p.ability_score:'&mdash;'],['Timing', p.timing_score!=null?p.timing_score:'&mdash;'],['Status', '<span class="px-2 py-0.5 rounded-full text-[10px] '+statusClass(p.status)+'">'+(p.status||'&mdash;')+'</span>'],['Source', '<span class="font-mono text-[10px]">'+(p.source||'&mdash;')+'</span>']]);
+  html += profileCard('Drone Capabilities', [['Drone Lab', p.has_drone_lab?'&#10004;':'&mdash;'],['FPGA', p.has_fpga?'&#10004;':'&mdash;'],['Custom HW', p.has_custom_hardware?'&#10004;':'&mdash;'],['Simulation', p.simulation_setup||'&mdash;'],['Hardware', Array.isArray(p.hardware_platforms)?p.hardware_platforms.join(', '):'&mdash;'],['Software', Array.isArray(p.software_stack)?p.software_stack.join(', '):'&mdash;']]);
+  html += '</div>';
+  if (data.audits && data.audits.length) {
+    html += '<div class="mt-4"><h3 class="text-white font-semibold text-sm mb-3">Lab Audits</h3>';
+    data.audits.forEach(function(a) {
+      html += '<div class="glass rounded-lg p-4 mb-3"><div class="grid grid-cols-4 gap-4 text-xs mb-3"><div class="text-center"><span class="text-gray-500 text-[10px] block">Hardware</span><span class="text-white font-bold font-mono text-sm">'+(a.hardware_score!=null?a.hardware_score:'&mdash;')+'</span></div><div class="text-center"><span class="text-gray-500 text-[10px] block">Software</span><span class="text-white font-bold font-mono text-sm">'+(a.software_score!=null?a.software_score:'&mdash;')+'</span></div><div class="text-center"><span class="text-gray-500 text-[10px] block">Research</span><span class="text-white font-bold font-mono text-sm">'+(a.research_score!=null?a.research_score:'&mdash;')+'</span></div><div class="text-center"><span class="text-gray-500 text-[10px] block">Overall</span><span class="text-cyan-400 font-bold font-mono text-lg">'+(a.overall_score!=null?a.overall_score:'&mdash;')+'</span></div></div></div>';
+    });
+    html += '</div>';
+  }
+  if (data.emails && data.emails.length) {
+    html += '<div class="mt-4"><h3 class="text-white font-semibold text-sm mb-3">Email Timeline</h3><div class="space-y-2">';
+    var statusIcon = { draft:'&#x1F4DD;', approved:'&#10004;', sent:'&#x1F4E4;', opened:'&#x1F441;', replied:'&#x1F4AC;', rejected:'&#10060;', failed:'&#x26A0;' };
+    data.emails.forEach(function(e) {
+      html += '<div class="glass rounded-lg p-3 flex items-center gap-3"><span class="text-base flex-shrink-0">'+(statusIcon[e.status]||'&#x1F4CB;')+'</span><div class="flex-1 min-w-0"><span class="text-xs text-white">Step '+e.step+': '+esc(e.subject||'')+'</span><div class="text-[10px] text-gray-500 mt-0.5 font-mono">'+(e.sent_at?'Sent '+new Date(e.sent_at).toLocaleDateString():e.scheduled_for?'Scheduled '+new Date(e.scheduled_for).toLocaleDateString():'')+(e.open_count?' &middot; '+e.open_count+' opens':'')+(e.click_count?' &middot; '+e.click_count+' clicks':'')+(e.replied_at?' &middot; Replied &#10004;':'')+'</div></div><span class="px-2 py-0.5 rounded-full text-[10px] '+statusClass(e.status)+' flex-shrink-0">'+e.status+'</span></div>';
+    });
+    html += '</div></div>';
+  }
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('prospect-modal').classList.remove('hidden');
+}
+function closeModal() { document.getElementById('prospect-modal').classList.add('hidden'); }
+function profileCard(title, rows) {
+  var html = '<div class="glass rounded-lg p-4"><h4 class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">' + title + '</h4>';
+  rows.forEach(function(r) { html += '<div class="flex justify-between text-[11px] py-1 border-b border-carbon-700/30"><span class="text-gray-500">' + r[0] + '</span><span class="text-gray-300 text-right">' + (r[1]||'&mdash;') + '</span></div>'; });
+  return html + '</div>';
+}
+
+// === Helpers ===
+function esc(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
+function statusClass(s) {
+  var map = { discovered:'bg-gray-600/40 text-gray-300', enriched:'bg-blue-600/30 text-blue-300', audited:'bg-cyan-600/30 text-cyan-300', scored:'bg-indigo-600/30 text-indigo-300', queued:'bg-yellow-600/30 text-yellow-300', contacted:'bg-amber-600/30 text-amber-300', opened:'bg-orange-600/30 text-orange-300', replied:'bg-green-600/30 text-green-300', meeting:'bg-purple-600/30 text-purple-300', converted:'bg-pink-600/30 text-pink-300', draft:'bg-gray-600/40 text-gray-300', approved:'bg-green-600/30 text-green-300', sent:'bg-blue-600/30 text-blue-300', rejected:'bg-red-600/30 text-red-300', failed:'bg-red-600/30 text-red-300', dead:'bg-red-800/30 text-red-400' };
+  return map[s] || 'bg-gray-600/40 text-gray-300';
+}
+function timeAgo(iso) { if (!iso) return ''; var diff = (Date.now()-new Date(iso).getTime())/1000; if(diff<60) return 'just now'; if(diff<3600) return Math.floor(diff/60)+'m ago'; if(diff<86400) return Math.floor(diff/3600)+'h ago'; return Math.floor(diff/86400)+'d ago'; }
+function refreshAll() { loadOverview(); }
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+document.getElementById('prospect-modal').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeModal(); });
+
+// Boot
+loadOverview();
+</script>
+</body>
+</html>

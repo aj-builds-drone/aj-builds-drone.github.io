@@ -1,0 +1,156 @@
+{
+  "rules": {
+    "leads": {
+      ".read": false,
+      ".write": true,
+      ".indexOn": ["status", "timestamp"],
+      "$leadId": {
+        ".validate": "newData.hasChildren(['businessName', 'email'])"
+      }
+    },
+    "signing": {
+      ".indexOn": ["status"],
+      "$signToken": {
+        ".read": true,
+        ".write": "!data.exists() || !data.child('status').val().matches(/^(signed|processed)$/)",
+        ".validate": "newData.hasChildren(['client_name', 'project_name'])"
+      }
+    },
+    "builds": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      ".indexOn": ["created_at", "status"]
+    },
+    "contracts": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "invoices": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "quotes": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "quote_viewer": {
+      ".indexOn": ["status"],
+      "$viewToken": {
+        ".read": true,
+        ".write": "!data.exists() || !data.child('status').val().matches(/^(approved|declined)$/)"
+      }
+    },
+    "portfolio": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "activity_logs": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      ".indexOn": ["created_at", "entity_type"]
+    },
+    "parse_requests": {
+      ".read": "auth != null",
+      ".write": true,
+      ".indexOn": ["status"]
+    },
+    "commands": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "site_analytics": {
+      ".read": "auth != null",
+      ".write": true,
+      ".indexOn": ["timestamp"]
+    },
+    "tracking": {
+      ".read": "auth != null",
+      ".write": true,
+      "clicks": {
+        ".indexOn": ["ts", "tracking_id"],
+        "$item": {
+          ".validate": "newData.hasChildren(['tracking_id', 'ts'])"
+        }
+      },
+      "opens": {
+        ".indexOn": ["ts", "tracking_id"],
+        "$item": {
+          ".validate": "newData.hasChildren(['tracking_id', 'ts'])"
+        }
+      },
+      "unsubscribes": {
+        ".indexOn": ["ts", "tracking_id"],
+        "$item": {
+          ".validate": "newData.hasChildren(['tracking_id', 'ts'])"
+        }
+      }
+    },
+    "outreach": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      "agent": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".indexOn": ["last_heartbeat"]
+      },
+      "stats": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      },
+      "rings": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      },
+      "activity": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".indexOn": ["ts"]
+      },
+      "log": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".indexOn": ["ts"]
+      },
+      "alerts": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".indexOn": ["ts"]
+      },
+      "funnel": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      },
+      "hot": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      },
+      "snapshots": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".indexOn": [".key"]
+      },
+      "scorecard": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".indexOn": [".key"]
+      },
+      "heatmap": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      },
+      "tpl_stats": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      },
+      "industries": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      },
+      "health": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".indexOn": ["ts"]
+      }
+    }
+  }
+}

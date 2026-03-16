@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+data/
+
+# Secrets — NEVER commit
+.env
+.env.*
+*.env
+firebase-cred*.json
+firebase-service-account*.json
+*-service-account*.json
+*.pem
+*.key
+
+# Virtual environment
+.venv/

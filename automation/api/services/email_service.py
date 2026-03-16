@@ -1,0 +1,577 @@
+"""
+AjayaDesign Automation — Email service (Gmail SMTP).
+
+Setup:
+1. Go to https://myaccount.google.com/apppasswords
+2. Generate an App Password for "Mail"
+3. Set SMTP_EMAIL and SMTP_APP_PASSWORD in .env / docker-compose
+"""
+
+import asyncio
+import logging
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+from api.config import settings
+
+logger = logging.getLogger(__name__)
+
+SMTP_HOST = "smtp.gmail.com"
+SMTP_PORT = 587
+
+
+async def send_email(
+    to: str,
+    subject: str,
+    body_html: str,
+    reply_to: str | None = None,
+) -> dict:
+    """
+    Send an email via Gmail SMTP.
+    Returns {"success": True/False, "message": "..."}
+    """
+    sender = settings.smtp_email
+    password = settings.smtp_app_password
+
+    if not sender or not password:
+        logger.warning("SMTP not configured — skipping email send")
+        return {"success": False, "message": "SMTP credentials not configured. Set SMTP_EMAIL and SMTP_APP_PASSWORD."}
+
+    msg = MIMEMultipart("alternative")
+    msg["From"] = f"AjayaDesign <{sender}>"
+    msg["To"] = to
+    msg["Subject"] = subject
+    if reply_to:
+        msg["Reply-To"] = reply_to
+
+    # Plain-text fallback
+    plain_text = body_html.replace("<br>", "\n").replace("<br/>", "\n")
+    # Strip HTML tags for plain text
+    import re
+    plain_text = re.sub(r"<[^>]+>", "", plain_text)
+
+    msg.attach(MIMEText(plain_text, "plain"))
+    msg.attach(MIMEText(body_html, "html"))
+
+    try:
+        def _sync_send():
+            with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as server:
+                server.ehlo()
+                server.starttls()
+                server.ehlo()
+                server.login(sender, password)
+                server.sendmail(sender, [to], msg.as_string())
+
+        await asyncio.to_thread(_sync_send)
+
+        logger.info(f"✅ Email sent to {to}: {subject}")
+        return {"success": True, "message": f"Email sent to {to}"}
+
+    except smtplib.SMTPRecipientsRefused as e:
+        # 550/551/552/553 = mailbox does not exist → hard bounce
+        codes = {code for _, (code, _) in e.recipients.items()}
+        logger.error(f"📬 Bounce ({codes}): {to} — {e}")
+        return {"success": False, "bounce": True, "message": f"Recipient refused ({codes}): {to}"}
+    except smtplib.SMTPAuthenticationError as e:
+        logger.error(f"SMTP auth failed: {e}")
+        return {"success": False, "message": "SMTP authentication failed. Check your App Password."}
+    except smtplib.SMTPSenderRefused as e:
+        # 421/450/550 from sender side — often daily limit exceeded
+        code = getattr(e, 'smtp_code', 0) or 0
+        msg_str = str(e).lower()
+        if code == 550 or '421' in str(code) or 'limit' in msg_str or 'quota' in msg_str or 'too many' in msg_str:
+            logger.error(f"🚫 Gmail daily limit exceeded: {e}")
+            return {"success": False, "limit_exceeded": True, "message": f"Gmail daily send limit exceeded (code {code})"}
+        logger.error(f"SMTP sender refused: {e}")
+        return {"success": False, "message": f"Sender refused: {str(e)}"}
+    except smtplib.SMTPDataError as e:
+        # 421 "4.7.0 Too many messages" or 550 rate limit
+        code = getattr(e, 'smtp_code', 0) or 0
+        msg_str = str(e).lower()
+        if code in (421, 450, 550) or 'limit' in msg_str or 'quota' in msg_str or 'too many' in msg_str:
+            logger.error(f"🚫 Gmail daily limit exceeded (SMTPDataError): {e}")
+            return {"success": False, "limit_exceeded": True, "message": f"Gmail daily send limit exceeded (code {code})"}
+        logger.error(f"SMTP data error: {e}")
+        return {"success": False, "message": f"SMTP data error: {str(e)}"}
+    except Exception as e:
+        msg_str = str(e).lower()
+        # Detect Gmail daily limit / rate limit from generic exceptions
+        if any(kw in msg_str for kw in (
+            "daily limit", "daily sending quota", "limit exceeded",
+            "too many", "rate limit", "403", "quota exceeded",
+        )):
+            logger.error(f"🚫 Gmail daily limit exceeded: {e}")
+            return {"success": False, "limit_exceeded": True, "message": f"Gmail daily limit exceeded: {str(e)[:200]}"}
+        # Detect bounce-like errors from generic exceptions
+        is_bounce = any(kw in msg_str for kw in (
+            "does not exist", "user unknown", "no such user",
+            "mailbox not found", "invalid recipient", "550 ", "551 ",
+            "552 ", "553 ", "address rejected",
+        ))
+        if is_bounce:
+            logger.error(f"📬 Bounce (generic): {to} — {e}")
+            return {"success": False, "bounce": True, "message": f"Bounce: {str(e)}"}
+        logger.error(f"Email send failed: {e}")
+        return {"success": False, "message": f"Email failed: {str(e)}"}
+
+
+def build_quote_email(
+    client_name: str,
+    project_name: str,
+    deliverables: list[dict],
+    total_amount: float,
+    payment_schedule: str,
+    valid_days: int,
+    revision: int,
+    view_url: str,
+    provider_name: str = "AjayaDesign",
+) -> tuple[str, str]:
+    """Build a project quote email (no pricing — drives click-through). Returns (subject, html_body)."""
+    rev_label = f" (Revision {revision})" if revision > 1 else ""
+    subject = f"Project Quote for {project_name}{rev_label} — {provider_name}"
+
+    # Build deliverable checklist (names only, no pricing)
+    num_deliverables = len(deliverables)
+    total_hours = sum(d.get("hours", 0) for d in deliverables)
+    checklist_html = ""
+    for d in deliverables:
+        desc = d.get("description", d.get("name", ""))
+        checklist_html += f"""
+          <tr>
+            <td style="padding: 6px 0; color: #333; font-size: 14px; line-height: 1.5;">
+              <span style="color: #6366f1; font-weight: 600; margin-right: 8px;">&#10003;</span> {desc}
+            </td>
+          </tr>"""
+
+    html = f"""
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 640px; margin: 0 auto; padding: 0;">
+
+      <!-- Header -->
+      <div style="background: linear-gradient(135deg, #0A0A0F 0%, #16161F 100%); padding: 40px 30px; text-align: center; border-radius: 12px 12px 0 0;">
+        <div style="font-size: 28px; margin-bottom: 8px;">📋</div>
+        <h1 style="color: #ffffff; font-size: 22px; margin: 0; font-weight: 700;">Project Quote{rev_label}</h1>
+        <p style="color: #9ca3af; margin-top: 8px; font-size: 14px;">{project_name}</p>
+        <p style="color: #6b7280; font-size: 12px; margin-top: 4px;">from {provider_name}</p>
+      </div>
+
+      <!-- Body -->
+      <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none;">
+
+        <p style="color: #333; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
+          Hi <strong>{client_name}</strong>,
+        </p>
+        <p style="color: #333; font-size: 15px; line-height: 1.6; margin: 0 0 24px;">
+          Thank you for your interest! I've put together a detailed proposal for
+          <strong>{project_name}</strong> covering {num_deliverables} deliverables.
+        </p>
+
+        <!-- Deliverable Checklist (no pricing) -->
+        <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+          <p style="font-weight: 600; color: #111; font-size: 14px; margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.05em; font-size: 12px; color: #6b7280;">Project Scope</p>
+          <table style="width: 100%;">
+            {checklist_html}
+          </table>
+        </div>
+
+        <!-- Teaser Stats -->
+        <div style="text-align: center; margin-bottom: 28px;">
+          <table style="margin: 0 auto; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 12px 20px; text-align: center;">
+                <div style="font-size: 24px; font-weight: 700; color: #6366f1;">{num_deliverables}</div>
+                <div style="font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Deliverables</div>
+              </td>
+              <td style="padding: 12px 20px; text-align: center; border-left: 1px solid #e5e7eb;">
+                <div style="font-size: 24px; font-weight: 700; color: #6366f1;">{int(total_hours)}</div>
+                <div style="font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Hours</div>
+              </td>
+              <td style="padding: 12px 20px; text-align: center; border-left: 1px solid #e5e7eb;">
+                <div style="font-size: 24px; font-weight: 700; color: #6366f1;">{valid_days}</div>
+                <div style="font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Days Valid</div>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- CTA Button -->
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="{view_url}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; letter-spacing: 0.3px;">
+            View Full Quote & Approve →
+          </a>
+          <p style="color: #9ca3af; font-size: 12px; margin-top: 12px;">
+            Full pricing breakdown, timeline & approval available at the link above.
+          </p>
+        </div>
+
+        <!-- What's Included -->
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+          <p style="font-weight: 600; color: #111; font-size: 14px; margin: 0 0 12px;">Every Project Includes:</p>
+          <table style="width: 100%; font-size: 13px; color: #333;">
+            <tr><td style="padding: 3px 0;">✅ Custom design & development</td></tr>
+            <tr><td style="padding: 3px 0;">✅ Responsive mobile-first design</td></tr>
+            <tr><td style="padding: 3px 0;">✅ SEO optimization & performance tuning</td></tr>
+            <tr><td style="padding: 3px 0;">✅ 30-day post-launch support</td></tr>
+            <tr><td style="padding: 3px 0;">✅ Source code ownership</td></tr>
+          </table>
+        </div>
+
+        <p style="color: #9ca3af; font-size: 13px; text-align: center;">
+          Have questions or want to discuss? Simply reply to this email.
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div style="background: #f9fafb; padding: 20px 30px; text-align: center; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
+        <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+          {provider_name} · ajayadesign@gmail.com
+        </p>
+        <p style="color: #d1d5db; font-size: 11px; margin-top: 4px;">
+          13721 Andrew Abernathy Pass, Manor, TX 78653
+        </p>
+      </div>
+    </div>
+    """
+    return subject, html
+
+
+def build_contract_email(
+    client_name: str,
+    project_name: str,
+    sign_url: str,
+    provider_name: str = "AjayaDesign",
+) -> tuple[str, str]:
+    """Build a contract signing invitation email. Returns (subject, html_body)."""
+    subject = f"Contract for {project_name} — Please Review & Sign"
+    html = f"""
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <h1 style="color: #111; font-size: 24px; margin: 0;">📝 Contract Ready for Review</h1>
+        <p style="color: #666; margin-top: 8px;">from {provider_name}</p>
+      </div>
+
+      <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+        <p style="color: #333; font-size: 16px; line-height: 1.6; margin: 0;">
+          Hi <strong>{client_name}</strong>,
+        </p>
+        <p style="color: #333; font-size: 16px; line-height: 1.6;">
+          Your contract for <strong>{project_name}</strong> is ready for review and signing.
+          Please click the button below to view the full contract, review the terms,
+          and sign electronically.
+        </p>
+      </div>
+
+      <div style="text-align: center; margin: 32px 0;">
+        <a href="{sign_url}" style="display: inline-block; background: #6366f1; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 600;">
+          Review & Sign Contract →
+        </a>
+      </div>
+
+      <p style="color: #9ca3af; font-size: 13px; text-align: center; margin-top: 32px;">
+        If you have any questions, reply to this email or contact us at ajayadesign@gmail.com
+      </p>
+      <p style="color: #d1d5db; font-size: 11px; text-align: center; margin-top: 16px;">
+        {provider_name} · 13721 Andrew Abernathy Pass, Manor, TX 78653
+      </p>
+    </div>
+    """
+    return subject, html
+
+
+# PayPal fee config (must match frontend)
+PAYPAL_ME = "ajayadesign"
+PAYPAL_FEE_PERCENT = 0.0349   # 3.49%
+PAYPAL_FEE_FIXED = 0.49
+
+
+def _paypal_gross(net: float) -> float:
+    """Calculate gross so seller nets exactly `net` after PayPal fees."""
+    import math
+    return math.ceil((net + PAYPAL_FEE_FIXED) / (1 - PAYPAL_FEE_PERCENT) * 100) / 100
+
+
+def _build_paypal_button_html(total_amount_str: str, payment_method: str) -> str:
+    """Return a PayPal payment button HTML block for the invoice email."""
+    if payment_method and payment_method.lower() != "paypal":
+        return ""
+    try:
+        net = float(total_amount_str.replace(",", "").replace("$", ""))
+    except (ValueError, TypeError):
+        return ""
+    if net <= 0:
+        return ""
+    gross = _paypal_gross(net)
+    fee = gross - net
+    link = f"https://paypal.me/{PAYPAL_ME}/{gross:.2f}USD"
+    return f"""
+      <div style="text-align: center; margin-bottom: 24px;">
+        <a href="{link}" target="_blank"
+           style="display: inline-block; background: #0070ba; color: #fff; font-size: 16px;
+                  font-weight: 700; text-decoration: none; padding: 14px 40px;
+                  border-radius: 8px; letter-spacing: 0.5px;">
+          Pay ${gross:.2f} with PayPal
+        </a>
+        <p style="color: #888; font-size: 11px; margin-top: 8px;">
+          Includes ${fee:.2f} processing fee &middot; Invoice total: ${net:.2f}
+        </p>
+      </div>
+    """
+
+
+def build_invoice_email(
+    client_name: str,
+    invoice_number: str,
+    total_amount: str,
+    due_date: str,
+    payment_method: str,
+    items_html: str,
+    provider_name: str = "AjayaDesign",
+) -> tuple[str, str]:
+    """Build an invoice email. Returns (subject, html_body)."""
+    subject = f"Invoice {invoice_number} from {provider_name}"
+    html = f"""
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <h1 style="color: #111; font-size: 24px; margin: 0;">💰 Invoice {invoice_number}</h1>
+        <p style="color: #666; margin-top: 8px;">from {provider_name}</p>
+      </div>
+
+      <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+        <p style="color: #333; font-size: 16px; line-height: 1.6; margin: 0;">
+          Hi <strong>{client_name}</strong>,
+        </p>
+        <p style="color: #333; font-size: 16px; line-height: 1.6;">
+          Here is your invoice for web design services.
+        </p>
+
+        {items_html}
+
+        <div style="border-top: 2px solid #e5e7eb; margin-top: 16px; padding-top: 16px;">
+          <table style="width: 100%;">
+            <tr>
+              <td style="font-size: 18px; font-weight: 700; color: #111;">Total Due</td>
+              <td style="text-align: right; font-size: 18px; font-weight: 700; color: #111;">${total_amount}</td>
+            </tr>
+            <tr>
+              <td style="font-size: 13px; color: #666;">Due Date</td>
+              <td style="text-align: right; font-size: 13px; color: #666;">{due_date}</td>
+            </tr>
+            <tr>
+              <td style="font-size: 13px; color: #666;">Payment Method</td>
+              <td style="text-align: right; font-size: 13px; color: #666;">{payment_method.title() if payment_method else 'See below'}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+        <p style="color: #92400e; font-size: 14px; margin: 0; font-weight: 600;">Payment Instructions</p>
+        <p style="color: #92400e; font-size: 13px; margin-top: 8px;">
+          Please send payment via <strong>{payment_method.title() if payment_method else 'your preferred method'}</strong>.
+          If you have questions about payment, reply to this email.
+        </p>
+      </div>
+
+      {_build_paypal_button_html(total_amount, payment_method)}
+
+      <p style="color: #9ca3af; font-size: 13px; text-align: center; margin-top: 32px;">
+        {provider_name} · 13721 Andrew Abernathy Pass, Manor, TX 78653
+      </p>
+    </div>
+    """
+    return subject, html
+
+
+def build_signed_notification_email(
+    contract_short_id: str,
+    client_name: str,
+    project_name: str,
+    signed_at: str,
+) -> tuple[str, str]:
+    """Notification to admin that a contract was signed. Returns (subject, html)."""
+    subject = f"✅ Contract {contract_short_id} signed by {client_name}"
+    html = f"""
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+      <h1 style="color: #059669; text-align: center;">✅ Contract Signed!</h1>
+      <div style="background: #ecfdf5; border: 1px solid #6ee7b7; border-radius: 12px; padding: 24px; margin: 24px 0;">
+        <p style="margin: 0 0 8px;"><strong>Contract:</strong> #{contract_short_id}</p>
+        <p style="margin: 0 0 8px;"><strong>Client:</strong> {client_name}</p>
+        <p style="margin: 0 0 8px;"><strong>Project:</strong> {project_name}</p>
+        <p style="margin: 0;"><strong>Signed At:</strong> {signed_at}</p>
+      </div>
+      <p style="color: #666; font-size: 14px; text-align: center;">
+        You can view the signed contract in your admin dashboard.
+      </p>
+    </div>
+    """
+    return subject, html
+
+
+def build_payment_reminder_email(
+    client_name: str,
+    invoice_number: str,
+    installment_amount: str,
+    due_date: str,
+    remaining_balance: str,
+    payment_method: str,
+    provider_name: str = "AjayaDesign",
+) -> tuple[str, str]:
+    """Build a payment reminder email for an upcoming/overdue installment. Returns (subject, html)."""
+    subject = f"Payment Reminder — ${installment_amount} due {due_date} ({invoice_number})"
+
+    paypal_btn = _build_paypal_button_html(installment_amount, payment_method)
+
+    # Determine urgency color
+    from datetime import date as _date
+    try:
+        due = _date.fromisoformat(due_date)
+        today = _date.today()
+        if due < today:
+            urgency_color = "#dc2626"  # red — overdue
+            urgency_label = "OVERDUE"
+            urgency_msg = f"This payment was due on <strong>{due_date}</strong> and is now overdue."
+        elif (due - today).days <= 3:
+            urgency_color = "#f59e0b"  # amber — due soon
+            urgency_label = "DUE SOON"
+            urgency_msg = f"This payment is due on <strong>{due_date}</strong> — that's in {(due - today).days} day(s)."
+        else:
+            urgency_color = "#6366f1"  # indigo — upcoming
+            urgency_label = "UPCOMING"
+            urgency_msg = f"This payment is due on <strong>{due_date}</strong>."
+    except Exception:
+        urgency_color = "#6366f1"
+        urgency_label = "REMINDER"
+        urgency_msg = f"This payment is due on <strong>{due_date}</strong>."
+
+    html = f"""
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <h1 style="color: #111; font-size: 24px; margin: 0;">🔔 Payment Reminder</h1>
+        <p style="color: #666; margin-top: 8px;">from {provider_name}</p>
+      </div>
+
+      <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+        <p style="color: #333; font-size: 16px; line-height: 1.6; margin: 0;">
+          Hi <strong>{client_name}</strong>,
+        </p>
+        <p style="color: #333; font-size: 16px; line-height: 1.6;">
+          This is a friendly reminder about your upcoming payment for Invoice <strong>{invoice_number}</strong>.
+        </p>
+      </div>
+
+      <div style="background: {urgency_color}10; border: 2px solid {urgency_color}40; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; margin-bottom: 16px;">
+          <span style="background: {urgency_color}; color: white; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; letter-spacing: 1px;">
+            {urgency_label}
+          </span>
+        </div>
+        <p style="color: #333; font-size: 14px; line-height: 1.6; margin: 0 0 16px;">
+          {urgency_msg}
+        </p>
+        <table style="width: 100%;">
+          <tr>
+            <td style="font-size: 14px; color: #666; padding: 4px 0;">Amount Due</td>
+            <td style="text-align: right; font-size: 20px; font-weight: 700; color: {urgency_color};">${installment_amount}</td>
+          </tr>
+          <tr>
+            <td style="font-size: 14px; color: #666; padding: 4px 0;">Due Date</td>
+            <td style="text-align: right; font-size: 14px; color: #333; font-weight: 600;">{due_date}</td>
+          </tr>
+          <tr>
+            <td style="font-size: 14px; color: #666; padding: 4px 0;">Remaining Balance</td>
+            <td style="text-align: right; font-size: 14px; color: #333;">${remaining_balance}</td>
+          </tr>
+          <tr>
+            <td style="font-size: 14px; color: #666; padding: 4px 0;">Payment Method</td>
+            <td style="text-align: right; font-size: 14px; color: #333;">{payment_method.title() if payment_method else 'See below'}</td>
+          </tr>
+        </table>
+      </div>
+
+      {paypal_btn}
+
+      <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+        <p style="color: #92400e; font-size: 14px; margin: 0; font-weight: 600;">Payment Instructions</p>
+        <p style="color: #92400e; font-size: 13px; margin-top: 8px;">
+          Please send payment via <strong>{payment_method.title() if payment_method else 'your preferred method'}</strong>.
+          If you have questions or need to adjust your payment plan, reply to this email.
+        </p>
+      </div>
+
+      <p style="color: #9ca3af; font-size: 13px; text-align: center; margin-top: 32px;">
+        Thank you for your continued business!
+      </p>
+      <p style="color: #d1d5db; font-size: 11px; text-align: center; margin-top: 16px;">
+        {provider_name} &middot; 13721 Andrew Abernathy Pass, Manor, TX 78653
+      </p>
+    </div>
+    """
+    return subject, html
+
+
+def build_quote_approved_notification_email(
+    quote_short_id: str,
+    client_name: str,
+    project_name: str,
+    total_amount: float,
+    signer_name: str,
+    approved_at: str,
+) -> tuple[str, str]:
+    """Notification to admin that a quote was approved and signed. Returns (subject, html)."""
+    amount_str = f"${total_amount:,.2f}" if total_amount else "N/A"
+    subject = f"✅ Quote approved by {client_name} — {project_name}"
+    html = f"""
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+      <h1 style="color: #059669; text-align: center; font-size: 28px;">✅ Quote Approved!</h1>
+      <p style="color: #666; text-align: center; font-size: 14px; margin-top: -8px;">Time to send the contract!</p>
+      <div style="background: #ecfdf5; border: 1px solid #6ee7b7; border-radius: 12px; padding: 24px; margin: 24px 0;">
+        <p style="margin: 0 0 8px;"><strong>Quote:</strong> #{quote_short_id}</p>
+        <p style="margin: 0 0 8px;"><strong>Client:</strong> {client_name}</p>
+        <p style="margin: 0 0 8px;"><strong>Project:</strong> {project_name}</p>
+        <p style="margin: 0 0 8px;"><strong>Amount:</strong> {amount_str}</p>
+        <p style="margin: 0 0 8px;"><strong>Signed by:</strong> {signer_name}</p>
+        <p style="margin: 0;"><strong>Approved at:</strong> {approved_at}</p>
+      </div>
+      <div style="background: #fffbeb; border: 1px solid #fcd34d; border-radius: 12px; padding: 16px; margin: 16px 0;">
+        <p style="color: #92400e; font-size: 14px; margin: 0; font-weight: 600;">⏭️ Next Step</p>
+        <p style="color: #92400e; font-size: 13px; margin-top: 8px;">
+          The client approved the quote. You can now create a contract from this quote in the admin dashboard.
+        </p>
+      </div>
+      <p style="color: #666; font-size: 14px; text-align: center;">
+        View details in your <a href=\"https://ajayadesign.github.io/admin/\" style=\"color: #059669;\">admin dashboard</a>.
+      </p>
+    </div>
+    """
+    return subject, html
+
+
+def build_quote_declined_notification_email(
+    quote_short_id: str,
+    client_name: str,
+    project_name: str,
+    declined_at: str,
+) -> tuple[str, str]:
+    """Notification to admin that a quote was declined. Returns (subject, html)."""
+    subject = f"❌ Quote declined by {client_name} — {project_name}"
+    html = f"""
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+      <h1 style="color: #dc2626; text-align: center; font-size: 28px;">❌ Quote Declined</h1>
+      <div style="background: #fef2f2; border: 1px solid #fca5a5; border-radius: 12px; padding: 24px; margin: 24px 0;">
+        <p style="margin: 0 0 8px;"><strong>Quote:</strong> #{quote_short_id}</p>
+        <p style="margin: 0 0 8px;"><strong>Client:</strong> {client_name}</p>
+        <p style="margin: 0 0 8px;"><strong>Project:</strong> {project_name}</p>
+        <p style="margin: 0;"><strong>Declined at:</strong> {declined_at}</p>
+      </div>
+      <div style="background: #fffbeb; border: 1px solid #fcd34d; border-radius: 12px; padding: 16px; margin: 16px 0;">
+        <p style="color: #92400e; font-size: 14px; margin: 0; font-weight: 600;">💡 Suggestion</p>
+        <p style="color: #92400e; font-size: 13px; margin-top: 8px;">
+          Consider reaching out to discuss a revised offer. You can create a new revision from the admin dashboard.
+        </p>
+      </div>
+      <p style="color: #666; font-size: 14px; text-align: center;">
+        View details in your <a href=\"https://ajayadesign.github.io/admin/\" style=\"color: #dc2626;\">admin dashboard</a>.
+      </p>
+    </div>
+    """
+    return subject, html

@@ -36,8 +36,23 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files — NEVER commit secrets
 .env*
+
+# credentials & secrets
+**/firebase-cred*.json
+**/firebase-service-account*.json
+**/*-service-account*.json
+**/*.pem
+**/*.key
+
+# automation runtime
+automation/.venv/
+automation/data/
+automation/__pycache__/
+
+# docker (secrets live in .env, not in compose)
+docker-compose.override.yml
 
 # vercel
 .vercel
