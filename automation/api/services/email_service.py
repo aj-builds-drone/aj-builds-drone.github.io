@@ -51,17 +51,17 @@ async def send_email(
     import re
     plain_text = re.sub(r"<[^>]+>", "", plain_text)
 
-    msg.attach(MIMEText(plain_text, "plain"))
-    msg.attach(MIMEText(body_html, "html"))
+    msg.attach(MIMEText(plain_text, "plain", "utf-8"))
+    msg.attach(MIMEText(body_html, "html", "utf-8"))
 
     try:
         def _sync_send():
-            with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as server:
+            with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=30) as server:
                 server.ehlo()
                 server.starttls()
                 server.ehlo()
                 server.login(sender, password)
-                server.sendmail(sender, [to], msg.as_string())
+                server.sendmail(sender, [to], msg.as_bytes())
 
         await asyncio.to_thread(_sync_send)
 

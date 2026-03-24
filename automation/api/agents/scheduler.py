@@ -24,6 +24,19 @@ from typing import Callable, Awaitable
 logger = logging.getLogger("drone.agents.scheduler")
 
 MAX_BACKOFF = 1800  # 30 minutes cap
+CIRCUIT_BREAKER_THRESHOLD = 10  # Auto-pause after this many consecutive failures
+CIRCUIT_BREAKER_RESET_MINUTES = 60  # Auto-resume after this many minutes
+
+# Agent groups for pipeline chaining
+DISCOVERY_AGENTS = {
+    "scholar_crawler", "nsf_crawler", "faculty_crawler",
+    "arxiv_crawler", "github_crawler", "sam_gov_crawler",
+}
+# Processing agents wake early when new prospects are discovered
+PIPELINE_AGENTS = {
+    "deduplicator", "enrichment", "batch_scorer", "research_analyzer",
+    "lab_auditor", "copywriter", "prospect_enqueue", "email_hunter", "geocoder",
+}
 
 
 class AgentTask:
@@ -43,6 +56,7 @@ class AgentTask:
         self._task: asyncio.Task | None = None
         self._started_at: float | None = None  # monotonic time when current run started
         self._recoveries: int = 0
+        self._circuit_broken_at: datetime | None = None  # when circuit breaker tripped
 
     def to_dict(self) -> dict:
         return {
@@ -67,6 +81,7 @@ class AgentScheduler:
         self._running = False
         self._started_at: datetime | None = None
         self._health_task: asyncio.Task | None = None
+        self._new_data_event = asyncio.Event()  # Set when crawlers find new prospects
 
     def register(self, name: str, fn: Callable[[], Awaitable[dict]], interval_seconds: int):
         self.agents[name] = AgentTask(name, fn, interval_seconds)
@@ -186,6 +201,14 @@ class AgentScheduler:
                     _summarize_result(agent.name, result, elapsed),
                     icon="✅", metadata={"run": agent.runs, "elapsed_s": round(elapsed, 1), "result": _safe_meta(result)},
                 )
+
+                # Pipeline chaining: if a discovery agent found new prospects, wake processing agents
+                if agent.name in DISCOVERY_AGENTS:
+                    new_count = result.get("new", 0) or result.get("prospects_new", 0) or 0
+                    if new_count > 0:
+                        logger.info(f"🔗 Pipeline trigger: {agent.name} found {new_count} new — waking processing agents")
+                        self._new_data_event.set()
+
             except Exception as e:
                 agent.errors += 1
                 agent.consecutive_errors += 1
@@ -203,6 +226,26 @@ class AgentScheduler:
 
             # Self-healing: exponential backoff on consecutive errors
             if agent.consecutive_errors > 0:
+                # Circuit breaker: if errors exceed threshold, auto-pause
+                if agent.consecutive_errors >= CIRCUIT_BREAKER_THRESHOLD and not agent._circuit_broken_at:
+                    agent._circuit_broken_at = datetime.now(timezone.utc)
+                    agent.paused = True
+                    agent.status = "paused"
+                    logger.error(
+                        f"⚡ Circuit breaker tripped for {agent.name} after "
+                        f"{agent.consecutive_errors} consecutive errors — auto-paused. "
+                        f"Will auto-resume in {CIRCUIT_BREAKER_RESET_MINUTES}min. "
+                        f"Last error: {agent.last_result}"
+                    )
+                    await _log_agent_activity(
+                        agent.name, "circuit_breaker",
+                        f"Circuit breaker tripped after {agent.consecutive_errors} errors. "
+                        f"Auto-paused for {CIRCUIT_BREAKER_RESET_MINUTES}min.",
+                        icon="⚡",
+                        metadata={"streak": agent.consecutive_errors, "last_error": str(agent.last_result)[:500]},
+                    )
+                    continue  # Skip backoff sleep, go to paused check at top of loop
+
                 backoff = min(agent.interval * (2 ** (agent.consecutive_errors - 1)), MAX_BACKOFF)
                 logger.info(f"Agent {agent.name} backing off {backoff}s (errors: {agent.consecutive_errors})")
                 try:
@@ -210,18 +253,49 @@ class AgentScheduler:
                 except asyncio.CancelledError:
                     break
             else:
-                try:
-                    await asyncio.sleep(agent.interval)
-                except asyncio.CancelledError:
-                    break
+                # Pipeline agents use interruptible sleep — wake early when new data arrives
+                if agent.name in PIPELINE_AGENTS:
+                    try:
+                        self._new_data_event.clear()
+                        await asyncio.wait_for(self._new_data_event.wait(), timeout=agent.interval)
+                        logger.info(f"🔗 Agent {agent.name} woken early — new prospects discovered")
+                    except asyncio.TimeoutError:
+                        pass  # Normal interval elapsed
+                    except asyncio.CancelledError:
+                        break
+                else:
+                    try:
+                        await asyncio.sleep(agent.interval)
+                    except asyncio.CancelledError:
+                        break
 
     # ── Health monitor: detects stuck agents ──
 
     async def _health_monitor(self):
-        """Periodically check for stuck agents and restart them."""
+        """Periodically check for stuck agents, restart them, and auto-resume circuit-broken agents."""
         while self._running:
             await asyncio.sleep(60)  # Check every minute
+            now = datetime.now(timezone.utc)
             for agent in self.agents.values():
+                # Circuit breaker auto-resume
+                if agent._circuit_broken_at and agent.paused:
+                    elapsed_min = (now - agent._circuit_broken_at).total_seconds() / 60
+                    if elapsed_min >= CIRCUIT_BREAKER_RESET_MINUTES:
+                        logger.info(
+                            f"⚡ Circuit breaker reset for {agent.name} after "
+                            f"{elapsed_min:.0f}min — resuming with reset error count"
+                        )
+                        agent._circuit_broken_at = None
+                        agent.paused = False
+                        agent.consecutive_errors = 0  # Reset for fresh start
+                        agent.status = "idle"
+                        await _log_agent_activity(
+                            agent.name, "circuit_breaker_reset",
+                            f"Circuit breaker reset after {elapsed_min:.0f}min — agent resumed",
+                            icon="🔄",
+                        )
+
+                # Stuck agent detection
                 if agent.status != "running" or agent._started_at is None:
                     continue
                 elapsed = time.monotonic() - agent._started_at
@@ -489,37 +563,37 @@ async def run_bounce_recovery_agent() -> dict:
 
 def register_all_agents():
     """Register all discovery and processing agents with the scheduler."""
-    # Discovery agents — staggered intervals
-    scheduler.register("scholar_crawler", run_scholar_agent, interval_seconds=4 * 3600)    # Every 4 hours
-    scheduler.register("nsf_crawler", run_nsf_agent, interval_seconds=6 * 3600)            # Every 6 hours
-    scheduler.register("faculty_crawler", run_faculty_agent, interval_seconds=8 * 3600)     # Every 8 hours
-    scheduler.register("arxiv_crawler", run_arxiv_agent, interval_seconds=12 * 3600)        # Every 12 hours
+    # Discovery agents — reduced intervals for continuous growth
+    scheduler.register("scholar_crawler", run_scholar_agent, interval_seconds=90 * 60)      # Every 90 min (SerpAPI rate limits)
+    scheduler.register("nsf_crawler", run_nsf_agent, interval_seconds=2 * 3600)             # Every 2 hours
+    scheduler.register("faculty_crawler", run_faculty_agent, interval_seconds=2 * 3600)     # Every 2 hours
+    scheduler.register("arxiv_crawler", run_arxiv_agent, interval_seconds=3 * 3600)         # Every 3 hours
 
-    # Processing agents — more frequent
-    scheduler.register("batch_scorer", run_scoring_agent, interval_seconds=1 * 3600)        # Every hour
-    scheduler.register("deduplicator", run_dedup_agent, interval_seconds=2 * 3600)          # Every 2 hours
+    # Processing agents — run frequently, also wake early via pipeline chaining
+    scheduler.register("batch_scorer", run_scoring_agent, interval_seconds=20 * 60)         # Every 20 min
+    scheduler.register("deduplicator", run_dedup_agent, interval_seconds=30 * 60)           # Every 30 min
 
     # Phase 3: Intelligence Engine agents
-    scheduler.register("enrichment", run_enrichment_agent, interval_seconds=2 * 3600)       # Every 2 hours
-    scheduler.register("lab_auditor", run_lab_audit_agent, interval_seconds=3 * 3600)       # Every 3 hours
-    scheduler.register("copywriter", run_copywriter_agent, interval_seconds=2 * 3600)       # Every 2 hours (DRAFTS only, needs research_analyzer first)
+    scheduler.register("enrichment", run_enrichment_agent, interval_seconds=30 * 60)        # Every 30 min
+    scheduler.register("lab_auditor", run_lab_audit_agent, interval_seconds=45 * 60)        # Every 45 min
+    scheduler.register("copywriter", run_copywriter_agent, interval_seconds=30 * 60)        # Every 30 min (DRAFTS only, needs research_analyzer first)
 
     # Phase 4: Outreach Engine agents
     scheduler.register("cadence_sender", run_cadence_agent, interval_seconds=15 * 60)       # Every 15 min — send approved emails
-    scheduler.register("prospect_enqueue", run_enqueue_agent, interval_seconds=4 * 3600)    # Every 4 hours — enqueue new prospects
+    scheduler.register("prospect_enqueue", run_enqueue_agent, interval_seconds=30 * 60)     # Every 30 min — enqueue new prospects
 
     # Phase 6: Scale agents
-    scheduler.register("github_crawler", run_github_agent, interval_seconds=24 * 3600)      # Every 24 hours — GitHub contributors
-    scheduler.register("sam_gov_crawler", run_sam_gov_agent, interval_seconds=12 * 3600)     # Every 12 hours — SAM.gov solicitations
+    scheduler.register("github_crawler", run_github_agent, interval_seconds=6 * 3600)       # Every 6 hours — GitHub contributors
+    scheduler.register("sam_gov_crawler", run_sam_gov_agent, interval_seconds=4 * 3600)      # Every 4 hours — SAM.gov solicitations
 
     # Email Hunter — aggressive email discovery for all prospects
-    scheduler.register("email_hunter", run_email_hunter_agent, interval_seconds=1 * 3600)   # Every hour — find missing emails
+    scheduler.register("email_hunter", run_email_hunter_agent, interval_seconds=30 * 60)    # Every 30 min — find missing emails
 
     # Research Analyzer — scores papers for drone relevance BEFORE copywriter runs
-    scheduler.register("research_analyzer", run_research_analyzer_agent, interval_seconds=2 * 3600)  # Every 2 hours — analyze papers
+    scheduler.register("research_analyzer", run_research_analyzer_agent, interval_seconds=30 * 60)  # Every 30 min — analyze papers
 
     # Geocoder — populate lat/lng for map display
-    scheduler.register("geocoder", run_geocoder_agent, interval_seconds=6 * 3600)  # Every 6 hours — geocode orgs
+    scheduler.register("geocoder", run_geocoder_agent, interval_seconds=2 * 3600)  # Every 2 hours — geocode orgs
 
     # Bounce checker — scan Gmail for NDRs and mark bounced emails
     scheduler.register("bounce_checker", run_bounce_checker_agent, interval_seconds=5 * 60)  # Every 5 min — detect bounces fast

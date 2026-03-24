@@ -219,10 +219,10 @@ def compare_prospect_to_peers(prospect: DroneProspect,
         }
     """
     # Get prospect's scores
-    hw = audit_data["hardware_score"] if audit_data else (prospect.score_hardware or 0)
-    sw = audit_data["software_score"] if audit_data else (prospect.score_software or 0)
-    rs = audit_data["research_score"] if audit_data else (prospect.score_research or 0)
-    overall = audit_data["overall_score"] if audit_data else (prospect.score_overall or 0)
+    hw = (audit_data["hardware_score"] if audit_data else None) or (prospect.score_hardware or 0)
+    sw = (audit_data["software_score"] if audit_data else None) or (prospect.score_software or 0)
+    rs = (audit_data["research_score"] if audit_data else None) or (prospect.score_research or 0)
+    overall = (audit_data["overall_score"] if audit_data else None) or (prospect.score_overall or 0)
 
     # Find relevant peers
     peers = _find_relevant_peers(prospect)

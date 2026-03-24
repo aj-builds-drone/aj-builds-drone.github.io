@@ -28,6 +28,7 @@ logger = logging.getLogger("drone.scholar_crawler")
 
 # Drone-related search queries
 SCHOLAR_QUERIES = [
+    # Original 15
     "UAV autonomous navigation",
     "drone SLAM visual odometry",
     "PX4 flight controller research",
@@ -43,6 +44,22 @@ SCHOLAR_QUERIES = [
     "ROS2 aerial robotics",
     "drone payload integration sensor fusion",
     "autonomous drone inspection infrastructure",
+    # Expanded — new discovery topics
+    "UAV FPGA embedded acceleration",
+    "drone sim-to-real transfer learning",
+    "visual inertial navigation micro aerial vehicle",
+    "cooperative multi-UAV task allocation",
+    "drone delivery last mile logistics",
+    "UAV wind estimation disturbance rejection",
+    "agile quadrotor racing FPV",
+    "counter-UAS detection classification",
+    "drone beyond visual line of sight BVLOS",
+    "vertical takeoff landing eVTOL",
+    "aerial manipulation grasping UAV",
+    "semantic mapping aerial robot",
+    "model predictive control quadrotor trajectory",
+    "UAV bridge inspection structural health",
+    "precision agriculture drone multispectral",
 ]
 
 SERPAPI_BASE = "https://serpapi.com/search"
@@ -140,6 +157,10 @@ async def _search_scholar(
 
     try:
         async with session.get(SERPAPI_BASE, params=params, timeout=aiohttp.ClientTimeout(total=30)) as resp:
+            if resp.status == 429:
+                logger.warning("Scholar API rate limited (429) — backing off 60s")
+                await asyncio.sleep(60)
+                return {"organic_results": []}
             if resp.status != 200:
                 logger.error("Scholar API error: %d", resp.status)
                 return {"organic_results": []}
@@ -276,7 +297,7 @@ async def _process_search_results(
     return new_count
 
 
-async def crawl_scholar(query: Optional[str] = None, max_pages: int = 2) -> dict:
+async def crawl_scholar(query: Optional[str] = None, max_pages: int = 5) -> dict:
     """
     Run a Google Scholar discovery crawl.
 
@@ -322,6 +343,8 @@ async def crawl_scholar(query: Optional[str] = None, max_pages: int = 2) -> dict
                     await db.flush()
 
                     await asyncio.sleep(2)  # polite delay between pages
+
+                await asyncio.sleep(5)  # delay between queries to avoid 429s
 
         batch.status = "complete"
         batch.completed_at = datetime.now(timezone.utc)

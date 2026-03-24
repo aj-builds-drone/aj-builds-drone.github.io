@@ -28,7 +28,7 @@ logger = logging.getLogger("drone.faculty_crawler")
 # Target universities and their department URLs
 # In production, this would be loaded from a YAML config or DB table
 TARGET_DEPARTMENTS = [
-    # (University Name, Department, Faculty Page URL)
+    # ── US Top 20 (original) ──
     ("MIT", "Aeronautics and Astronautics", "https://aeroastro.mit.edu/people/faculty/"),
     ("MIT", "EECS", "https://www.eecs.mit.edu/people/faculty-advisors/"),
     ("Stanford", "Aeronautics & Astronautics", "https://aa.stanford.edu/people/faculty"),
@@ -49,6 +49,43 @@ TARGET_DEPARTMENTS = [
     ("Cornell", "MAE", "https://www.mae.cornell.edu/mae/people/faculty"),
     ("University of Colorado", "Aerospace", "https://www.colorado.edu/aerospace/academics/faculty"),
     ("Arizona State", "Mechanical & Aerospace", "https://semte.engineering.asu.edu/mechanical-aerospace-faculty/"),
+    # ── US Expanded ──
+    ("Caltech", "Aerospace (GALCIT)", "https://www.galcit.caltech.edu/people"),
+    ("UCLA", "Mechanical & Aerospace", "https://www.mae.ucla.edu/people/faculty/"),
+    ("USC", "Aerospace & Mechanical", "https://ame.usc.edu/directory/faculty/"),
+    ("UC San Diego", "MAE", "https://mae.ucsd.edu/people/faculty"),
+    ("Northwestern", "Mechanical Engineering", "https://www.mccormick.northwestern.edu/mechanical/people/faculty/"),
+    ("Princeton", "MAE", "https://mae.princeton.edu/people/faculty"),
+    ("Johns Hopkins", "Mechanical Engineering", "https://me.jhu.edu/faculty/"),
+    ("Duke", "Mechanical Engineering", "https://mems.duke.edu/faculty"),
+    ("University of Virginia", "MAE", "https://engineering.virginia.edu/departments/mechanical-and-aerospace-engineering/people"),
+    ("Iowa State", "Aerospace Engineering", "https://www.aere.iastate.edu/people/faculty/"),
+    ("University of Cincinnati", "Aerospace Engineering", "https://ceas.uc.edu/academics/departments/aerospace-engineering-engineering-mechanics/people.html"),
+    ("NC State", "MAE", "https://mae.ncsu.edu/people/faculty/"),
+    ("Rensselaer", "Mechanical & Aerospace", "https://mane.rpi.edu/people/faculty"),
+    ("University of Minnesota", "AEM", "https://cse.umn.edu/aem/people"),
+    # ── International — Europe ──
+    ("ETH Zurich", "Autonomous Systems Lab", "https://asl.ethz.ch/the-lab/people.html"),
+    ("TU Delft", "Aerospace Engineering", "https://www.tudelft.nl/en/ae/organisation/departments/control-and-operations/people"),
+    ("Imperial College London", "Aeronautics", "https://www.imperial.ac.uk/aeronautics/people/academic-staff/"),
+    ("University of Oxford", "Engineering Science", "https://eng.ox.ac.uk/people/"),
+    ("KTH Stockholm", "Robotics", "https://www.kth.se/is/rpl/division-of-robotics-perception-and-learning-1.779439"),
+    ("TU Munich", "Aerospace Engineering", "https://www.epc.ed.tum.de/en/lrt/team/"),
+    ("EPFL", "Intelligent Systems Lab", "https://lis.epfl.ch/people/"),
+    ("University of Bologna", "DEI", "https://dei.unibo.it/en/department/people"),
+    ("Cranfield University", "Aerospace Transport Systems", "https://www.cranfield.ac.uk/centres/centre-for-autonomous-and-cyber-physical-systems"),
+    # ── International — Asia-Pacific ──
+    ("HKUST", "ECE", "https://ece.hkust.edu.hk/people/faculty"),
+    ("NUS Singapore", "Mechanical Engineering", "https://cde.nus.edu.sg/me/staff/academic-staff/"),
+    ("NTU Singapore", "MAE", "https://www.ntu.edu.sg/mae/about-us/our-people/faculty"),
+    ("University of Tokyo", "Aerospace Engineering", "https://www.aerospace.t.u-tokyo.ac.jp/en/member/"),
+    ("KAIST", "Aerospace Engineering", "https://ae.kaist.ac.kr/eng/page/sub0501.do"),
+    ("Tsinghua University", "Automation", "https://www.au.tsinghua.edu.cn/en/Faculty.htm"),
+    ("Seoul National University", "Aerospace Engineering", "https://aerospace.snu.ac.kr/en/faculty"),
+    # ── International — Australia ──
+    ("University of Sydney", "ACFR", "https://www.sydney.edu.au/engineering/our-research/robotics-and-intelligent-systems/australian-centre-for-field-robotics.html"),
+    ("QUT Brisbane", "Robotics", "https://research.qut.edu.au/qcr/people/"),
+    ("ANU Canberra", "Robotics", "https://comp.anu.edu.au/people/"),
 ]
 
 # Drone-related keywords to filter faculty by research interests

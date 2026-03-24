@@ -51,6 +51,15 @@ async def lifespan(app: FastAPI):
     await scheduler.start()
     logger.info("Agent scheduler started")
 
+    # Recover stuck/failed states from previous run
+    try:
+        from api.services.pipeline_worker import recover_all_bad_states
+        recovered = await recover_all_bad_states()
+        if any(v > 0 for v in recovered.values()):
+            logger.info("Startup recovery: %s", recovered)
+    except Exception as e:
+        logger.warning("Startup recovery failed: %s", e)
+
     logger.info("AJ Builds Drone API ready")
     yield
 

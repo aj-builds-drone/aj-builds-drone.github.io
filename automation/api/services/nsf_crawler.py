@@ -29,6 +29,7 @@ logger = logging.getLogger("drone.nsf_crawler")
 
 # NSF search queries covering drone-adjacent topics
 NSF_QUERIES = [
+    # Original 12
     "unmanned aerial vehicle",
     "drone autonomous",
     "UAV navigation",
@@ -41,6 +42,17 @@ NSF_QUERIES = [
     "LiDAR aerial mapping",
     "visual SLAM aerial",
     "PX4 ArduPilot",
+    # Expanded
+    "autonomous aerial system",
+    "multi-rotor UAS",
+    "counter-UAS",
+    "urban air mobility",
+    "eVTOL",
+    "drone delivery",
+    "aerial manipulation",
+    "cooperative unmanned",
+    "drone inspection infrastructure",
+    "beyond visual line of sight",
 ]
 
 # NSF program codes relevant to drone research
@@ -263,13 +275,19 @@ async def crawl_nsf(query: Optional[str] = None, max_results: int = 100) -> dict
 
         async with aiohttp.ClientSession() as http:
             for q in queries:
-                awards = await _search_nsf(http, q, limit=min(max_results, 25))
-                if awards:
+                # Paginate: fetch multiple pages per query
+                for page_offset in range(1, 76, 25):
+                    awards = await _search_nsf(http, q, offset=page_offset, limit=25)
+                    if not awards:
+                        break
                     n = await _process_awards(db, awards, batch, q)
                     total_new += n
                     await db.flush()
+                    if len(awards) < 25:
+                        break  # last page
+                    await asyncio.sleep(1)
 
-                await asyncio.sleep(1)  # polite delay
+                await asyncio.sleep(1)  # polite delay between queries
 
         batch.status = "complete"
         batch.completed_at = datetime.now(timezone.utc)

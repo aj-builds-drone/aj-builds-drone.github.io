@@ -43,6 +43,30 @@ TARGET_REPOS = [
     "ethz-asl/rotors_simulator",
     "microsoft/AirSim",
     "DLR-RM/stable-baselines3",
+    # ── Expanded: SLAM & perception ──
+    "HKUST-Aerial-Robotics/VINS-Mono",
+    "HKUST-Aerial-Robotics/VINS-Fusion",
+    "hku-mars/FAST_LIO",
+    "hku-mars/ikd-Tree",
+    "uzh-rpg/rpg_svo_pro_open",
+    "raulmur/ORB_SLAM2",
+    "UZ-SLAMLab/ORB_SLAM3",
+    # ── Expanded: drone-specific ──
+    "crazyflie/crazyflie-firmware",
+    "dji-sdk/Guidance-SDK-ROS",
+    "mavlink/mavlink",
+    "mavlink/MAVSDK",
+    "PX4/PX4-SITL_gazebo-classic",
+    "ethz-asl/mav_voxblox_planning",
+    "tum-vision/lsd_slam",
+    # ── Expanded: autonomy frameworks ──
+    "autowarefoundation/autoware",
+    "ApolloAuto/apollo",
+    "ArduPilot/pymavlink",
+    # ── Expanded: simulation & flight ──
+    "betaflight/betaflight",
+    "iNavFlight/inav",
+    "cleanflight/cleanflight",
 ]
 
 GH_API = "https://api.github.com"
@@ -57,6 +81,9 @@ DRONE_BIO_KEYWORDS = {
     "avionics", "unmanned", "lidar", "computer vision", "real-time",
     "perception", "swarm", "gazebo", "simulation",
 }
+
+if not settings.gh_token:
+    logger.warning("GH_TOKEN not set — GitHub API limited to 60 requests/hour (unauthenticated)")
 
 
 def _headers() -> dict:
@@ -77,7 +104,9 @@ async def _fetch_json(session: aiohttp.ClientSession, url: str, params: dict = N
                 if remaining == "0":
                     reset = int(resp.headers.get("X-RateLimit-Reset", "0"))
                     wait = max(reset - int(datetime.now(timezone.utc).timestamp()), 10)
-                    logger.warning("GitHub rate limited — reset in %ds", wait)
+                    wait = min(wait, 3600)  # cap at 1 hour
+                    logger.warning("GitHub rate limited — sleeping %ds until reset", wait)
+                    await asyncio.sleep(wait)
                     return None
                 logger.warning("GitHub 403: %s", await resp.text())
                 return None

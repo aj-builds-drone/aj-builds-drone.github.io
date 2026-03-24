@@ -15,7 +15,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 from uuid import uuid4
 
-from sqlalchemy import select, func
+from sqlalchemy import select, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.config import settings
@@ -591,12 +591,15 @@ async def process_send_queue() -> dict:
             stats["skipped"] = today_count
             return stats
 
-        # Only send approved emails whose scheduled time has passed
+        # Only send approved emails whose scheduled time has passed (or is NULL = send now)
         result = await db.execute(
             select(OutreachEmail)
             .where(
                 OutreachEmail.status == "approved",
-                OutreachEmail.scheduled_for <= now,
+                or_(
+                    OutreachEmail.scheduled_for <= now,
+                    OutreachEmail.scheduled_for.is_(None),
+                ),
             )
             .order_by(OutreachEmail.scheduled_for)
             .limit(remaining)
@@ -785,15 +788,14 @@ async def handle_unsubscribe(prospect_id: str):
 async def batch_enqueue_prospects(limit: int = 20) -> int:
     """
     Enqueue scored, un-contacted prospects for outreach.
-    Targets hot/warm tier prospects with emails and completed audits.
+    Targets prospects with emails, valid research hooks, ordered by priority.
+    Relaxed from hot/warm-only to include any tier with a good hook.
     """
     async with async_session_factory() as db:
         result = await db.execute(
             select(DroneProspect.id).where(
                 DroneProspect.email.isnot(None),
                 DroneProspect.emails_sent == 0,
-                DroneProspect.tier.in_(["hot", "warm"]),
-                DroneProspect.audited_at.isnot(None),
                 DroneProspect.status == "scored",
             ).order_by(DroneProspect.priority_score.desc()).limit(limit)
         )

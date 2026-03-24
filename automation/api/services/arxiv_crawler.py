@@ -28,6 +28,7 @@ logger = logging.getLogger("drone.arxiv_crawler")
 
 # arXiv category + keyword search queries
 ARXIV_QUERIES = [
+    # Original 10
     "cat:cs.RO AND (drone OR UAV OR unmanned aerial)",
     "cat:cs.RO AND (SLAM AND aerial)",
     "cat:cs.RO AND (quadrotor OR multirotor) AND (control OR planning)",
@@ -38,7 +39,26 @@ ARXIV_QUERIES = [
     "cat:cs.RO AND (LiDAR AND aerial AND mapping)",
     "cat:cs.AI AND (drone AND reinforcement learning)",
     "cat:eess.SP AND (radar AND UAV AND detection)",
+    # Expanded — deeper niches
+    "cat:cs.RO AND (motion planning AND aerial AND obstacle)",
+    "cat:cs.RO AND (visual inertial AND odometry OR VINS)",
+    "cat:cs.RO AND (collision avoidance AND UAV)",
+    "cat:cs.RO AND (multi-agent AND UAV OR drone)",
+    "cat:cs.CV AND (semantic segmentation AND aerial)",
+    "cat:cs.CV AND (object detection AND drone OR UAV)",
+    "cat:cs.RO AND (sim-to-real AND aerial OR quadrotor)",
+    "cat:cs.SY AND (model predictive control AND quadrotor)",
+    "cat:cs.RO AND (exploration AND aerial AND unknown)",
+    "cat:cs.RO AND (cooperative AND multi-UAV)",
+    "cat:eess.SP AND (signal processing AND unmanned aerial)",
+    "cat:cs.RO AND (manipulation AND aerial OR flying)",
+    "cat:cs.RO AND (landing AND autonomous AND aerial)",
+    "cat:cs.RO AND (payload AND delivery AND drone)",
+    "cat:cs.NE AND (evolutionary AND UAV OR drone)",
 ]
+
+# Track offsets per query for pagination across runs
+_query_offsets: dict[str, int] = {}
 
 ARXIV_API = "http://export.arxiv.org/api/query"
 RESULTS_PER_QUERY = 30
@@ -179,11 +199,12 @@ async def _search_arxiv(
     session: aiohttp.ClientSession,
     query: str,
     max_results: int = RESULTS_PER_QUERY,
+    start: int = 0,
 ) -> str:
     """Query arXiv API and return raw XML response."""
     params = {
         "search_query": query,
-        "start": 0,
+        "start": start,
         "max_results": max_results,
         "sortBy": "submittedDate",
         "sortOrder": "descending",
@@ -227,8 +248,9 @@ async def discover_arxiv_prospects() -> dict:
         try:
             async with aiohttp.ClientSession() as http:
                 for query in ARXIV_QUERIES:
-                    logger.info("arXiv query: %s", query)
-                    xml_text = await _search_arxiv(http, query)
+                    offset = _query_offsets.get(query, 0)
+                    logger.info("arXiv query: %s (offset=%d)", query, offset)
+                    xml_text = await _search_arxiv(http, query, start=offset)
                     if not xml_text:
                         await asyncio.sleep(DELAY_BETWEEN_REQUESTS)
                         continue
@@ -277,6 +299,11 @@ async def discover_arxiv_prospects() -> dict:
                             new += 1
 
                     await db.commit()
+                    # Advance offset for next run to discover deeper results
+                    _query_offsets[query] = offset + RESULTS_PER_QUERY
+                    # Reset offset if it gets too deep (cycle back)
+                    if _query_offsets[query] >= 300:
+                        _query_offsets[query] = 0
                     # Respect arXiv rate limit
                     await asyncio.sleep(DELAY_BETWEEN_REQUESTS)
 

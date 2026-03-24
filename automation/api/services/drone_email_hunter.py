@@ -228,15 +228,42 @@ async def check_mx(domain: str) -> list[str]:
         return []
 
 
+# Track whether outbound port 25 is reachable (cached across calls)
+_smtp_port_25_reachable: bool | None = None
+
+
+async def _check_port_25() -> bool:
+    """Test if outbound port 25 is reachable. Cached for efficiency."""
+    global _smtp_port_25_reachable
+    if _smtp_port_25_reachable is not None:
+        return _smtp_port_25_reachable
+    try:
+        reader, writer = await asyncio.wait_for(
+            asyncio.open_connection("alt1.gmail-smtp-in.l.google.com", 25), timeout=5
+        )
+        writer.close()
+        _smtp_port_25_reachable = True
+        logger.info("[SMTP] Port 25 reachable — full SMTP verification enabled")
+    except Exception:
+        _smtp_port_25_reachable = False
+        logger.warning("[SMTP] Port 25 blocked — falling back to MX-only verification")
+    return _smtp_port_25_reachable
+
+
 async def smtp_verify_email(email: str) -> dict:
     """
     Verify email via SMTP RCPT TO handshake.
-    Returns {'valid': bool, 'catch_all': bool}.
+    Returns {'valid': bool, 'catch_all': bool, 'mx_valid': bool}.
+    Falls back to MX-only verification if port 25 is blocked.
     """
     domain = email.split("@")[-1]
     mx_hosts = await check_mx(domain)
     if not mx_hosts:
-        return {"valid": False, "catch_all": False}
+        return {"valid": False, "catch_all": False, "mx_valid": False}
+
+    # If port 25 is blocked, return MX-valid (domain accepts mail)
+    if not await _check_port_25():
+        return {"valid": False, "catch_all": False, "mx_valid": True}
 
     for mx_host in mx_hosts[:2]:
         try:
@@ -269,12 +296,12 @@ async def smtp_verify_email(email: str) -> dict:
             await writer.drain()
             writer.close()
 
-            return {"valid": code == 250 and not is_catch_all, "catch_all": is_catch_all}
+            return {"valid": code == 250 and not is_catch_all, "catch_all": is_catch_all, "mx_valid": True}
         except Exception as e:
             logger.debug("SMTP check failed for %s via %s: %s", email, mx_host, e)
             continue
 
-    return {"valid": False, "catch_all": False}
+    return {"valid": False, "catch_all": False, "mx_valid": True}
 
 
 # ─── Strategy 1: University Directory Search ─────────────────────────
@@ -311,7 +338,7 @@ async def _strategy_directory(session: aiohttp.ClientSession, name: str, domain:
             return edu_emails[0]
 
     except Exception as e:
-        logger.debug("[Directory] Error for %s at %s: %s", name, domain, e)
+        logger.info("[Directory] Error for %s at %s: %s", name, domain, e)
 
     return None
 
@@ -388,7 +415,7 @@ async def _strategy_profile_scrape(session: aiohttp.ClientSession,
                 return email
 
         except Exception as e:
-            logger.debug("[ProfileScrape] Error scraping %s: %s", url, e)
+            logger.info("[ProfileScrape] Error scraping %s: %s", url, e)
 
     return None
 
@@ -434,6 +461,11 @@ async def _strategy_scholar(session: aiohttp.ClientSession, scholar_url: Optiona
                         best = f"{first.lower()}.{last.lower()}@{domain}"
                         logger.info("[Scholar→CatchAll] Best guess %s for %s", best, name)
                         return best
+                    if result.get("mx_valid") and not result["valid"]:
+                        # Port 25 blocked but MX valid — return best pattern guess
+                        best = guesses[0] if guesses else f"{first.lower()}.{last.lower()}@{domain}"
+                        logger.info("[Scholar→MX] Port 25 blocked, MX valid — returning %s for %s", best, name)
+                        return best
 
         # Also check for direct email in page text
         emails = EMAIL_RE.findall(html)
@@ -442,7 +474,7 @@ async def _strategy_scholar(session: aiohttp.ClientSession, scholar_url: Optiona
             return edu_emails[0]
 
     except Exception as e:
-        logger.debug("[Scholar] Error for %s: %s", name, e)
+        logger.info("[Scholar] Error for %s: %s", name, e)
 
     return None
 
@@ -471,6 +503,7 @@ async def _strategy_pattern_guess(name: str, org: str) -> Optional[str]:
     # Verify MX exists first (skip if domain has no mail server)
     mx_hosts = await check_mx(domain)
     if not mx_hosts:
+        logger.info("[PatternGuess] No MX records for %s — skipping %s", domain, name)
         return None
 
     for guess in guesses[:7]:  # Cap SMTP verification attempts
@@ -478,13 +511,14 @@ async def _strategy_pattern_guess(name: str, org: str) -> Optional[str]:
         if result["valid"]:
             logger.info("[PatternGuess] SMTP verified %s for %s at %s", guess, name, org)
             return guess
-
-    # If catch-all detected, return the most common academic format
-    for guess in guesses[:3]:
-        result = await smtp_verify_email(guess)
-        if result["catch_all"]:
+        if result.get("catch_all"):
             best = f"{first.lower()}.{last.lower()}@{domain}"
             logger.info("[PatternGuess] Catch-all domain %s — returning %s", domain, best)
+            return best
+        if result.get("mx_valid") and not result["valid"]:
+            # Port 25 blocked — MX valid, return best guess (first.last@domain)
+            best = guesses[0]  # first known pattern or first.last@domain
+            logger.info("[PatternGuess] MX valid for %s, port 25 blocked — returning best guess %s", domain, best)
             return best
 
     return None
@@ -571,7 +605,7 @@ async def _strategy_hunter(session: aiohttp.ClientSession, name: str,
                 return email
 
     except Exception as e:
-        logger.debug("[Hunter] Error for %s: %s", name, e)
+        logger.info("[Hunter] Error for %s: %s", name, e)
 
     return None
 
@@ -634,7 +668,7 @@ async def _strategy_arxiv_source(session: aiohttp.ClientSession,
                     return edu[0]
 
             except Exception as e:
-                logger.debug("[arXiv] Error for %s from %s: %s", name, url, e)
+                logger.info("[arXiv] Error for %s from %s: %s", name, url, e)
 
     return None
 

@@ -359,7 +359,7 @@ async def batch_score_prospects(limit: int = 50) -> int:
         result = await db.execute(
             select(DroneProspect.id).where(
                 DroneProspect.priority_score.is_(None),
-                DroneProspect.status.in_(["enriched", "audited", "discovered"]),
+                DroneProspect.status.in_(["enriched", "audited", "discovered", "merged"]),
             ).order_by(DroneProspect.created_at.asc()).limit(limit)
         )
         ids = [str(r[0]) for r in result.fetchall()]

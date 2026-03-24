@@ -32,7 +32,7 @@ from typing import Optional
 from sqlalchemy import select, update, func, and_, or_, text
 
 from api.database import async_session_factory
-from api.models.prospect import Prospect, OutreachEmail
+from api.models.prospect import DroneProspect as Prospect, OutreachEmail
 
 logger = logging.getLogger("outreach.pipeline")
 
@@ -1101,7 +1101,7 @@ async def recover_all_bad_states() -> dict:
             )
             if not email_result.scalars().first():
                 # Orphaned — queued but no email waiting
-                if p.owner_email:
+                if p.email:
                     p.status = "enriched"  # Can be re-enqueued
                 else:
                     p.status = "audited"   # Needs recon again
@@ -1125,7 +1125,7 @@ async def recover_all_bad_states() -> dict:
         result = await db.execute(
             select(Prospect).where(
                 Prospect.status == "enriched",
-                Prospect.owner_email.isnot(None),
+                Prospect.email.isnot(None),
                 Prospect.updated_at < day_ago,
             )
         )

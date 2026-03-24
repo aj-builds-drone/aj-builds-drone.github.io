@@ -85,7 +85,7 @@ def _connect_imap():
     if not imap_user or not imap_pass:
         raise RuntimeError("SMTP_EMAIL / SMTP_APP_PASSWORD not configured")
 
-    conn = imaplib.IMAP4_SSL(IMAP_HOST, IMAP_PORT)
+    conn = imaplib.IMAP4_SSL(IMAP_HOST, IMAP_PORT, timeout=30)
     conn.login(imap_user, imap_pass)
     return conn
 
@@ -172,6 +172,7 @@ def _sync_scan_bounces() -> list[dict]:
     from datetime import timedelta as _td
 
     conn = _connect_imap()
+    conn.socket().settimeout(30)  # 30s per IMAP operation
     try:
         conn.select("INBOX")
         since_date = (datetime.now() - _td(days=7)).strftime("%d-%b-%Y")
@@ -364,12 +365,19 @@ async def check_bounces() -> dict:
 # Reply Detection — scan inbox for replies from prospects
 # ═══════════════════════════════════════════════════════════════════
 
+# Max addresses to check per IMAP cycle — prevents timeout
+MAX_REPLY_CHECK_BATCH = 50
+
+
 def _sync_scan_replies(addrs_to_check: list[str], since_date: str) -> list[str]:
     """
     Blocking IMAP scan for replies — runs in a thread.
     Returns list of email addresses that have replied.
+    Limits to MAX_REPLY_CHECK_BATCH addresses per call to prevent timeouts.
     """
+    addrs_to_check = addrs_to_check[:MAX_REPLY_CHECK_BATCH]
     conn = _connect_imap()
+    conn.socket().settimeout(30)  # 30s per IMAP operation
     try:
         conn.select("INBOX")
         replied = []
@@ -408,7 +416,7 @@ async def check_replies() -> dict:
         "errors": [],
     }
 
-    # Phase 1: Get prospect map from DB
+    # Phase 1: Get prospect map from DB — ONLY prospects we've actually sent emails to
     async with async_session_factory() as db:
         sent_r = await db.execute(
             select(
@@ -417,13 +425,16 @@ async def check_replies() -> dict:
                 DroneProspect.name,
                 DroneProspect.status,
             )
+            .join(OutreachEmail, OutreachEmail.prospect_id == DroneProspect.id)
             .where(
                 DroneProspect.email.isnot(None),
+                OutreachEmail.status == "sent",
                 DroneProspect.status.notin_((
                     "replied", "meeting_booked", "converted",
                     "dead", "do_not_contact",
                 )),
             )
+            .distinct()
         )
         prospect_map = {}
         for row in sent_r.fetchall():

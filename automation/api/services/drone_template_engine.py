@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Optional
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from sqlalchemy import select
 
 from api.database import async_session_factory
 from api.models.prospect import DroneProspect, LabAudit, OutreachEmail
@@ -405,7 +406,6 @@ async def batch_compose_drafts(limit: int = 50) -> int:
     No tier restriction — if research_analyzer found a drone-relevant hook,
     the prospect gets a draft regardless of hot/warm/cold tier.
     """
-    from sqlalchemy import select
 
     async with async_session_factory() as db:
         # Get prospects that have email, haven't been sent to, and have research analysis

@@ -60,10 +60,10 @@ def generate_report_html(prospect: DroneProspect, audit: dict,
     dept = escape(prospect.department or "")
 
     # Scores
-    hw_score = audit.get("hardware_score", 0)
-    sw_score = audit.get("software_score", 0)
-    rs_score = audit.get("research_score", 0)
-    overall = audit.get("overall_score", 0)
+    hw_score = audit.get("hardware_score") or 0
+    sw_score = audit.get("software_score") or 0
+    rs_score = audit.get("research_score") or 0
+    overall = audit.get("overall_score") or 0
 
     # Header
     html = f"""
@@ -81,8 +81,8 @@ def generate_report_html(prospect: DroneProspect, audit: dict,
 """
 
     # ── Research Profile ──
-    papers_3yr = audit.get("papers_last_3yr", 0)
-    avg_cites = audit.get("avg_citations", 0)
+    papers_3yr = audit.get("papers_last_3yr") or 0
+    avg_cites = audit.get("avg_citations") or 0
     h_index = prospect.h_index or "N/A"
     areas = prospect.research_areas or []
     top_venues = audit.get("top_venues", [])
