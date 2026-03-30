@@ -13,7 +13,8 @@ const navLinks = [
   { href: "/research-match", label: "RESEARCH", code: "03" },
   { href: "/grant-calculator", label: "GRANTS", code: "04" },
   { href: "/case-studies", label: "CASES", code: "05" },
-  { href: "/contact", label: "RFQ", code: "06" },
+  { href: "/linkedin-content", label: "LINKEDIN", code: "06" },
+  { href: "/contact", label: "RFQ", code: "07" },
 ];
 
 export default function Navbar() {
