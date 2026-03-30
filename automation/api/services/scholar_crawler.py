@@ -233,7 +233,7 @@ async def _process_search_results(
             existing = await db.execute(
                 select(DroneProspect).where(DroneProspect.name == author_name)
             )
-            existing = existing.scalar_one_or_none()
+            existing = existing.scalars().first()
             if existing:
                 batch.prospects_found += 1
                 continue
