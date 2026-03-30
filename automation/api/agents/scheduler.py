@@ -202,6 +202,14 @@ class AgentScheduler:
                     icon="✅", metadata={"run": agent.runs, "elapsed_s": round(elapsed, 1), "result": _safe_meta(result)},
                 )
 
+                # Crawler health monitoring: track consecutive zero-result runs
+                if agent.name in DISCOVERY_AGENTS:
+                    try:
+                        from api.services.crawler_health import check_crawler_health
+                        await check_crawler_health(agent.name, result)
+                    except Exception as he:
+                        logger.warning("Crawler health check failed for %s: %s", agent.name, he)
+
                 # Pipeline chaining: if a discovery agent found new prospects, wake processing agents
                 if agent.name in DISCOVERY_AGENTS:
                     new_count = result.get("new", 0) or result.get("prospects_new", 0) or 0
