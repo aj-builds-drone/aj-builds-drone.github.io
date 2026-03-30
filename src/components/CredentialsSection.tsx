@@ -1,6 +1,44 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+
+function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const started = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started.current) {
+          started.current = true;
+          const duration = 1500;
+          const steps = 40;
+          const increment = target / steps;
+          let current = 0;
+          const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+              setCount(target);
+              clearInterval(timer);
+            } else {
+              setCount(Math.floor(current));
+            }
+          }, duration / steps);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [target]);
+
+  return <span ref={ref}>{count}{suffix}</span>;
+}
 
 const credentials = [
   {
@@ -108,6 +146,56 @@ export default function CredentialsSection() {
             </motion.div>
           ))}
         </div>
+
+        {/* Publications & Technical Credentials */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-16 mb-16"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <span className="font-mono text-xs text-accent-green tracking-widest">
+              [PUBLICATIONS & CREDENTIALS]
+            </span>
+            <div className="h-px flex-1 bg-gradient-to-r from-accent-green/50 to-transparent" />
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {[
+              { value: 12, suffix: "", label: "PUBLICATIONS", icon: "📄" },
+              { value: 8, suffix: "×", label: "AMD AWARDS", icon: "🏆" },
+              { value: 1, suffix: "", label: "MSU GRADUATE", icon: "🎓", display: "MSU" },
+              { value: 1, suffix: "", label: "FPGA LEAD ENGINEER", icon: "⚡", display: "FPGA" },
+              { value: 5, suffix: "G", label: "RESEARCH", icon: "📡" },
+            ].map((item, i) => (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                className="osd-card rounded-lg p-5 text-center hud-corners hover:border-accent-green/50 transition-colors"
+              >
+                <span className="text-2xl block mb-2">{item.icon}</span>
+                <span className="block font-mono text-3xl text-accent-green font-bold">
+                  {item.display ? item.display : <AnimatedCounter target={item.value} suffix={item.suffix} />}
+                </span>
+                <span className="block font-mono text-[10px] text-text-secondary tracking-widest mt-2 uppercase">
+                  {item.label}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+          <div className="mt-6 text-center">
+            <Link
+              href="/capabilities-deck"
+              className="inline-flex items-center gap-2 font-mono text-sm text-accent-green hover:text-accent-green/80 transition-colors group"
+            >
+              View Full Capabilities
+              <span className="group-hover:translate-x-1 transition-transform">→</span>
+            </Link>
+          </div>
+        </motion.div>
 
         {/* Background narrative */}
         <motion.div
