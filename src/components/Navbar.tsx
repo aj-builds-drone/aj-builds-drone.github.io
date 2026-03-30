@@ -10,7 +10,9 @@ const navLinks = [
   { href: "/", label: "HOME", code: "00" },
   { href: "/projects", label: "HANGAR", code: "01" },
   { href: "/services", label: "SERVICES", code: "02" },
-  { href: "/contact", label: "RFQ", code: "03" },
+  { href: "/research-match", label: "RESEARCH", code: "03" },
+  { href: "/grant-calculator", label: "GRANTS", code: "04" },
+  { href: "/contact", label: "RFQ", code: "05" },
 ];
 
 export default function Navbar() {
