@@ -1,5 +1,6 @@
 import { SectionHeader } from "@/components/HUDElements";
 import ResearchMatcher from "@/components/ResearchMatcher";
+import PaperFinder from "@/components/PaperFinder";
 import VideoBackground from "@/components/VideoBackground";
 
 export const metadata = {
@@ -32,6 +33,13 @@ export default function ResearchMatchPage() {
             subtitle="Select your research areas to discover matching drone capabilities and collaboration opportunities. Built for professors, PIs, and research teams exploring aerial robotics integration."
             as="h1"
           />
+        </div>
+      </section>
+
+      {/* Paper Finder */}
+      <section className="py-16 border-b border-border-dim">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <PaperFinder />
         </div>
       </section>
 

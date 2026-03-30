@@ -6,6 +6,7 @@ import FlightLog from "@/components/FlightLog";
 import TelemetryDashboard from "@/components/Telemetry/TelemetryDashboard";
 import GitHubActivity from "@/components/GitHubActivity";
 import DroneBuilder from "@/components/DroneBuilder/DroneBuilder";
+import ServiceAreaMap from "@/components/ServiceAreaMap";
 import VideoBackground from "@/components/VideoBackground";
 import { getProjects } from "@/lib/getProjects";
 import ProjectCard from "@/components/ProjectCard";
@@ -124,6 +125,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* Service Area Map */}
+      <ServiceAreaMap />
 
       {/* Flight Log — Embedded YouTube reel */}
       <FlightLog />
