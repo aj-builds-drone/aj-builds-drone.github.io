@@ -138,8 +138,17 @@ def _parse_research_areas(interests: list[str]) -> list[str]:
 
 def _scholarly_search_pubs(query: str, year_low: int, max_results: int = 10) -> list[dict]:
     """Synchronous: search Google Scholar publications via scholarly."""
-    from scholarly import scholarly
+    from scholarly import scholarly, ProxyGenerator
     import time
+
+    # Set up proxy rotation to avoid Google blocks
+    try:
+        pg = ProxyGenerator()
+        pg.FreeProxies()
+        scholarly.use_proxy(pg)
+        logger.info("Scholar: using free proxy rotation")
+    except Exception as e:
+        logger.warning("Scholar: proxy setup failed (%s), using direct connection", e)
 
     results = []
     try:
@@ -148,7 +157,7 @@ def _scholarly_search_pubs(query: str, year_low: int, max_results: int = 10) -> 
             if i >= max_results:
                 break
             results.append(pub)
-            time.sleep(random.uniform(1.0, 2.0))  # polite delay between iterations
+            time.sleep(random.uniform(5.0, 10.0))  # longer delay to avoid detection
     except Exception as e:
         logger.error("scholarly search_pubs error for %r: %s", query, e)
     return results
@@ -164,7 +173,7 @@ def _scholarly_get_author(author_name: str) -> Optional[dict]:
         author = next(search, None)
         if author is None:
             return None
-        time.sleep(random.uniform(2.0, 4.0))
+        time.sleep(random.uniform(8.0, 15.0))  # longer delay for profile fills
         filled = scholarly.fill(author, sections=["basics", "indices", "publications"])
         return filled
     except StopIteration:
@@ -240,7 +249,7 @@ async def _process_search_results(
 
             # Get detailed profile
             profile = await _get_author_profile(author_name)
-            await asyncio.sleep(random.uniform(3.0, 5.0))  # polite delay
+            await asyncio.sleep(random.uniform(8.0, 15.0))  # longer delay to avoid detection
 
             affiliation = ""
             interests = []
@@ -355,9 +364,9 @@ async def crawl_scholar(query: Optional[str] = None, max_pages: int = 5) -> dict
                 total_new += n
                 await db.flush()
 
-                await asyncio.sleep(random.uniform(3.0, 5.0))  # polite delay between pages
+                await asyncio.sleep(random.uniform(10.0, 20.0))  # longer delay to avoid Google blocks
 
-            await asyncio.sleep(random.uniform(5.0, 8.0))  # delay between queries
+            await asyncio.sleep(random.uniform(15.0, 30.0))  # significant delay between queries
 
         batch.status = "complete"
         batch.completed_at = datetime.now(timezone.utc)
