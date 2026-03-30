@@ -30,7 +30,7 @@ CIRCUIT_BREAKER_RESET_MINUTES = 60  # Auto-resume after this many minutes
 # Agent groups for pipeline chaining
 DISCOVERY_AGENTS = {
     "scholar_crawler", "nsf_crawler", "faculty_crawler",
-    "arxiv_crawler", "github_crawler", "sam_gov_crawler",
+    "arxiv_crawler", "github_crawler", "sam_gov_crawler", "conference_crawler",
 }
 # Processing agents wake early when new prospects are discovered
 PIPELINE_AGENTS = {
@@ -379,7 +379,7 @@ AGENT_ICONS = {
     "arxiv_crawler": "📄", "batch_scorer": "📊", "deduplicator": "🔗",
     "enrichment": "🔍", "lab_auditor": "🏗️", "copywriter": "✉️",
     "cadence_sender": "📤", "prospect_enqueue": "📥", "github_crawler": "🐙",
-    "sam_gov_crawler": "🇺🇸", "email_hunter": "📧", "research_analyzer": "🧠",
+    "sam_gov_crawler": "🇺🇸", "email_hunter": "📧", "research_analyzer": "🧠", "conference_crawler": "🎤",
     "geocoder": "📍",
 }
 
@@ -520,6 +520,13 @@ async def run_github_agent() -> dict:
     return result
 
 
+async def run_conference_agent() -> dict:
+    """Run conference speaker discovery crawl."""
+    from api.services.conference_crawler import crawl_conferences
+    result = await crawl_conferences()
+    return result
+
+
 async def run_sam_gov_agent() -> dict:
     """Run SAM.gov solicitation discovery crawl."""
     from api.services.sam_crawler import crawl_sam_gov
@@ -593,6 +600,9 @@ def register_all_agents():
     # Phase 6: Scale agents
     scheduler.register("github_crawler", run_github_agent, interval_seconds=6 * 3600)       # Every 6 hours — GitHub contributors
     scheduler.register("sam_gov_crawler", run_sam_gov_agent, interval_seconds=4 * 3600)      # Every 4 hours — SAM.gov solicitations
+
+    # Conference speaker crawler — ICRA, IROS, RSS, AUVSI, etc.
+    scheduler.register("conference_crawler", run_conference_agent, interval_seconds=12 * 3600)  # Every 12 hours — conference speakers
 
     # Email Hunter — aggressive email discovery for all prospects
     scheduler.register("email_hunter", run_email_hunter_agent, interval_seconds=30 * 60)    # Every 30 min — find missing emails

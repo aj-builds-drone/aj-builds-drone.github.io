@@ -86,6 +86,24 @@ TARGET_DEPARTMENTS = [
     ("University of Sydney", "ACFR", "https://www.sydney.edu.au/engineering/our-research/robotics-and-intelligent-systems/australian-centre-for-field-robotics.html"),
     ("QUT Brisbane", "Robotics", "https://research.qut.edu.au/qcr/people/"),
     ("ANU Canberra", "Robotics", "https://comp.anu.edu.au/people/"),
+    # ── Cross-disciplinary: Agriculture, Geology, Civil, Environmental (added 2026-03-30) ──
+    ("UC Davis", "Biological & Agricultural Engineering", "https://bae.ucdavis.edu/people/faculty"),
+    ("Oregon State", "Geosciences", "https://geo.oregonstate.edu/people"),
+    ("University of Florida", "Agricultural & Biological Engineering", "https://abe.ufl.edu/people/faculty/"),
+    ("Texas A&M", "Civil Engineering", "https://engineering.tamu.edu/civil/profiles/faculty.html"),
+    ("Purdue", "Agricultural & Biological Engineering", "https://engineering.purdue.edu/ABE/people/faculty"),
+    ("University of Minnesota", "Bioproducts & Biosystems Engineering", "https://bbe.umn.edu/people/faculty"),
+    ("Colorado School of Mines", "Geology & Geological Engineering", "https://geology.mines.edu/faculty-list/"),
+    ("Virginia Tech", "Civil & Environmental Engineering", "https://cee.vt.edu/people/faculty.html"),
+    ("NC State", "Biological & Agricultural Engineering", "https://www.bae.ncsu.edu/people/faculty/"),
+    ("Michigan State", "Biosystems & Agricultural Engineering", "https://www.egr.msu.edu/bae/people/faculty"),
+    ("Penn State", "Civil & Environmental Engineering", "https://www.cee.psu.edu/department/directory/faculty.aspx"),
+    ("Iowa State", "Agricultural & Biosystems Engineering", "https://www.abe.iastate.edu/people/faculty/"),
+    ("Kansas State", "Biological & Agricultural Engineering", "https://www.bae.k-state.edu/people/faculty/"),
+    ("University of Georgia", "College of Engineering", "https://engineering.uga.edu/people/faculty"),
+    ("UPenn", "Mechanical Engineering (GRASP Lab)", "https://www.grasp.upenn.edu/people/"),
+    ("ETH Zurich", "Environmental Systems Science", "https://usys.ethz.ch/en/people.html"),
+    ("TU Delft", "Civil Engineering & Geosciences", "https://www.tudelft.nl/en/ceg/about-faculty/departments/geoscience-remote-sensing/staff"),
 ]
 
 # Drone-related keywords to filter faculty by research interests

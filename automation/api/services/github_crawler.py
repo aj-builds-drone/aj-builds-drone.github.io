@@ -67,6 +67,22 @@ TARGET_REPOS = [
     "betaflight/betaflight",
     "iNavFlight/inav",
     "cleanflight/cleanflight",
+    # ── Research / .edu focused repos (added 2026-03-30) ──
+    "kumarrobotics/msckf_vio",
+    "KumarRobotics/kr_autonomous_flight",
+    "utiasDSL/gym-pybullet-drones",
+    "mit-acl/cadrl",
+    "StanfordASL/AA274A",
+    "ethz-asl/maplab",
+    "ethz-asl/okvis",
+    "ethz-asl/kalibr",
+    "HKUST-Aerial-Robotics/Fast-Planner",
+    "HKUST-Aerial-Robotics/ego-planner",
+    "uzh-rpg/agile_autonomy",
+    "uzh-rpg/event-based_vision_resources",
+    "mit-biomimetics/Cheetah-Software",
+    "utiasASRL/vtr3",
+    "ntnu-arl/aerial_gym_simulator",
 ]
 
 GH_API = "https://api.github.com"

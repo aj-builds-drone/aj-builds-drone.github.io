@@ -53,6 +53,17 @@ NSF_QUERIES = [
     "cooperative unmanned",
     "drone inspection infrastructure",
     "beyond visual line of sight",
+    # ── Program-code / applied terms (added 2026-03-30) ──
+    "CAREER award drone",
+    "NRI robotics",
+    "CPS cyber-physical systems UAV",
+    "EFRI emerging frontiers robotics",
+    "precision agriculture UAS",
+    "drone environmental monitoring",
+    "UAV geological survey",
+    "civil infrastructure inspection UAS",
+    "unmanned systems wildfire",
+    "UAS coastal erosion",
 ]
 
 # NSF program codes relevant to drone research

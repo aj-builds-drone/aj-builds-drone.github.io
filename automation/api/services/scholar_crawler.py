@@ -60,6 +60,22 @@ SCHOLAR_QUERIES = [
     "model predictive control quadrotor trajectory",
     "UAV bridge inspection structural health",
     "precision agriculture drone multispectral",
+    # ── Practical / applied terms (added 2026-03-30) ──
+    "drone survey construction site",
+    "UAV data collection pipeline",
+    "aerial robotics laboratory",
+    "unmanned systems research center",
+    "drone testbed facility",
+    "drone photogrammetry workflow",
+    "UAV thermal inspection roof",
+    "drone crop spraying agriculture",
+    "UAV corridor mapping pipeline",
+    "drone stockpile volume measurement",
+    "UAS wildfire monitoring",
+    "drone power line inspection utility",
+    "UAV search and rescue wilderness",
+    "drone environmental monitoring water quality",
+    "sUAS geospatial data processing",
 ]
 
 # Daily call tracking (raised to 500 — scholarly is free)

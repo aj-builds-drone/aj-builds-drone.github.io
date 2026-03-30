@@ -20,7 +20,7 @@ ALERT_THRESHOLD = 3  # consecutive zero-result runs before alerting
 # Crawler names we monitor
 MONITORED_CRAWLERS = {
     "scholar_crawler", "nsf_crawler", "faculty_crawler",
-    "arxiv_crawler", "github_crawler",
+    "arxiv_crawler", "github_crawler", "conference_crawler",
 }
 
 

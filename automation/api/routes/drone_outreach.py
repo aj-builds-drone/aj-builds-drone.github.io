@@ -108,6 +108,14 @@ async def trigger_github_crawl(body: dict = {}):
     return result
 
 
+@router.post("/discover/conference")
+async def trigger_conference_crawl(body: dict = {}):
+    """Trigger conference speaker discovery crawl (ICRA, IROS, RSS, AUVSI, etc.)."""
+    from api.services.conference_crawler import crawl_conferences
+    result = await crawl_conferences()
+    return result
+
+
 @router.post("/discover/sam-gov")
 async def trigger_sam_gov_crawl(body: dict = {}):
     """Trigger SAM.gov government solicitation discovery crawl."""
@@ -122,7 +130,7 @@ async def seed_batch(body: dict = {}):
     Seed a large initial batch of prospects by triggering all discovery sources.
     Used to bootstrap the pipeline with 500+ prospects.
     """
-    sources = body.get("sources", ["scholar", "nsf", "faculty", "arxiv", "github", "sam_gov"])
+    sources = body.get("sources", ["scholar", "nsf", "faculty", "arxiv", "github", "sam_gov", "conference"])
     results = {}
 
     if "scholar" in sources:
@@ -148,6 +156,10 @@ async def seed_batch(body: dict = {}):
     if "sam_gov" in sources:
         from api.services.sam_crawler import crawl_sam_gov
         results["sam_gov"] = await crawl_sam_gov()
+
+    if "conference" in sources:
+        from api.services.conference_crawler import crawl_conferences
+        results["conference"] = await crawl_conferences()
 
     total_new = sum(r.get("prospects_new", 0) for r in results.values())
     total_found = sum(r.get("prospects_found", 0) for r in results.values())
