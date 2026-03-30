@@ -95,7 +95,7 @@ class Settings(BaseSettings):
 
     # Scholar / Academic discovery
     serpapi_key: str = Field(default="", description="SerpAPI key for Google Scholar scraping")
-    scholar_daily_limit: int = Field(default=100, description="Max Scholar API calls per day")
+    scholar_daily_limit: int = Field(default=500, description="Max Scholar API calls per day")
     nsf_api_base: str = Field(default="https://api.nsf.gov/services/v1/awards.json", description="NSF Award Search API")
     hunter_api_key: str = Field(default="", description="Hunter.io API key for email enrichment (optional)")
 

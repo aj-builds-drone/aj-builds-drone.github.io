@@ -1,8 +1,8 @@
 """
 Google Scholar Crawler — Discover professors publishing drone/UAV/SLAM/FPGA papers.
 
-Uses SerpAPI (Google Scholar endpoint) to find authors, extract profiles,
-and create DroneProspect records with research data.
+Uses the `scholarly` library to scrape Google Scholar directly (no API key needed).
+Finds authors, extracts profiles, and creates DroneProspect records with research data.
 
 Discovery sources:
 - Google Scholar search for drone-related keywords
@@ -11,12 +11,12 @@ Discovery sources:
 
 import asyncio
 import logging
+import random
 import re
 from datetime import datetime, timezone
 from typing import Optional
 from uuid import uuid4
 
-import aiohttp
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -62,9 +62,8 @@ SCHOLAR_QUERIES = [
     "precision agriculture drone multispectral",
 ]
 
-SERPAPI_BASE = "https://serpapi.com/search"
-
-# Daily call tracking
+# Daily call tracking (raised to 500 — scholarly is free)
+DAILY_LIMIT = 500
 _daily_calls = 0
 _daily_date = ""
 
@@ -75,8 +74,8 @@ def _check_daily_limit() -> bool:
     if _daily_date != today:
         _daily_calls = 0
         _daily_date = today
-    if _daily_calls >= settings.scholar_daily_limit:
-        logger.warning("Scholar daily limit reached (%d/%d)", _daily_calls, settings.scholar_daily_limit)
+    if _daily_calls >= DAILY_LIMIT:
+        logger.warning("Scholar daily limit reached (%d/%d)", _daily_calls, DAILY_LIMIT)
         return False
     return True
 
@@ -94,14 +93,11 @@ def _extract_university(affiliation: str) -> Optional[str]:
     """Extract university name from affiliation string like 'Professor, MIT'."""
     if not affiliation:
         return None
-    # Common patterns: "Department, University" or "University"
     parts = [p.strip() for p in affiliation.split(",")]
-    # Look for part containing "university", "institute", "college", etc.
     for part in parts:
         lower = part.lower()
         if any(kw in lower for kw in ("university", "institute", "college", "polytechnic", "school of")):
             return part
-    # If no match, return the last part (often the institution)
     return parts[-1] if parts else None
 
 
@@ -133,142 +129,165 @@ def _parse_research_areas(interests: list[str]) -> list[str]:
         interest_lower = interest.lower()
         if any(kw in interest_lower for kw in drone_keywords):
             areas.append(interest)
-    return areas or interests[:5]  # fallback: first 5 interests
+    return areas or interests[:5]
 
 
-async def _search_scholar(
-    session: aiohttp.ClientSession,
-    query: str,
-    start: int = 0,
-) -> dict:
-    """Search Google Scholar via SerpAPI."""
-    if not _check_daily_limit():
-        return {"organic_results": []}
-    _increment_call()
+# ---------------------------------------------------------------------------
+# scholarly wrappers (synchronous lib → asyncio.to_thread)
+# ---------------------------------------------------------------------------
 
-    params = {
-        "engine": "google_scholar",
-        "q": query,
-        "api_key": settings.serpapi_key,
-        "start": start,
-        "num": 10,
-        "as_ylo": datetime.now().year - 3,  # last 3 years only
-    }
+def _scholarly_search_pubs(query: str, year_low: int, max_results: int = 10) -> list[dict]:
+    """Synchronous: search Google Scholar publications via scholarly."""
+    from scholarly import scholarly
+    import time
+
+    results = []
+    try:
+        search_gen = scholarly.search_pubs(query, year_low=year_low)
+        for i, pub in enumerate(search_gen):
+            if i >= max_results:
+                break
+            results.append(pub)
+            time.sleep(random.uniform(1.0, 2.0))  # polite delay between iterations
+    except Exception as e:
+        logger.error("scholarly search_pubs error for %r: %s", query, e)
+    return results
+
+
+def _scholarly_get_author(author_name: str) -> Optional[dict]:
+    """Synchronous: search for an author by name and fill their profile."""
+    from scholarly import scholarly
+    import time
 
     try:
-        async with session.get(SERPAPI_BASE, params=params, timeout=aiohttp.ClientTimeout(total=30)) as resp:
-            if resp.status == 429:
-                logger.warning("Scholar API rate limited (429) — backing off 60s")
-                await asyncio.sleep(60)
-                return {"organic_results": []}
-            if resp.status != 200:
-                logger.error("Scholar API error: %d", resp.status)
-                return {"organic_results": []}
-            return await resp.json()
+        search = scholarly.search_author(author_name)
+        author = next(search, None)
+        if author is None:
+            return None
+        time.sleep(random.uniform(2.0, 4.0))
+        filled = scholarly.fill(author, sections=["basics", "indices", "publications"])
+        return filled
+    except StopIteration:
+        return None
     except Exception as e:
-        logger.error("Scholar API exception: %s", e)
-        return {"organic_results": []}
+        logger.warning("scholarly author lookup error for %r: %s", author_name, e)
+        return None
 
 
-async def _get_author_profile(
-    session: aiohttp.ClientSession,
-    author_id: str,
-) -> dict:
-    """Get detailed author profile from Google Scholar via SerpAPI."""
+async def _search_scholar_pubs(query: str, start: int = 0) -> list[dict]:
+    """Search Google Scholar via scholarly (async wrapper)."""
     if not _check_daily_limit():
-        return {}
+        return []
     _increment_call()
 
-    params = {
-        "engine": "google_scholar_author",
-        "author_id": author_id,
-        "api_key": settings.serpapi_key,
-    }
+    year_low = datetime.now().year - 3
+    try:
+        results = await asyncio.to_thread(_scholarly_search_pubs, query, year_low, max_results=10)
+        return results
+    except Exception as e:
+        logger.error("Scholar search exception: %s", e)
+        return []
+
+
+async def _get_author_profile(author_name: str) -> Optional[dict]:
+    """Get detailed author profile from scholarly (async wrapper)."""
+    if not _check_daily_limit():
+        return None
+    _increment_call()
 
     try:
-        async with session.get(SERPAPI_BASE, params=params, timeout=aiohttp.ClientTimeout(total=30)) as resp:
-            if resp.status != 200:
-                return {}
-            return await resp.json()
+        profile = await asyncio.to_thread(_scholarly_get_author, author_name)
+        return profile
     except Exception as e:
-        logger.error("Author profile API exception: %s", e)
-        return {}
+        logger.error("Author profile exception: %s", e)
+        return None
+
+
+def _extract_author_id_from_profile(profile: dict) -> Optional[str]:
+    """Extract Google Scholar author ID from a scholarly profile dict."""
+    return profile.get("scholar_id") or profile.get("author_id")
 
 
 async def _process_search_results(
-    http: aiohttp.ClientSession,
     db: AsyncSession,
     results: list[dict],
     batch: DiscoveryBatch,
 ) -> int:
-    """Process search results, extract authors, create prospect records."""
+    """Process scholarly search results, extract authors, create prospect records."""
     new_count = 0
 
-    for result in results:
-        # Extract authors from publication info
-        pub_info = result.get("publication_info", {})
-        authors_data = pub_info.get("authors", [])
+    for pub in results:
+        bib = pub.get("bib", {})
+        author_names = bib.get("author", [])
+        if isinstance(author_names, str):
+            author_names = [a.strip() for a in author_names.split(" and ")]
 
-        for author in authors_data:
-            author_id = author.get("author_id")
-            author_name = author.get("name", "").strip()
+        pub_url = pub.get("pub_url") or pub.get("eprint_url") or ""
 
-            if not author_name:
+        for author_name in author_names:
+            author_name = author_name.strip()
+            if not author_name or len(author_name) < 3:
                 continue
 
-            # Check for duplicate by name+org (scholar_url if available)
-            existing = None
-            if author_id:
-                scholar_url = f"https://scholar.google.com/citations?user={author_id}"
-                existing = await db.execute(
-                    select(DroneProspect).where(DroneProspect.scholar_url == scholar_url)
-                )
-                existing = existing.scalar_one_or_none()
-
+            # Check for duplicate by name
+            existing = await db.execute(
+                select(DroneProspect).where(DroneProspect.name == author_name)
+            )
+            existing = existing.scalar_one_or_none()
             if existing:
                 batch.prospects_found += 1
                 continue
 
             # Get detailed profile
-            profile = {}
-            if author_id:
-                profile = await _get_author_profile(http, author_id)
-                await asyncio.sleep(1)  # rate limit
+            profile = await _get_author_profile(author_name)
+            await asyncio.sleep(random.uniform(3.0, 5.0))  # polite delay
 
-            author_info = profile.get("author", {})
-            affiliation = author_info.get("affiliations", "")
-            interests = [i.get("title", "") for i in author_info.get("interests", [])]
+            affiliation = ""
+            interests = []
+            h_index = None
+            total_citations = None
+            scholar_url = None
+            recent_papers = []
+
+            if profile:
+                affiliation = profile.get("affiliation", "")
+                interests = [i if isinstance(i, str) else i.get("title", "") for i in (profile.get("interests") or [])]
+                scholar_id = _extract_author_id_from_profile(profile)
+                if scholar_id:
+                    scholar_url = f"https://scholar.google.com/citations?user={scholar_id}"
+
+                # Check duplicate by scholar_url too
+                if scholar_url:
+                    dup = await db.execute(
+                        select(DroneProspect).where(DroneProspect.scholar_url == scholar_url)
+                    )
+                    if dup.scalar_one_or_none():
+                        batch.prospects_found += 1
+                        continue
+
+                h_index = profile.get("hindex") or profile.get("citedby", None)
+                # scholarly stores indices in different ways
+                if isinstance(h_index, dict):
+                    h_index = h_index.get("all") or h_index.get("5y")
+                total_citations = profile.get("citedby") if isinstance(profile.get("citedby"), int) else None
+
+                # Extract recent papers from filled publications
+                for article in (profile.get("publications") or [])[:10]:
+                    a_bib = article.get("bib", {})
+                    recent_papers.append({
+                        "title": a_bib.get("title", ""),
+                        "year": str(a_bib.get("pub_year", "")),
+                        "citation_count": article.get("num_citations", 0),
+                        "url": article.get("pub_url") or article.get("eprint_url") or "",
+                    })
 
             university = _extract_university(affiliation)
             department = _extract_department(affiliation)
-
             if not university:
                 university = affiliation or "Unknown"
 
-            # Extract citation stats
-            cited_by = profile.get("cited_by", {})
-            h_index = None
-            total_citations = None
-            if cited_by:
-                for table_entry in cited_by.get("table", []):
-                    if table_entry.get("citations", {}).get("all") is not None:
-                        total_citations = table_entry["citations"]["all"]
-                    if table_entry.get("h_index", {}).get("all") is not None:
-                        h_index = table_entry["h_index"]["all"]
-
-            # Extract recent papers
-            recent_papers = []
-            for article in (profile.get("articles", []) or [])[:10]:
-                recent_papers.append({
-                    "title": article.get("title", ""),
-                    "year": article.get("year", ""),
-                    "citation_count": article.get("cited_by", {}).get("value", 0),
-                    "url": article.get("link", ""),
-                })
-
             research_areas = _parse_research_areas(interests)
 
-            # Create prospect
             prospect = DroneProspect(
                 id=uuid4(),
                 name=author_name,
@@ -276,13 +295,13 @@ async def _process_search_results(
                 department=department,
                 organization=university,
                 organization_type="university",
-                scholar_url=f"https://scholar.google.com/citations?user={author_id}" if author_id else None,
+                scholar_url=scholar_url,
                 research_areas=research_areas,
                 recent_papers=recent_papers,
                 h_index=h_index,
                 total_citations=total_citations,
                 source="google_scholar",
-                source_url=result.get("link", ""),
+                source_url=pub_url,
                 discovery_batch_id=batch.id,
                 status="discovered",
             )
@@ -308,10 +327,6 @@ async def crawl_scholar(query: Optional[str] = None, max_pages: int = 5) -> dict
     Returns:
         {"batch_id": str, "found": int, "new": int}
     """
-    if not settings.serpapi_key:
-        logger.warning("No SerpAPI key configured — skipping Scholar crawl")
-        return {"error": "No SerpAPI key configured"}
-
     queries = [query] if query else SCHOLAR_QUERIES
 
     async with async_session_factory() as db:
@@ -327,24 +342,22 @@ async def crawl_scholar(query: Optional[str] = None, max_pages: int = 5) -> dict
 
         total_new = 0
 
-        async with aiohttp.ClientSession() as http:
-            for q in queries:
-                if not _check_daily_limit():
+        for q in queries:
+            if not _check_daily_limit():
+                break
+
+            for page in range(max_pages):
+                results = await _search_scholar_pubs(q, start=page * 10)
+                if not results:
                     break
 
-                for page in range(max_pages):
-                    data = await _search_scholar(http, q, start=page * 10)
-                    results = data.get("organic_results", [])
-                    if not results:
-                        break
+                n = await _process_search_results(db, results, batch)
+                total_new += n
+                await db.flush()
 
-                    n = await _process_search_results(http, db, results, batch)
-                    total_new += n
-                    await db.flush()
+                await asyncio.sleep(random.uniform(3.0, 5.0))  # polite delay between pages
 
-                    await asyncio.sleep(2)  # polite delay between pages
-
-                await asyncio.sleep(5)  # delay between queries to avoid 429s
+            await asyncio.sleep(random.uniform(5.0, 8.0))  # delay between queries
 
         batch.status = "complete"
         batch.completed_at = datetime.now(timezone.utc)
