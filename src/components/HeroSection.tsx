@@ -90,11 +90,11 @@ export default function HeroSection() {
           className="mb-8"
         >
           <h1 className="font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight break-words w-full max-w-full overflow-hidden">
-            <span className="text-foreground">UAV Systems Contractor:</span>
+            <span className="text-foreground">Custom UAV Platforms for</span>
             <br />
-            <span className="text-accent-orange">From Simulation</span>
+            <span className="text-accent-orange">Academic Research</span>
             <br />
-            <span className="text-accent-green">to Maiden Flight.</span>
+            <span className="text-accent-green">& Industrial Inspection.</span>
           </h1>
         </motion.div>
 

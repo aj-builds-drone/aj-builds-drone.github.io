@@ -23,6 +23,65 @@ export default async function Home() {
       {/* Operator Credentials & Stats */}
       <CredentialsSection />
 
+      {/* For Researchers */}
+      <section className="py-24 border-t border-border-dim">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="font-mono text-xs text-accent-green tracking-widest">[RSR]</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-accent-green/50 to-transparent" />
+          </div>
+          <h2 className="font-mono text-2xl md:text-3xl font-bold tracking-wider mb-4">FOR RESEARCHERS</h2>
+          <p className="text-text-secondary max-w-2xl mb-8">
+            Purpose-built UAV platforms designed for academic research labs. We support you from grant proposal through deployment.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: "▣", title: "Grant Proposal Support", desc: "Equipment specs, BOMs, and budget justifications for NSF, DOE, USDA applications" },
+              { icon: "⬡", title: "Custom Data Pipelines", desc: "Sensor → cloud → analysis workflows tailored to your research methodology" },
+              { icon: "◈", title: "Automated Missions", desc: "Repeatable survey patterns with terrain-following for longitudinal studies" },
+              { icon: "◉", title: "CV & ML Integration", desc: "Deploy trained models on aerial data — crop health, defect detection, wildlife counting" },
+            ].map((item) => (
+              <div key={item.title} className="border border-border-dim rounded-lg p-6 hover:border-accent-green/50 transition-colors">
+                <span className="text-2xl text-accent-green">{item.icon}</span>
+                <h3 className="font-mono text-sm font-bold tracking-wider mt-3 mb-2">{item.title}</h3>
+                <p className="text-text-secondary text-xs leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8">
+            <Link href="/services/ai-automation" className="btn-glitch inline-flex items-center gap-2 px-8 py-3 border border-accent-green text-accent-green font-mono text-xs tracking-widest rounded hover:bg-accent-green/10 transition-colors">
+              ▶ AI AUTOMATION SERVICES
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Research Areas */}
+      <section className="py-16 border-t border-border-dim">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="font-mono text-xs text-accent-orange tracking-widest">[OPS]</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-accent-orange/50 to-transparent" />
+          </div>
+          <h2 className="font-mono text-2xl md:text-3xl font-bold tracking-wider mb-8">RESEARCH AREAS</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {[
+              { icon: "🌿", label: "Environmental Monitoring", desc: "Air quality, water sampling, ecosystem mapping" },
+              { icon: "🌾", label: "Agricultural Survey", desc: "Crop health, NDVI analysis, precision agriculture" },
+              { icon: "🏗️", label: "Infrastructure Inspection", desc: "Bridges, towers, pipelines, solar farms" },
+              { icon: "🔍", label: "Search & Rescue", desc: "Thermal imaging, autonomous search patterns" },
+              { icon: "🗺️", label: "Geological Mapping", desc: "Photogrammetry, LiDAR, terrain modeling" },
+            ].map((area) => (
+              <div key={area.label} className="border border-border-dim rounded-lg p-5 text-center hover:border-accent-orange/50 transition-colors">
+                <div className="text-2xl mb-2">{area.icon}</div>
+                <h3 className="font-mono text-xs font-bold tracking-wider mb-1">{area.label}</h3>
+                <p className="text-text-secondary text-[10px] leading-relaxed">{area.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Featured Projects Preview */}
       <section className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

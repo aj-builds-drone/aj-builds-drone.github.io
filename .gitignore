@@ -51,6 +51,9 @@ automation/.venv/
 automation/data/
 automation/__pycache__/
 
+# OpenClaw agent state (contains auth tokens, session data)
+.openclaw/
+
 # docker (secrets live in .env, not in compose)
 docker-compose.override.yml
 
@@ -68,4 +71,4 @@ UPGRADE_PLAN.md
 /public/models/
 
 # raw uncompressed video sources (keep only compressed)
-public/videos/*-raw.mp4
+public/videos/*-raw.mp4.env.secrets
