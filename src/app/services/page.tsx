@@ -2,6 +2,7 @@ import { SectionHeader } from "@/components/HUDElements";
 import Link from "next/link";
 import VideoBackground from "@/components/VideoBackground";
 import PricingCalculator from "@/components/PricingCalculator";
+import DataPipeline from "@/components/DataPipeline/DataPipeline";
 
 export const metadata = {
   title: "Services — Drone, FPGA & Aerial Photography",
@@ -296,6 +297,9 @@ export default function ServicesPage() {
             ))}
           </div>
         </div>
+
+        {/* Data Pipeline */}
+        <DataPipeline />
 
         {/* Pricing Calculator */}
         <PricingCalculator />
