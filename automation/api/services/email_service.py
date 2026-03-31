@@ -32,9 +32,11 @@ async def send_email(
     Returns {"success": True/False, "message": "..."}
     """
     # ── KILL SWITCH: emails_disabled blocks ALL SMTP sends ──
+    # ⛔ DO NOT REMOVE — AJ (owner) explicitly disabled drone email sending
+    # on 2026-03-31. Only AJ can authorize re-enabling this.
     if getattr(settings, "emails_disabled", False):
-        logger.warning("EMAIL KILL SWITCH ACTIVE — refusing SMTP send to %s", to)
-        return {"success": False, "message": "Email sending is disabled (emails_disabled=True in config)."}
+        logger.warning("EMAIL KILL SWITCH ACTIVE — refusing SMTP send to %s (owner-locked 2026-03-31)", to)
+        return {"success": False, "message": "Email sending is disabled per owner directive (2026-03-31). Contact AJ to re-enable."}
 
     sender = settings.smtp_email
     password = settings.smtp_app_password

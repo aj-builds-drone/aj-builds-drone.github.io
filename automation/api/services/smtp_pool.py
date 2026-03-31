@@ -68,10 +68,12 @@ async def send_via_pool(
     Returns {"success": bool, "provider": str, "message": str, ...}
     """
     # ── KILL SWITCH: emails_disabled blocks ALL SMTP sends ──
+    # ⛔ DO NOT REMOVE — AJ (owner) explicitly disabled drone email sending
+    # on 2026-03-31. Only AJ can authorize re-enabling this.
     from api.config import settings as _cfg
     if getattr(_cfg, "emails_disabled", False):
-        logger.warning("EMAIL KILL SWITCH ACTIVE — refusing pool send to %s", to)
-        return {"success": False, "provider": "none", "message": "Email sending is disabled (emails_disabled=True)."}
+        logger.warning("EMAIL KILL SWITCH ACTIVE — refusing pool send to %s (owner-locked 2026-03-31)", to)
+        return {"success": False, "provider": "none", "message": "Email sending disabled per owner directive (2026-03-31)."}
 
     today = date.today()
 

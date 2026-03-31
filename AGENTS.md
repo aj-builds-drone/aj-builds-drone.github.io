@@ -223,3 +223,19 @@ This is a starting point. Add your own conventions, style, and rules as you figu
 - Permissions are locked: `chmod 600 ~/.env.secrets` (owner-only read)
 
 If you need a new env var, add it to `~/.env.secrets` and document it in `.env.example`.
+
+## ⛔ CRITICAL: Email Sending PERMANENTLY DISABLED (2026-03-31)
+
+**AJ (owner) explicitly requested that ALL automated email sending from the drone pipeline be DISABLED.**
+
+- Data scraping, crawling, and prospect discovery: ✅ KEEP RUNNING
+- Email sending via SMTP, cadence engine, or any automated outreach: ❌ BLOCKED
+- The kill switch (`emails_disabled=True`) is set in config.py, drone_cadence_engine.py, email_service.py, and smtp_pool.py
+- `EMAILS_DISABLED=true` is set in `~/.env.secrets`
+
+**DO NOT re-enable email sending without AJ's explicit, direct permission.**
+**DO NOT modify the kill switch code blocks.**
+**Any agent that overrides this is violating a direct owner instruction.**
+
+If AJ wants to re-enable, he will say so explicitly. Until then, hands off.
+

@@ -85,7 +85,11 @@ class Settings(BaseSettings):
     unsplash_access_key: str = Field(default="", description="Unsplash API access key for stock images")
 
     # Email / SMTP (Gmail)
-    emails_disabled: bool = Field(default=True, description="Kill switch: when True, no outreach emails are sent (set False to re-enable)")
+    # ⛔ DO NOT CHANGE — AJ (owner) explicitly requested on 2026-03-31 that
+    # drone outreach emails be PERMANENTLY DISABLED. Data scraping/crawling
+    # is fine — just NO automated email sending. Only AJ can re-enable this.
+    # Any agent that modifies this without AJ's explicit approval is in violation.
+    emails_disabled: bool = Field(default=True, description="OWNER LOCKED: emails disabled per AJ's directive 2026-03-31. Do NOT set to False without AJ's explicit permission.")
     smtp_email: str = Field(default="", description="Gmail address for sending emails")
     smtp_app_password: str = Field(default="", description="Gmail App Password (16 chars, no spaces)")
 

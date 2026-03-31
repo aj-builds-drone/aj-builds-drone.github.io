@@ -355,9 +355,12 @@ async def send_email_record(email_id: str):
     Returns True on success, False on failure, 'limit_exceeded' if quota hit.
     """
     # ── KILL SWITCH: emails_disabled in config blocks ALL sends ──
+    # ⛔ DO NOT REMOVE — AJ (owner) explicitly disabled drone email sending
+    # on 2026-03-31. Crawlers/scrapers should keep running. Only email
+    # sending is blocked. Only AJ can authorize re-enabling this.
     from api.config import settings as _cfg
     if getattr(_cfg, "emails_disabled", False):
-        logger.warning("EMAIL KILL SWITCH ACTIVE — refusing to send email %s", email_id)
+        logger.warning("EMAIL KILL SWITCH ACTIVE — refusing to send email %s (owner-locked 2026-03-31)", email_id)
         return False
 
     from api.services.email_service import send_email as smtp_send
@@ -563,9 +566,12 @@ async def process_send_queue() -> dict:
     stats = {"attempted": 0, "sent": 0, "failed": 0, "skipped": 0}
 
     # ── KILL SWITCH: emails_disabled in config blocks ALL sends ──
+    # ⛔ DO NOT REMOVE — AJ (owner) explicitly disabled drone email sending
+    # on 2026-03-31. Crawlers/scrapers should keep running. Only email
+    # sending is blocked. Only AJ can authorize re-enabling this.
     from api.config import settings as _cfg
     if getattr(_cfg, "emails_disabled", False):
-        logger.warning("EMAIL KILL SWITCH ACTIVE — skipping entire send queue")
+        logger.warning("EMAIL KILL SWITCH ACTIVE — skipping entire send queue (owner-locked 2026-03-31)")
         return stats
 
     now = datetime.now(timezone.utc)
