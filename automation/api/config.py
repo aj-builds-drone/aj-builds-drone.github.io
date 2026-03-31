@@ -85,6 +85,7 @@ class Settings(BaseSettings):
     unsplash_access_key: str = Field(default="", description="Unsplash API access key for stock images")
 
     # Email / SMTP (Gmail)
+    emails_disabled: bool = Field(default=True, description="Kill switch: when True, no outreach emails are sent (set False to re-enable)")
     smtp_email: str = Field(default="", description="Gmail address for sending emails")
     smtp_app_password: str = Field(default="", description="Gmail App Password (16 chars, no spaces)")
 

@@ -31,6 +31,11 @@ async def send_email(
     Send an email via Gmail SMTP.
     Returns {"success": True/False, "message": "..."}
     """
+    # ── KILL SWITCH: emails_disabled blocks ALL SMTP sends ──
+    if getattr(settings, "emails_disabled", False):
+        logger.warning("EMAIL KILL SWITCH ACTIVE — refusing SMTP send to %s", to)
+        return {"success": False, "message": "Email sending is disabled (emails_disabled=True in config)."}
+
     sender = settings.smtp_email
     password = settings.smtp_app_password
 

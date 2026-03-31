@@ -354,6 +354,12 @@ async def send_email_record(email_id: str):
 
     Returns True on success, False on failure, 'limit_exceeded' if quota hit.
     """
+    # ── KILL SWITCH: emails_disabled in config blocks ALL sends ──
+    from api.config import settings as _cfg
+    if getattr(_cfg, "emails_disabled", False):
+        logger.warning("EMAIL KILL SWITCH ACTIVE — refusing to send email %s", email_id)
+        return False
+
     from api.services.email_service import send_email as smtp_send
     from api.services.notify import _send_telegram_message, _esc_md
     from api.services.email_tracker import inject_tracking
@@ -555,6 +561,13 @@ async def process_send_queue() -> dict:
     Called periodically by APScheduler. Respects daily limits and send windows.
     """
     stats = {"attempted": 0, "sent": 0, "failed": 0, "skipped": 0}
+
+    # ── KILL SWITCH: emails_disabled in config blocks ALL sends ──
+    from api.config import settings as _cfg
+    if getattr(_cfg, "emails_disabled", False):
+        logger.warning("EMAIL KILL SWITCH ACTIVE — skipping entire send queue")
+        return stats
+
     now = datetime.now(timezone.utc)
 
     # Skip during academic blackout

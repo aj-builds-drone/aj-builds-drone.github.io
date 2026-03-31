@@ -67,6 +67,12 @@ async def send_via_pool(
     Tries providers in priority order, falls back if one fails.
     Returns {"success": bool, "provider": str, "message": str, ...}
     """
+    # ── KILL SWITCH: emails_disabled blocks ALL SMTP sends ──
+    from api.config import settings as _cfg
+    if getattr(_cfg, "emails_disabled", False):
+        logger.warning("EMAIL KILL SWITCH ACTIVE — refusing pool send to %s", to)
+        return {"success": False, "provider": "none", "message": "Email sending is disabled (emails_disabled=True)."}
+
     today = date.today()
 
     async with async_session_factory() as db:
