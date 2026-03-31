@@ -250,6 +250,60 @@ const jsonLd = {
         { "@type": "ListItem", position: 4, name: "Contact", item: `${siteUrl}/contact/` },
       ],
     },
+    {
+      "@type": "FAQPage",
+      "@id": `${siteUrl}/#faq`,
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "What types of drones does AJ Builds Drone build?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "We build custom multirotor, fixed-wing, and VTOL UAV platforms for research, inspection, agriculture, and cinematography. Each platform is designed around your specific payload and mission requirements, from sensor selection through maiden flight.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Do you work with university research labs?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Yes — university partnerships are a core focus. We provide grant proposal support (equipment specs, BOMs, budget justifications for NSF/DOE/USDA), custom platform design, automated data pipelines, and ongoing technical support throughout your research timeline.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "What certifications do you hold?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "FAA Part 107 Remote Pilot Certificate for commercial drone operations, M.S. in Electrical & Computer Engineering from Mississippi State University, and Sr. FPGA Systems Engineer experience at AMD/Xilinx. We also carry commercial drone liability insurance.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "How much do drone survey services cost compared to traditional methods?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Drone surveys typically cost 75-90% less than traditional methods. For example, a 500-acre land survey that costs ~$100K with ground crews can be completed for ~$12.5K with drones, with better accuracy (<2cm RTK vs 10-30cm) and faster turnaround (hours vs weeks). Use our ROI Calculator for a project-specific estimate.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "What is your service area?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Based in Austin, TX but operating globally. We've supported projects across the continental US and can ship custom platforms or deploy on-site anywhere. Remote consulting and data pipeline development can be done from anywhere.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Can you help with grant proposals?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Absolutely. We provide detailed equipment specifications, bills of materials, budget justifications, and technical methodology text formatted for NSF, DOE, USDA, and NASA grant applications. We've helped labs secure funding for UAV-based research programs.",
+          },
+        },
+      ],
+    },
   ],
 };
 
