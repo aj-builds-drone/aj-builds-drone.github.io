@@ -83,6 +83,7 @@ export default function PricingCalculator() {
                 type="range"
                 min={1}
                 max={100}
+                aria-label="Survey area in acres"
                 value={area}
                 onChange={(e) => setArea(Number(e.target.value))}
                 className="w-full h-1 bg-border-dim rounded-full appearance-none cursor-pointer
@@ -91,7 +92,7 @@ export default function PricingCalculator() {
                            [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full
                            [&::-moz-range-thumb]:bg-accent-orange [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
               />
-              <div className="flex justify-between font-mono text-[10px] text-text-secondary/50 mt-1">
+              <div className="flex justify-between font-mono text-[10px] text-text-secondary mt-1">
                 <span>1 ac</span>
                 <span>50 ac</span>
                 <span>100 ac</span>
@@ -118,7 +119,7 @@ export default function PricingCalculator() {
                   </button>
                 ))}
               </div>
-              <p className="font-mono text-[10px] text-text-secondary/60 mt-2">
+              <p className="font-mono text-[10px] text-text-secondary mt-2">
                 {complexity === 0 && "Open terrain, clear weather, standard altitude"}
                 {complexity === 1 && "Mixed terrain, some obstacles, moderate coordination"}
                 {complexity === 2 && "Urban/industrial, airspace authorization required"}
@@ -146,7 +147,7 @@ export default function PricingCalculator() {
                     >
                       <div className="flex items-center gap-2">
                         <span
-                          className={`font-mono text-xs ${isSelected ? "text-accent-green" : "text-text-secondary/30"}`}
+                          className={`font-mono text-xs ${isSelected ? "text-accent-green" : "text-text-secondary"}`}
                         >
                           {isSelected ? "☑" : "☐"}
                         </span>
@@ -221,7 +222,7 @@ export default function PricingCalculator() {
                 </div>
               )}
 
-              <div className="font-mono text-[10px] text-text-secondary/60 mb-4">
+              <div className="font-mono text-[10px] text-text-secondary mb-4">
                 * Estimate is for budgeting purposes only. Final quote provided after site assessment and mission planning.
               </div>
 

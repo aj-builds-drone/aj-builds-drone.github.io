@@ -302,13 +302,13 @@ ${estimate.nsfSupplemental ? "<p>✅ <strong>This budget fits within an NSF supp
                     } ${isRGB ? "opacity-80" : ""}`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className={isSelected ? "text-accent-cyan" : "text-text-secondary/30"}>
+                      <span className={isSelected ? "text-accent-cyan" : "text-text-secondary"}>
                         {isSelected ? "☑" : "☐"}
                       </span>
                       <span className={isSelected ? "text-foreground" : "text-text-secondary"}>
                         {sensor.label}
                       </span>
-                      {isRGB && <span className="text-[9px] text-text-secondary/50">(included)</span>}
+                      {isRGB && <span className="text-[9px] text-text-secondary">(included)</span>}
                     </div>
                     {sensor.equipmentCost > 0 && (
                       <span className="text-[10px] text-accent-orange">+${sensor.equipmentCost.toLocaleString()}</span>
@@ -467,7 +467,7 @@ ${estimate.nsfSupplemental ? "<p>✅ <strong>This budget fits within an NSF supp
               </button>
             </div>
 
-            <p className="font-mono text-[10px] text-text-secondary/60">
+            <p className="font-mono text-[10px] text-text-secondary">
               * Estimates for grant proposal budgeting only. Final pricing determined after consultation.
             </p>
           </motion.div>

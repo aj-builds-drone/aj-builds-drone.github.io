@@ -59,10 +59,10 @@ export default function HeroSection() {
       <DroneScene />
 
       {/* Scanning effect */}
-      <div className="absolute inset-0 scan-sweep overflow-hidden z-[1]" />
+      <div className="absolute inset-0 scan-sweep overflow-hidden z-[1] pointer-events-none" />
 
       {/* Grid fade overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background z-[1]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background z-[1] pointer-events-none" />
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16" style={{ pointerEvents: "none" }}>
         {/* HUD top bar */}

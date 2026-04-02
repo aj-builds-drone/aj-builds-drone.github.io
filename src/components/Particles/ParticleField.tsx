@@ -173,7 +173,7 @@ export default function ParticleField() {
         dpr={1}
         camera={{ position: [0, 0, 8], fov: 50 }}
         gl={{ antialias: false, alpha: true }}
-        style={{ background: "transparent" }}
+        style={{ background: "transparent", pointerEvents: "none" }}
         frameloop="always"
       >
         <Particles />

@@ -303,7 +303,7 @@ export default function PaperFinder() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="e.g. crop health monitoring, bridge inspection, SLAM..."
-          className="w-full pl-10 pr-4 py-4 bg-surface/50 border border-border-dim rounded-lg font-mono text-sm text-foreground placeholder:text-text-secondary/50 focus:outline-none focus:border-accent-cyan focus:shadow-[0_0_20px_rgba(0,255,255,0.1)] transition-all"
+          className="w-full pl-10 pr-4 py-4 bg-surface/50 border border-border-dim rounded-lg font-mono text-sm text-foreground placeholder:text-text-secondary focus:outline-none focus:border-accent-cyan focus:shadow-[0_0_20px_rgba(0,255,255,0.1)] transition-all"
         />
         {query && (
           <button

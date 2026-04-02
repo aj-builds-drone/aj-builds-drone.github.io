@@ -68,7 +68,7 @@ export default function DroneScene() {
   if (isMobile) {
     return (
       <div
-        className="absolute inset-0 z-0 flex items-center justify-center"
+        className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none"
         aria-hidden="true"
       >
         <svg
@@ -119,13 +119,13 @@ export default function DroneScene() {
     <div
       className="absolute inset-0 z-0"
       aria-hidden="true"
-      style={{ pointerEvents: "auto" }}
+      style={{ pointerEvents: "none" }}
     >
       <Canvas
         dpr={[1, 1.5]}
         camera={{ position: [0, 0.3, 1.8], fov: 40 }}
         gl={{ antialias: true, alpha: true }}
-        style={{ background: "transparent" }}
+        style={{ background: "transparent", pointerEvents: "none" }}
       >
         <Suspense fallback={<LoadingFallback />}>
           {/* Lighting */}

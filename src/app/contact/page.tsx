@@ -174,7 +174,7 @@ export default function ContactPage() {
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full bg-background border border-border-dim rounded px-4 py-3 font-mono text-sm text-foreground placeholder:text-text-secondary/50 focus:outline-none focus:border-accent-orange transition-colors"
+                    className="w-full bg-background border border-border-dim rounded px-4 py-3 font-mono text-sm text-foreground placeholder:text-text-secondary focus:outline-none focus:border-accent-orange transition-colors"
                     placeholder="Enter your name"
                   />
                 </div>
@@ -187,7 +187,7 @@ export default function ContactPage() {
                     name="org"
                     value={formData.org}
                     onChange={handleChange}
-                    className="w-full bg-background border border-border-dim rounded px-4 py-3 font-mono text-sm text-foreground placeholder:text-text-secondary/50 focus:outline-none focus:border-accent-orange transition-colors"
+                    className="w-full bg-background border border-border-dim rounded px-4 py-3 font-mono text-sm text-foreground placeholder:text-text-secondary focus:outline-none focus:border-accent-orange transition-colors"
                     placeholder="University / Company"
                   />
                 </div>
@@ -204,7 +204,7 @@ export default function ContactPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full bg-background border border-border-dim rounded px-4 py-3 font-mono text-sm text-foreground placeholder:text-text-secondary/50 focus:outline-none focus:border-accent-orange transition-colors"
+                  className="w-full bg-background border border-border-dim rounded px-4 py-3 font-mono text-sm text-foreground placeholder:text-text-secondary focus:outline-none focus:border-accent-orange transition-colors"
                   placeholder="you@organization.edu"
                 />
               </div>
@@ -282,7 +282,7 @@ export default function ContactPage() {
                   rows={6}
                   value={formData.message}
                   onChange={handleChange}
-                  className="w-full bg-background border border-border-dim rounded px-4 py-3 font-mono text-sm text-foreground placeholder:text-text-secondary/50 focus:outline-none focus:border-accent-orange transition-colors resize-none"
+                  className="w-full bg-background border border-border-dim rounded px-4 py-3 font-mono text-sm text-foreground placeholder:text-text-secondary focus:outline-none focus:border-accent-orange transition-colors resize-none"
                   placeholder="Describe your project requirements, target platform, operating environment, payload needs, autonomy level..."
                 />
               </div>

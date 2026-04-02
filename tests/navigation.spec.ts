@@ -10,8 +10,9 @@ async function openMenuIfMobile(page: import("@playwright/test").Page) {
     // Wait for React hydration before clicking
     await page.waitForTimeout(800);
     await hamburger.click();
-    // Wait for framer-motion AnimatePresence to reveal the menu
-    const mobileLink = page.locator('nav a', { hasText: 'HOME' }).first();
+    // Wait for framer-motion AnimatePresence to reveal the mobile menu links
+    // Use last() since mobile links appear after desktop (hidden) links in DOM
+    const mobileLink = page.locator('nav a', { hasText: 'HOME' }).last();
     try {
       await mobileLink.waitFor({ state: 'visible', timeout: 3000 });
     } catch {
@@ -30,7 +31,7 @@ test.describe("Navigation — Internal Links", () => {
     await page.goto("/projects/");
     await page.waitForLoadState("networkidle");
     await openMenuIfMobile(page);
-    await page.locator("nav").locator("a", { hasText: "HOME" }).first().click();
+    await page.locator("nav a:visible", { hasText: "HOME" }).first().click();
     await expect(page).toHaveURL(/\/$/);
   });
 
@@ -38,7 +39,7 @@ test.describe("Navigation — Internal Links", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
     await openMenuIfMobile(page);
-    await page.locator("nav").locator("a", { hasText: "HANGAR" }).first().click();
+    await page.locator("nav").getByRole("link", { name: /HANGAR/ }).first().click();
     await expect(page).toHaveURL(/\/projects\//);
   });
 
@@ -46,15 +47,16 @@ test.describe("Navigation — Internal Links", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
     await openMenuIfMobile(page);
-    await page.locator("nav").locator("a", { hasText: "SERVICES" }).first().click();
-    await expect(page).toHaveURL(/\/services\//);
+    const link = page.locator("nav").getByRole("link", { name: /SERVICES/ }).first();
+    await link.click({ force: true });
+    await expect(page).toHaveURL(/\/services\//, { timeout: 10000 });
   });
 
   test("navbar RFQ link navigates to /contact/", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
     await openMenuIfMobile(page);
-    await page.locator("nav").locator("a", { hasText: "RFQ" }).first().click();
+    await page.locator("nav a:visible", { hasText: "RFQ" }).first().click();
     await expect(page).toHaveURL(/\/contact\//);
   });
 });

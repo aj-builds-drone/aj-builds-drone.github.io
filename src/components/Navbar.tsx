@@ -37,7 +37,7 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-8 h-8 border border-accent-green relative flex items-center justify-center">
               <div className="w-2 h-2 bg-accent-green pulse-green" />
-              <div className="absolute inset-0 border border-accent-green/30 scale-125" />
+              <div className="absolute inset-0 border border-accent-green/30 scale-125 pointer-events-none" />
             </div>
             <span className="font-mono text-sm tracking-widest text-accent-green">
               AJ//DRONE<span className="text-accent-orange">_SYS</span>
