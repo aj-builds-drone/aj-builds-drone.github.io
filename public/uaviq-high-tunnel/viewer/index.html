@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>UAV-IQ high-tunnel UAV — 3D viewer</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #eef1f4; font: 13px system-ui, sans-serif; }
+  canvas { display: block; }
+  #ui { position: absolute; top: 8px; left: 8px; z-index: 2; background: #ffffffeb; border-radius: 8px; padding: 8px 10px;
+        box-shadow: 0 1px 4px #0003; max-width: 370px; max-height: calc(100% - 56px); overflow-y: auto; }
+  #ui h1 { font-size: 14px; margin: 0 0 6px; cursor: pointer; user-select: none; }
+  #ui h1::after { content: " \25BE"; color: #888; }
+  #ui.min h1 { margin: 0; }
+  #ui.min h1::after { content: " \25B8  (show controls)"; font-weight: normal; font-size: 12px; }
+  #ui.min .row { display: none; }
+  #ui button { margin: 2px 2px 2px 0; padding: 3px 7px; font-size: 12px; cursor: pointer; }
+  #ui button.big { font-weight: 600; }
+  #ui label { display: inline-block; margin: 3px 8px 3px 0; }
+  #ui .row { margin: 4px 0; }
+  #ui .hd { font-weight: 600; margin-top: 8px; padding-top: 6px; border-top: 1px solid #dde2e8; }
+  #ui .note { color: #666; font-size: 12px; }
+  #ui input[type=range] { vertical-align: middle; width: 130px; }
+  #perf { background: #f2f4f7; border-radius: 6px; padding: 5px 8px; line-height: 1.45; }
+  #status { position: absolute; bottom: 8px; left: 8px; color: #555; z-index: 2; }
+  #legend { position: absolute; bottom: 8px; right: 8px; background: #ffffffe6; border-radius: 8px; padding: 6px 10px; z-index: 2; }
+  .sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -2px; margin: 0 4px 0 10px; }
+  #overlay { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 1; }
+  #tip { position: absolute; pointer-events: none; background: #1f2630ee; color: #fff; padding: 4px 8px; border-radius: 4px;
+         font-size: 12px; display: none; white-space: pre; z-index: 3; max-width: 520px; }
+</style>
+<script type="importmap">
+{ "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+</head>
+<body>
+<div id="ui">
+  <h1>Proposed high-tunnel UAV (Option A)</h1>
+  <div class="row">
+    <button data-view="iso_front">3/4 front</button><button data-view="iso_rear">3/4 rear</button>
+    <button data-view="front">Front</button><button data-view="left">Side</button>
+    <button data-view="top">Top</button><button data-view="bottom">Bottom</button>
+  </div>
+  <div class="row">
+    Colours:
+    <label><input type="radio" name="mode" value="built" checked> as built</label>
+    <label><input type="radio" name="mode" value="status"> reuse / replace / add</label>
+  </div>
+  <div class="row hd">Releaser</div>
+  <div class="row">
+    <label><input type="radio" name="rel" value="none"> none</label>
+    <label><input type="radio" name="rel" value="1L" checked> 1 L</label>
+    <label><input type="radio" name="rel" value="2L"> 2 L</label>
+    <label><input type="radio" name="rel" value="4L"> 4 L</label>
+  </div>
+  <div class="row" id="perf"></div>
+  <div class="row hd">Show</div>
+  <div class="row">
+    <label><input type="checkbox" id="fov"> sensor fields of view</label>
+    <label><input type="checkbox" id="dims"> dimensions</label>
+    <label><input type="checkbox" id="labels" checked> labels</label>
+    <label><input type="checkbox" id="spin"> spin props</label>
+  </div>
+  <div class="row">Compare size:
+    <label><input type="checkbox" class="cmp" value="0"> UCLA X500</label>
+    <label><input type="checkbox" class="cmp" value="1"> Starling 2 Max</label>
+  </div>
+  <div class="row">
+    <button id="burst" class="big">Burst ▸</button>
+    <input type="range" id="explode" min="0" max="100" value="0"> <span id="explodev">0 %</span>
+  </div>
+  <div class="row hd">Scene</div>
+  <div class="row">
+    <button id="tunnel" class="big">Put it in a high tunnel</button>
+    <button data-view="tunnel_iso" class="tview">Behind, above</button><button data-view="tunnel_end" class="tview">Along the row</button>
+  </div>
+  <div class="row note">Hover a part for its status, mass and price; double-click to zoom. Releaser shapes are assumed
+    (the brief gives masses only) and the tunnel is illustrative.</div>
+</div>
+<canvas id="overlay"></canvas>
+<div id="tip"></div>
+<div id="legend"></div>
+<div id="status">loading…</div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const params = new URLSearchParams(location.search);
+const capture = params.has('capture');
+const $ = id => document.getElementById(id);
+const status = $('status');
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(capture ? 1 : window.devicePixelRatio);
+document.body.appendChild(renderer.domElement);
+const overlay = $('overlay'), octx = overlay.getContext('2d');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xeef1f4);
+const camera = new THREE.PerspectiveCamera(30, 1, 5, 60000);
+camera.up.set(0, 0, 1);
+let controls = new OrbitControls(camera, renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f99, 1.1));
+const key = new THREE.DirectionalLight(0xffffff, 2.0);
+const fill = new THREE.DirectionalLight(0xffffff, 0.6);
+key.position.set(-500, -700, 900);
+fill.position.set(700, 500, 300);
+scene.add(key, fill);
+
+const man = await (await fetch('manifest.json')).json();
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+const V3 = a => new THREE.Vector3(a[0], a[1], a[2]);
+const rad = THREE.MathUtils.degToRad;
+const grid = new THREE.GridHelper(3000, 30, 0xb9c0c8, 0xd5dae0);
+grid.rotation.x = Math.PI / 2; grid.position.z = man.ground_z; scene.add(grid);
+let gridOn = true;   // off for the animations: a plain background keeps the GIFs small
+
+const matCache = new Map();
+function mat(color, o = {}) {
+  const k = color + JSON.stringify(o);
+  if (!matCache.has(k)) matCache.set(k, new THREE.MeshStandardMaterial({ color: new THREE.Color(color), roughness: 0.55,
+                                                                         metalness: 0.05, ...o }));
+  return matCache.get(k);
+}
+const edgeMat = new THREE.LineBasicMaterial({ color: 0x1b1f24, transparent: true, opacity: 0.35 });
+const UPZ = V(0, 0, 1), UPY = V(0, 1, 0);
+
+// ---- the aircraft -----------------------------------------------------------------
+const root = new THREE.Group(); scene.add(root);
+const meshes = [], movers = [], pickable = [], props = [], motorGroups = [];
+function mover(o, ex) {
+  o.userData.base = o.position.clone();
+  o.userData.ex = ex ? V3(ex) : V(0, 0, 0);
+  movers.push(o);
+}
+function itemMesh(it) {
+  let geo;
+  const m = new THREE.Mesh();
+  if (it.shape === 'box') {
+    geo = new THREE.BoxGeometry(it.size[0] - 0.4, it.size[1] - 0.4, it.size[2] - 0.4);
+    m.rotation.z = rad(it.yaw || 0);
+    m.position.set(...it.pos);
+  } else if (it.shape === 'cyl') {
+    geo = new THREE.CylinderGeometry(it.r - 0.2, it.r - 0.2, it.h - 0.4, 48);
+    m.quaternion.setFromUnitVectors(UPY, V3(it.axis).normalize());
+    m.position.set(...it.pos);
+  } else {
+    const a = V3(it.a), b = V3(it.b);
+    geo = new THREE.CylinderGeometry(it.od / 2, it.od / 2, a.distanceTo(b), 24);
+    m.quaternion.setFromUnitVectors(UPY, b.clone().sub(a).normalize());
+    m.position.copy(a.add(b).multiplyScalar(0.5));
+  }
+  m.geometry = geo;
+  if (it.shape === 'box') m.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 25), edgeMat));
+  m.userData = { ...it, kind: 'item' };
+  return m;
+}
+for (const it of man.items) {
+  const m = itemMesh(it);
+  root.add(m); meshes.push(m); pickable.push(m);
+  mover(m, it.burst);
+}
+
+const motorMats = { stator: mat('#3b3e42', { metalness: 0.6, roughness: 0.4 }), bell: mat('#6b737c', { metalness: 0.7, roughness: 0.35 }),
+                    blade: mat('#18191b', { roughness: 0.35, metalness: 0.2 }),
+                    disc: new THREE.MeshStandardMaterial({ color: 0x9aa3ad, roughness: 0.6, transparent: true, opacity: 0.22,
+                                                           depthWrite: false, side: THREE.DoubleSide }) };
+const R = man.prop.d / 2;
+for (const mo of man.motors) {
+  const g = new THREE.Group();
+  g.position.set(...mo.pos);
+  const cylZ = (r, h, z, m) => {
+    const c = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 40), m);
+    c.rotation.x = Math.PI / 2; c.position.z = z; return c;
+  };
+  const stator = cylZ(man.motor.r - 3, 5, 2.5, motorMats.stator);
+  const bell = cylZ(man.motor.r, man.motor.h - 5, 5 + (man.motor.h - 5) / 2, motorMats.bell);
+  const shaft = cylZ(3, man.prop.z - mo.pos[2] - man.motor.h + 6, (man.motor.h + man.prop.z - mo.pos[2]) / 2, motorMats.stator);
+  stator.userData.part = 'stator'; bell.userData.part = 'bell'; shaft.userData.part = 'stator';
+  const prop = new THREE.Group();
+  prop.position.z = man.prop.z - mo.pos[2];
+  const disc = new THREE.Mesh(new THREE.CircleGeometry(R, 72), motorMats.disc);
+  disc.userData.part = 'disc';
+  prop.add(disc);
+  for (const s of [1, -1]) {
+    const blade = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 10), motorMats.blade);
+    blade.scale.set(R * 0.47, 15, 2.2); blade.position.x = s * R * 0.52;
+    blade.rotation.x = s * 0.12;
+    blade.userData.part = 'blade';
+    prop.add(blade);
+  }
+  const hub = cylZ(10, 9, 0, motorMats.stator);
+  hub.userData.part = 'stator';
+  prop.add(hub);
+  prop.rotation.z = Math.random() * Math.PI;
+  prop.userData = { kind: 'prop', label: man.prop.label, status: 'replace', price: man.prop.price, dir: mo.dir,
+                    role: `16 in carbon prop, ${mo.dir > 0 ? 'counter-clockwise' : 'clockwise'} (PX4 quad X)` };
+  g.add(stator, bell, shaft, prop);
+  g.userData = { kind: 'motor', label: man.motor.label, status: 'replace', mass_g: man.motor.mass_g, price: man.motor.price,
+                 role: man.motor.role, tag: mo.tag, primary: true };
+  root.add(g); motorGroups.push(g); props.push(prop); pickable.push(g);
+  mover(g, mo.burst);
+  mover(prop, [0, 0, man.prop.burst_z]);
+}
+
+// ---- sensor fields of view, dimensions and size comparison ------------------------------
+const helpers = new THREE.Group(); helpers.userData.helper = true; root.add(helpers);
+const fovGroup = new THREE.Group(), dimGroup = new THREE.Group(), cmpGroup = new THREE.Group();
+helpers.add(fovGroup, dimGroup, cmpGroup);
+fovGroup.visible = dimGroup.visible = false;
+const ghost = (color, opacity) => new THREE.MeshBasicMaterial({ color: new THREE.Color(color), transparent: true, opacity,
+                                                               depthWrite: false, side: THREE.DoubleSide });
+const lineMat = color => new THREE.LineBasicMaterial({ color: new THREE.Color(color) });
+let fovLabels = [];
+function buildFov(inTunnel) {
+  fovGroup.clear();
+  fovLabels = [];
+  const F = man.fov;
+  // RealSense D455: a frustum ahead of the camera.
+  {
+    const f = F.d455, far = inTunnel ? f.far_tunnel : f.far_air, a = V3(f.apex);
+    const th = Math.tan(rad(f.h / 2)) * far, tv = Math.tan(rad(f.v / 2)) * far;
+    const c = [[th, tv], [-th, tv], [-th, -tv], [th, -tv]].map(([y, z]) => V(a.x + far, a.y + y, a.z + z));
+    const pos = [];
+    for (let i = 0; i < 4; i++) pos.push(a.x, a.y, a.z, ...c[i].toArray(), ...c[(i + 1) % 4].toArray());
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    fovGroup.add(new THREE.Mesh(g, ghost('#1a73e8', 0.10)));
+    const lp = [];
+    for (let i = 0; i < 4; i++) lp.push(a, c[i], c[i], c[(i + 1) % 4]);
+    fovGroup.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lp), lineMat('#1a73e8')));
+    fovLabels.push({ p: V(a.x + far, a.y, a.z + tv), text: `D455 depth: ${f.h}° × ${f.v}°, best 0.6–6 m`, color: '#1a73e8' });
+  }
+  // ARK Flow: optical-flow cone and the time-of-flight beam, down to the ground or the canopy.
+  {
+    const f = F.flow, a = V3(f.apex), len = a.z - (inTunnel ? f.to_tunnel : f.to_air);
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(len * Math.tan(rad(f.cone / 2)), len, 48, 1, true), ghost('#2e7d32', 0.12));
+    cone.rotation.x = Math.PI / 2; cone.position.set(a.x, a.y, a.z - len / 2);
+    const beam = new THREE.Mesh(new THREE.ConeGeometry(Math.max(4, len * Math.tan(rad(f.beam / 2))), len, 16, 1, true), ghost('#e65100', 0.55));
+    beam.rotation.x = Math.PI / 2; beam.position.copy(cone.position);
+    fovGroup.add(cone, beam);
+    fovLabels.push({ p: V(a.x, a.y, a.z - len * 0.7), text: inTunnel ? 'ARK Flow: velocity + height above the canopy'
+                                                              : 'ARK Flow: optical flow + range beam down', color: '#2e7d32' });
+  }
+  // ARK DIST LR: a narrow beam up to the roof, or to the light above.
+  {
+    const f = F.dist, a = V3(f.apex), T = man.tunnel;
+    const len = inTunnel ? T.lights.z - T.lights.size[2] / 2 - man.fly_z - a.z : f.len_air;
+    const beam = new THREE.Mesh(new THREE.ConeGeometry(Math.max(4, len * Math.tan(rad(f.beam / 2))), len, 16, 1, true), ghost('#e65100', 0.55));
+    beam.rotation.x = -Math.PI / 2; beam.position.set(a.x, a.y, a.z + len / 2);
+    fovGroup.add(beam);
+    fovLabels.push({ p: V(a.x, a.y, a.z + len * 0.8),
+                     text: inTunnel ? `ARK DIST: ${(len / 1000).toFixed(1)} m to the light above` : 'ARK DIST: range up to the roof',
+                     color: '#e65100' });
+  }
+  // LightWare SF45/B: the 320° scan plane.
+  {
+    const f = F.sf45, r = inTunnel ? f.r_tunnel : f.r_air, half = rad(f.arc / 2);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(35, r, 96, 1, -half, 2 * half), ghost('#7b1fa2', 0.10));
+    ring.position.set(...f.center);
+    const arc = [];
+    for (let i = 0; i <= 96; i++) { const t = -half + 2 * half * i / 96; arc.push(V(r * Math.cos(t), r * Math.sin(t), 0)); }
+    const rim = new THREE.Line(new THREE.BufferGeometry().setFromPoints(arc), lineMat('#7b1fa2'));
+    rim.position.copy(ring.position);
+    fovGroup.add(ring, rim);
+    fovLabels.push({ p: V(f.center[0] - r * 0.55, f.center[1] - r * 0.55, f.center[2]),
+                     text: `SF45/B: ${f.arc}° obstacle scan, 0.2–50 m`, color: '#7b1fa2' });
+  }
+  fovGroup.traverse(o => { o.userData.helper = true; });
+}
+buildFov(false);
+
+let dimLabels = [];
+{
+  const pts = [];
+  for (const d of man.dims) {
+    const a = V3(d.a), b = V3(d.b), dir = b.clone().sub(a).normalize();
+    const n = Math.abs(dir.z) > 0.9 ? V(1, 0, 0) : V(0, 0, 1);
+    pts.push(a, b, a.clone().addScaledVector(n, -25), a.clone().addScaledVector(n, 25),
+             b.clone().addScaledVector(n, -25), b.clone().addScaledVector(n, 25));
+    dimLabels.push({ p: a.clone().add(b).multiplyScalar(0.5), a: a.clone(), b: b.clone(), text: d.text });
+  }
+  dimGroup.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), lineMat('#4a5563')));
+}
+
+const cmpSets = [];
+let cmpLabels = [];
+man.compare.forEach((c, i) => {
+  const g = new THREE.Group(), lm = lineMat(c.color), z = man.prop.z + 2 + i;
+  const circle = (cx, cy, r) => {
+    const p = [];
+    for (let k = 0; k <= 72; k++) p.push(V(cx + r * Math.cos(k * Math.PI / 36), cy + r * Math.sin(k * Math.PI / 36), z));
+    return new THREE.Line(new THREE.BufferGeometry().setFromPoints(p), lm);
+  };
+  for (const [x, y] of c.motors) g.add(circle(x, y, c.prop_d / 2));
+  const [bx, by] = c.body.map(v => v / 2);
+  g.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints([V(bx, by, z), V(-bx, by, z), V(-bx, -by, z), V(bx, -by, z)]), lm));
+  g.visible = false;
+  const far = Math.max(...c.motors.map(([x, y]) => Math.hypot(x, y))) + c.prop_d / 2;
+  g.userData.label = { p: V(-far / Math.SQRT2, -far / Math.SQRT2, z), text: c.name, color: c.color };
+  cmpGroup.add(g); cmpSets.push(g);
+});
+
+// ---- the high tunnel (illustrative) ----------------------------------------------------
+let tunnel = null, tunnelOn = false, tunnelLabels = [];
+function rng(seed) { return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
+function buildTunnel() {
+  const T = man.tunnel, g = new THREE.Group(), L = T.length, a = T.width / 2, b = T.ridge - T.wall;
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(L + 3000, T.width + 3000), mat('#a08868', { roughness: 1 }));
+  ground.position.z = -2; g.add(ground);
+  const B = T.beds, rand = rng(7);
+  const plantGeo = new THREE.IcosahedronGeometry(B.plant_r, 1), perBed = Math.floor(B.length / B.pitch);
+  const plants = new THREE.InstancedMesh(plantGeo, mat('#3d8b37', { roughness: 0.8 }), B.y.length * B.rows.length * perBed);
+  const dummy = new THREE.Object3D();
+  let k = 0;
+  for (const y of B.y) {
+    const bed = new THREE.Mesh(new THREE.BoxGeometry(B.length, B.width, B.height), mat('#2b2d2f', { roughness: 0.9 }));
+    bed.position.set(0, y, B.height / 2); g.add(bed);
+    for (const ry of B.rows) for (let i = 0; i < perBed; i++) {
+      const s = 0.75 + 0.3 * rand();
+      dummy.position.set(-B.length / 2 + B.pitch * (i + 0.5), y + ry, B.canopy - B.plant_r * s);
+      dummy.scale.set(s, s, s * 0.9); dummy.rotation.z = rand() * 6.3; dummy.updateMatrix();
+      plants.setMatrixAt(k++, dummy.matrix);
+    }
+    for (const sy of [-1, 1]) for (let x = -L / 2 + T.supports.pitch / 2; x < L / 2; x += T.supports.pitch) {
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(T.supports.od / 2, T.supports.od / 2, T.supports.height, 12), mat('#6d6d6d'));
+      post.rotation.x = Math.PI / 2; post.position.set(x, y + sy * (B.width / 2 + 60), T.supports.height / 2); g.add(post);
+    }
+  }
+  g.add(plants);
+  // Hoops: vertical side walls, then an elliptical arch to the ridge.
+  const prof = [V(0, -a, 0), V(0, -a, T.wall)];
+  for (let i = 1; i < 48; i++) { const t = Math.PI - Math.PI * i / 48; prof.push(V(0, a * Math.cos(t), T.wall + b * Math.sin(t))); }
+  prof.push(V(0, a, T.wall), V(0, a, 0));
+  const steel = mat('#b8bec5', { metalness: 0.6, roughness: 0.4 });
+  const hoops = Math.round(L / T.hoop_pitch);
+  for (let h = 0; h <= hoops; h++) {
+    const x = -L / 2 + h * T.hoop_pitch;
+    const path = new THREE.CurvePath();
+    for (let i = 0; i < prof.length - 1; i++) path.add(new THREE.LineCurve3(prof[i].clone().setX(x), prof[i + 1].clone().setX(x)));
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(path, 200, T.hoop_od / 2, 8, false), steel));
+  }
+  const along = (y, z, od, m) => {
+    const p = new THREE.Mesh(new THREE.CylinderGeometry(od / 2, od / 2, L, 12), m);
+    p.rotation.z = Math.PI / 2; p.position.set(0, y, z); return p;
+  };
+  g.add(along(0, T.ridge, 34, steel), along(-a, T.wall, 34, steel), along(a, T.wall, 34, steel));
+  // Film: translucent, open at both ends so the camera can look in.
+  const fp = [], fi = [];
+  prof.forEach(p => { fp.push(-L / 2, p.y, p.z, L / 2, p.y, p.z); });
+  for (let i = 0; i < prof.length - 1; i++) { const j = 2 * i; fi.push(j, j + 1, j + 2, j + 1, j + 3, j + 2); }
+  const film = new THREE.BufferGeometry();
+  film.setAttribute('position', new THREE.Float32BufferAttribute(fp, 3)); film.setIndex(fi); film.computeVertexNormals();
+  g.add(new THREE.Mesh(film, new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.13, depthWrite: false,
+                                                               side: THREE.DoubleSide, roughness: 0.3 })));
+  // Lights over the centre row, overhead irrigation over the paths.
+  const lamp = mat('#f4f1e8', { emissive: new THREE.Color('#fff3c4'), emissiveIntensity: 0.35 });
+  const [lx, ly, lz] = T.lights.size;
+  for (let x = -L / 2 + T.lights.pitch / 2; x < L / 2; x += T.lights.pitch) {
+    const l = new THREE.Mesh(new THREE.BoxGeometry(lx, ly, lz), lamp); l.position.set(x, 0, T.lights.z); g.add(l);
+    const hang = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, T.ridge - T.lights.z, 6), mat('#555'));
+    hang.rotation.x = Math.PI / 2; hang.position.set(x, 0, (T.ridge + T.lights.z) / 2); g.add(hang);
+  }
+  for (const y of T.irrigation.y) g.add(along(y, T.irrigation.z, T.irrigation.od, mat('#2f5d8a')));
+  // The flight line along the centre row.
+  const fl = new THREE.Line(new THREE.BufferGeometry().setFromPoints([V(-L / 2, 0, man.fly_z), V(L / 2, 0, man.fly_z)]),
+                            new THREE.LineDashedMaterial({ color: 0xc62828, dashSize: 250, gapSize: 160 }));
+  fl.computeLineDistances(); g.add(fl);
+  const ax = T.aircraft_x;
+  tunnelLabels = [
+    { p: V(ax + 2600, 0, man.fly_z), text: 'flight line, 1.5 m up', color: '#c62828' },
+    { p: V(ax + 3200, B.y[1], B.canopy), text: 'canopy ≈ 0.6 m', color: '#2e7d32' },
+    { p: V(-L / 2 + T.lights.pitch * 1.5, 0, T.lights.z + 60), text: `lights ${(T.lights.z / 1000).toFixed(1)} m` },
+    { p: V(ax + 3600, T.irrigation.y[1], T.irrigation.z), text: `overhead irrigation ${(T.irrigation.z / 1000).toFixed(1)} m` },
+    { p: V(ax + 1700, B.y[3] + B.width / 2 + 60, T.supports.height), text: 'crop supports' },
+    { caption: true,
+      text: `Illustrative tunnel: ${(T.width / 1000).toFixed(1)} m wide, ${(T.ridge / 1000).toFixed(1)} m to the ridge. ` +
+            'Your measurements replace it.' },
+  ];
+  g.visible = false;
+  scene.add(g);
+  return g;
+}
+function setTunnel(on) {
+  if (on && !tunnel) tunnel = buildTunnel();
+  tunnelOn = on;
+  if (tunnel) tunnel.visible = on;
+  root.position.set(on ? man.tunnel.aircraft_x : 0, 0, on ? man.fly_z : 0);
+  buildFov(on);
+  $('tunnel').textContent = on ? 'Back to the bench' : 'Put it in a high tunnel';
+  document.querySelectorAll('.tview').forEach(b => b.style.display = on ? '' : 'none');
+}
+
+// ---- appearance, releaser variant, burst -----------------------------------------------
+let mode = 'built', variant = '1L';
+function applyLook() {
+  const st = c => mat(man.status[c].color, { roughness: 0.6 });
+  for (const m of meshes) m.material = mode === 'status' ? st(m.userData.status) : mat(m.userData.color);
+  for (const g of motorGroups) g.traverse(o => {
+    if (!o.isMesh) return;
+    const p = o.userData.part;
+    if (p === 'disc') o.material = mode === 'status' ? ghost(man.status.replace.color, 0.2) : motorMats.disc;
+    else o.material = mode === 'status' ? st('replace') : motorMats[p];
+  });
+  updateLegend();
+}
+function setVariant(v) {
+  variant = v;
+  for (const m of meshes) {
+    const u = m.userData;
+    if (u.group === 'releaser') m.visible = v !== 'none' && (u.variant === 'any' || u.variant === v);
+  }
+  const P = man.variants[v];
+  $('perf').innerHTML = `<b>${P.title}</b><br>Take-off ${P.tow.toFixed(1)} kg · thrust-to-weight ${P.tw.toFixed(1)}<br>` +
+    `Flight time ${P.nav} navigating${P.rel ? `, ${P.rel} releasing` : ''} (20 % reserve)<br>` +
+    `<span style="color:${P.color};font-weight:600">${P.verdict}</span>`;
+  document.querySelectorAll('input[name=rel]').forEach(r => r.checked = r.value === v);
+}
+const anim = { b: 0, bTo: 0 };
+const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const approach = (a, b, d) => a < b ? Math.min(b, a + d) : Math.max(b, a - d);
+function pose() {
+  const eb = ease(anim.b);
+  for (const o of movers) o.position.copy(o.userData.base).addScaledVector(o.userData.ex, eb);
+  helpers.visible = anim.b < 0.01;
+  grid.position.z = man.ground_z - 260 * eb;
+}
+function syncUI() {
+  $('explode').value = Math.round(anim.b * 100);
+  $('explodev').textContent = `${Math.round(anim.b * 100)} %`;
+  $('burst').textContent = anim.bTo > 0.5 ? 'Assemble ◂' : 'Burst ▸';
+}
+let spinOn = false;
+function animate(dt) {
+  if (anim.b !== anim.bTo) { anim.b = approach(anim.b, anim.bTo, dt / 1.6); pose(); syncUI(); }
+  if (spinOn) for (const p of props) p.rotation.z += p.userData.dir * dt * 9;
+}
+
+// ---- views ----------------------------------------------------------------------------
+const VIEWS = {
+  iso_front: { dir: V(-1, -0.85, -0.55), fov: 24 }, iso_rear: { dir: V(1, -0.8, -0.6), fov: 24 },
+  front: { dir: V(-1, 0, -0.08), fov: 8 }, left: { dir: V(0, -1, -0.05), fov: 8 },
+  top: { dir: V(0, 0, -1), up: V(1, 0, 0), fov: 8 }, bottom: { dir: V(0, 0, 1), up: V(1, 0, 0), fov: 8 },
+  sensors: { dir: V(-1, -1.1, -0.75), fov: 30, helpers: true },
+  compare: { dir: V(0, 0, -1), up: V(1, 0, 0), fov: 12, helpers: true },
+  burst_iso: { dir: V(-1, -0.85, -0.55), fov: 26 },
+};
+function tunnelBox(x0, x1, y, z1) { return new THREE.Box3(V(x0, -y, 0), V(x1, y, z1)); }
+const TV = () => {
+  const T = man.tunnel, ax = T.aircraft_x;
+  return {
+    tunnel_iso: { dir: V(1, -0.75, -0.5), fov: 32, box: tunnelBox(ax - 1000, ax + 3200, 2600, 3000) },
+    tunnel_end: { dir: V(1, 0.08, -0.1), fov: 42, box: tunnelBox(ax - 300, ax + 300, T.width / 2, T.ridge) },
+  };
+};
+function shown(o) { for (; o; o = o.parent) if (!o.visible) return false; return true; }
+function isHelper(o) { for (; o; o = o.parent) if (o.userData.helper) return true; return false; }
+
+// Frame on sampled vertices (not the bounding box, whose empty corners shrink the model).
+function framePoints(v = {}) {
+  if (v.box) {
+    const b = v.box, pts = [];
+    for (const x of [b.min.x, b.max.x]) for (const y of [b.min.y, b.max.y]) for (const z of [b.min.z, b.max.z]) pts.push(V(x, y, z));
+    return pts;
+  }
+  const pts = [], q = new THREE.Vector3();
+  scene.updateMatrixWorld(true);
+  root.traverse(o => {
+    if (!(o.isMesh || o.isLine) || !shown(o) || (!v.helpers && isHelper(o))) return;
+    const pos = o.geometry.attributes.position;
+    const step = Math.max(1, Math.floor(pos.count / 1500));
+    for (let i = 0; i < pos.count; i += step) pts.push(q.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld).clone());
+  });
+  return pts;
+}
+function viewSpec(v, aspect, pts = framePoints(v)) {
+  const f = v.dir.clone().normalize();
+  const up = (v.up || V(0, 0, 1)).clone();
+  const r = new THREE.Vector3().crossVectors(f, up).normalize();
+  const u = new THREE.Vector3().crossVectors(r, f).normalize();
+  const fov = v.fov || 30;
+  const tv = Math.tan(rad(fov / 2)), th = tv * aspect;
+  if (!pts.length) return null;
+  const t = new THREE.Box3().setFromPoints(pts).getCenter(new THREE.Vector3());
+  const q = new THREE.Vector3();
+  let d = 0;
+  for (let it = 0; it < 4; it++) {
+    d = 0;
+    for (const p of pts) {
+      q.subVectors(p, t);
+      d = Math.max(d, Math.abs(q.dot(r)) / th - q.dot(f), Math.abs(q.dot(u)) / tv - q.dot(f));
+    }
+    const c = t.clone().addScaledVector(f, -d);
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (const p of pts) {
+      q.subVectors(p, c);
+      const z = q.dot(f), x = q.dot(r) / (z * th), y = q.dot(u) / (z * tv);
+      x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+    }
+    t.addScaledVector(r, (x0 + x1) / 2 * th * d).addScaledVector(u, (y0 + y1) / 2 * tv * d);
+  }
+  d *= 1.06;
+  return { pos: t.clone().addScaledVector(f, -d), target: t, up: u, fov };
+}
+function resetControls(target) {
+  controls.dispose();
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.copy(target);
+  controls.update();
+}
+function applySpec(s) {
+  camera.fov = s.fov; camera.up.copy(s.up);
+  camera.position.copy(s.pos); camera.lookAt(s.target);
+  camera.updateProjectionMatrix();
+  resetControls(s.target);
+}
+let tween = null;
+function lookup(name) { return VIEWS[name] || TV()[name]; }
+function frameView(v, aspect) {
+  tween = null;
+  const s = viewSpec(typeof v === 'string' ? lookup(v) : v, aspect);
+  if (s) applySpec(s);
+}
+function tweenTo(s, dur) {
+  if (!s) return;
+  tween = { from: { pos: camera.position.clone(), target: controls.target.clone(), up: camera.up.clone(), fov: camera.fov },
+            to: s, t: 0, dur };
+}
+function stepTween(dt) {
+  if (!tween) return;
+  tween.t = Math.min(1, tween.t + dt / tween.dur);
+  const k = ease(tween.t), a = tween.from, b = tween.to;
+  camera.position.lerpVectors(a.pos, b.pos, k);
+  controls.target.lerpVectors(a.target, b.target, k);
+  camera.up.lerpVectors(a.up, b.up, k).normalize();
+  camera.fov = a.fov + (b.fov - a.fov) * k;
+  camera.lookAt(controls.target);
+  camera.updateProjectionMatrix();
+  if (tween.t >= 1) { tween = null; resetControls(b.target); }
+}
+function burstTo(value) {
+  const saved = anim.b;
+  anim.b = value; pose();
+  const s = viewSpec({ dir: camera.getWorldDirection(new THREE.Vector3()), up: camera.up.clone(), fov: camera.fov }, camera.aspect);
+  anim.b = saved; pose();
+  anim.bTo = value;
+  if (!tunnelOn) tweenTo(s, 1.6);
+  syncUI();
+}
+
+// ---- labels: drawn on the overlay canvas, and into captured images ------------------------
+let labelsOn = true, dimsOn = false, fovOn = false;
+function topOf(o) {
+  const b = new THREE.Box3().setFromObject(o);
+  return V((b.min.x + b.max.x) / 2, (b.min.y + b.max.y) / 2, b.max.z + 2);
+}
+function labelList(w, h) {
+  const out = [];
+  const add = (p, text, kind, color) => {
+    const q = p.clone().project(camera);
+    if (q.z > 1 || q.z < -1 || Math.abs(q.x) > 1.05 || Math.abs(q.y) > 1.05) return;
+    out.push({ x: (q.x + 1) / 2 * w, y: (1 - q.y) / 2 * h, text, kind, color });
+  };
+  const world = p => root.localToWorld(p.clone());
+  scene.updateMatrixWorld(true);
+  if (labelsOn) {
+    for (const o of [...meshes, ...motorGroups]) {
+      const u = o.userData;
+      if (!u.tag || !shown(o) || (anim.b < 0.3 && !u.primary)) continue;
+      add(topOf(o), u.tag, 'equip');
+    }
+  }
+  if (fovOn && shown(fovGroup)) for (const L of fovLabels) add(world(L.p), L.text, 'note', L.color);
+  if (dimsOn && shown(dimGroup)) for (const L of dimLabels) {
+    // A dimension seen end-on (the height, from above) has nothing to label.
+    const a = world(L.a).project(camera), b = world(L.b).project(camera);
+    if (Math.hypot((a.x - b.x) * w, (a.y - b.y) * h) / 2 > 40) add(world(L.p), L.text, 'note', '#4a5563');
+  }
+  for (const g of cmpSets) if (shown(g)) add(world(g.userData.label.p), g.userData.label.text, 'note', g.userData.label.color);
+  if (tunnelOn) for (const L of tunnelLabels) {
+    if (L.caption) out.push({ x: 0, y: 0, text: L.text, kind: 'caption' });
+    else add(L.p, L.text, 'note', L.color);
+  }
+  return out;
+}
+function drawLabels(g, w, h, s = 1) {
+  const pad = 4 * s, lh = 14 * s;
+  const font = k => `${k === 'equip' ? 400 : 600} ${11.5 * s}px system-ui, sans-serif`;
+  const list = labelList(w, h);
+  for (const L of list) {
+    g.font = font(L.kind);
+    L.lines = L.text.split('\n');
+    L.w = Math.max(...L.lines.map(t => g.measureText(t).width)) + 2 * pad;
+    L.h = L.lines.length * lh + 1.5 * pad;
+  }
+  // Part tags: callouts in two columns beside their anchors, in height order, with leader lines.
+  const tags = list.filter(L => L.kind === 'equip');
+  if (tags.length) {
+    const xs = tags.map(L => L.x), x0 = Math.min(...xs), x1 = Math.max(...xs), mid = (x0 + x1) / 2;
+    for (const side of [-1, 1]) {
+      const col = tags.filter(L => (L.x < mid) === (side < 0)).sort((a, b) => a.y - b.y);
+      let next = 6 * s;
+      for (const L of col) {
+        L.side = side;
+        L.by = Math.max(L.y - L.h / 2, next);
+        next = L.by + L.h + 4 * s;
+        L.bx = side < 0 ? Math.max(4 * s, x0 - 40 * s - L.w) : Math.min(w - L.w - 4 * s, x1 + 40 * s);
+      }
+      const over = next - (h - 6 * s);
+      if (over > 0) for (const L of col) L.by -= over;
+    }
+  }
+  // Notes sit on their point; one that would overlap another label is pushed up, with a leader line.
+  const placed = tags.slice();
+  for (const L of list.filter(l => l.kind !== 'equip').sort((a, b) => b.y - a.y)) {
+    if (L.kind === 'caption') { L.bx = 10 * s; L.by = h - L.h - 10 * s; placed.push(L); continue; }
+    L.bx = L.x - L.w / 2; L.by = L.y - L.h / 2;
+    for (let k = 0; k < 40; k++) {
+      const hit = placed.find(P => L.bx < P.bx + P.w + 3 && P.bx < L.bx + L.w + 3 && L.by < P.by + P.h + 3 && P.by < L.by + L.h + 3);
+      if (!hit) break;
+      L.by = hit.by - L.h - 3;
+    }
+    placed.push(L);
+  }
+  g.textBaseline = 'top';
+  for (const L of list) {
+    const moved = L.kind === 'note' && Math.abs(L.by + L.h / 2 - L.y) > 4 * s;
+    if (L.kind === 'equip' || moved) {
+      const ex = L.kind === 'equip' ? (L.side < 0 ? L.bx + L.w : L.bx) : L.bx + L.w / 2;
+      const ey = L.kind === 'equip' ? L.by + L.h / 2 : L.by + L.h;
+      g.strokeStyle = '#2b333c'; g.fillStyle = '#2b333c'; g.lineWidth = s;
+      g.beginPath(); g.moveTo(L.x, L.y); g.lineTo(ex, ey); g.stroke();
+      g.beginPath(); g.arc(L.x, L.y, 2.2 * s, 0, 2 * Math.PI); g.fill();
+    }
+    g.fillStyle = '#ffffffe6';
+    g.strokeStyle = L.color || '#a7b0ba'; g.lineWidth = s;
+    g.beginPath();
+    if (g.roundRect) g.roundRect(L.bx, L.by, L.w, L.h, 4 * s); else g.rect(L.bx, L.by, L.w, L.h);
+    g.fill(); g.stroke();
+    g.fillStyle = L.color || '#1d2329';
+    g.font = font(L.kind);
+    L.lines.forEach((t, i) => g.fillText(t, L.bx + pad, L.by + 0.75 * pad + i * lh));
+  }
+}
+// The status legend, drawn into captured images (the page shows it as HTML).
+function drawLegend(g, w, h, s) {
+  const items = Object.values(man.status), pad = 8 * s, sq = 12 * s, lh = 19 * s;
+  g.font = `${12 * s}px system-ui, sans-serif`;
+  const bw = Math.max(...items.map(i => g.measureText(i.name).width)) + sq + 3 * pad, bh = items.length * lh + pad;
+  const x = w - bw - 10 * s, y = h - bh - 10 * s;
+  g.fillStyle = '#ffffffe6'; g.strokeStyle = '#a7b0ba'; g.lineWidth = s;
+  g.beginPath();
+  if (g.roundRect) g.roundRect(x, y, bw, bh, 6 * s); else g.rect(x, y, bw, bh);
+  g.fill(); g.stroke();
+  g.textBaseline = 'top';
+  items.forEach((it, i) => {
+    g.fillStyle = it.color; g.fillRect(x + pad, y + pad / 2 + i * lh + 3 * s, sq, sq);
+    g.fillStyle = '#1d2329'; g.fillText(it.name, x + 2 * pad + sq, y + pad / 2 + i * lh + 2 * s);
+  });
+}
+
+// ---- hover tooltip and double-click zoom ---------------------------------------------------
+function describe(u) {
+  const facts = [man.status[u.status]?.name, u.mass_g != null ? `${u.mass_g.toLocaleString()} g` : null, u.price].filter(Boolean);
+  const lines = [u.label || u.name];
+  if (facts.length) lines.push(facts.join(' · '));
+  if (u.role) lines.push(u.role);
+  if (u.shape === 'box') lines.push(`${u.size.map(v => +v.toFixed(1)).join(' × ')} mm`);
+  return lines.join('\n');
+}
+const ray = new THREE.Raycaster();
+const tip = $('tip');
+let pointer = null, lastHover = 0;
+renderer.domElement.addEventListener('pointermove', e => { pointer = e; });
+renderer.domElement.addEventListener('pointerleave', () => { pointer = null; tip.style.display = 'none'; });
+function pickAt(e) {
+  const r = renderer.domElement.getBoundingClientRect();
+  ray.setFromCamera(new THREE.Vector2((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1), camera);
+  for (const h of ray.intersectObjects(pickable, true)) {
+    if (!h.object.isMesh || !shown(h.object) || h.object.userData.part === 'disc') continue;
+    let o = h.object;
+    while (o && !o.userData.kind) o = o.parent;
+    if (o) return o;
+  }
+  return null;
+}
+function hover(now) {
+  if (!pointer || now - lastHover < 80 || tween) return;
+  lastHover = now;
+  const e = pointer, o = pickAt(e);
+  if (!o) { tip.style.display = 'none'; return; }
+  tip.textContent = describe(o.userData);
+  tip.style.left = `${Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8)}px`;
+  tip.style.top = `${e.clientY + 16}px`;
+  tip.style.display = 'block';
+}
+renderer.domElement.addEventListener('dblclick', e => {
+  const o = pickAt(e);
+  if (!o) return;
+  const b = new THREE.Box3().setFromObject(o).expandByScalar(15), pts = [];
+  for (const x of [b.min.x, b.max.x]) for (const y of [b.min.y, b.max.y]) for (const z of [b.min.z, b.max.z]) pts.push(V(x, y, z));
+  tweenTo(viewSpec({ dir: camera.getWorldDirection(new THREE.Vector3()), up: camera.up.clone(), fov: camera.fov },
+                   camera.aspect, pts), 0.8);
+});
+
+function updateLegend() {
+  const sw = (c, t) => `<span class="sw" style="background:${c}"></span>${t}`;
+  $('legend').innerHTML = mode === 'status'
+    ? Object.values(man.status).map(s => sw(s.color, s.name)).join('')
+    : sw('#1d2329', 'carbon frame') + sw('#e8b923', '6S battery') + sw('#2f3a46', 'Pixhawk + Jetson') +
+      sw('#b9c0c8', 'D455') + sw('#eef2f5', 'releaser (assumed size)');
+}
+
+// ---- page wiring and render loop ---------------------------------------------------------
+function resize() {
+  const w = capture ? 1600 : innerWidth, h = capture ? 1000 : innerHeight;
+  renderer.setSize(w, h, !capture);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  const dpr = capture ? 1 : devicePixelRatio;
+  overlay.width = Math.round(w * dpr); overlay.height = Math.round(h * dpr);
+  overlay.style.width = `${w}px`; overlay.style.height = `${h}px`;
+}
+addEventListener('resize', resize);
+resize();
+applyLook();
+setVariant('1L');
+setTunnel(false);
+pose();
+syncUI();
+frameView('iso_front', camera.aspect);
+
+document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => frameView(b.dataset.view, camera.aspect));
+document.querySelectorAll('input[name=mode]').forEach(r => r.onchange = () => { mode = r.value; applyLook(); });
+document.querySelectorAll('input[name=rel]').forEach(r => r.onchange = () => setVariant(r.value));
+$('fov').onchange = e => { fovOn = fovGroup.visible = e.target.checked; };
+$('dims').onchange = e => { dimsOn = dimGroup.visible = e.target.checked; };
+$('labels').onchange = e => { labelsOn = e.target.checked; };
+$('spin').onchange = e => { spinOn = e.target.checked; };
+document.querySelectorAll('.cmp').forEach(c => c.onchange = () => { cmpSets[+c.value].visible = c.checked; });
+$('burst').onclick = () => burstTo(anim.bTo > 0.5 ? 0 : 1);
+$('explode').oninput = e => { tween = null; anim.b = anim.bTo = +e.target.value / 100; pose(); syncUI(); };
+$('tunnel').onclick = () => {
+  const on = !tunnelOn;
+  if (on && anim.b > 0) { anim.b = anim.bTo = 0; pose(); syncUI(); }
+  setTunnel(on);
+  frameView(on ? 'tunnel_iso' : 'iso_front', camera.aspect);
+};
+const ui = $('ui');
+ui.querySelector('h1').onclick = () => ui.classList.toggle('min');
+if (innerWidth < 700) ui.classList.add('min');
+status.textContent = 'drag to orbit, wheel to zoom, right-drag to pan';
+if (!capture) setTimeout(() => { status.textContent = ''; }, 8000);
+
+function draw() {
+  // Near/far follow the orbit distance so the narrow-angle views keep their depth precision.
+  const dist = camera.position.distanceTo(controls.target);
+  camera.near = Math.max(1, dist * 0.02);
+  camera.far = dist * 6 + 20000;
+  camera.updateProjectionMatrix();
+  grid.visible = gridOn && !tunnelOn && camera.position.z > grid.position.z;
+  renderer.render(scene, camera);
+  if (capture) return;
+  const w = renderer.domElement.clientWidth, h = renderer.domElement.clientHeight, s = overlay.width / Math.max(1, w);
+  octx.setTransform(1, 0, 0, 1, 0, 0);
+  octx.clearRect(0, 0, overlay.width, overlay.height);
+  octx.setTransform(s, 0, 0, s, 0, 0);
+  drawLabels(octx, w, h);
+}
+let last = performance.now();
+function loop(now) {
+  requestAnimationFrame(loop);
+  const dt = Math.min(0.1, Math.max(0, (now - last) / 1000)); last = now;
+  animate(dt); stepTween(dt); hover(now); draw();
+}
+requestAnimationFrame(loop);
+
+// ---- capture mode: /viewer/?capture=1 posts PNGs to research/scripts/serve_viewer.py ---------------
+// ?capture=1 renders the stills, a contact sheet and the animations; ?capture=gif only the animations.
+if (capture) {
+  const onlyGifs = params.get('capture') === 'gif';
+  ui.style.display = 'none';
+  const S = (name, view, o = {}) => ({ name, view, mode: 'built', variant: '1L', fov: false, dims: false, labels: false,
+                                       compare: [], burst: 0, tunnel: false, ...o });
+  const shots = [
+    S('01_iso_front', 'iso_front'), S('02_iso_rear', 'iso_rear'), S('03_front', 'front'), S('04_side', 'left'),
+    S('05_top', 'top'), S('06_bottom', 'bottom'),
+    S('07_reuse_replace_add', 'iso_front', { mode: 'status', labels: true }),
+    S('08_burst', 'burst_iso', { burst: 1, labels: true }),
+    S('09_sensor_fields_of_view', 'sensors', { fov: true }),
+    S('10_size_vs_x500_and_starling', 'compare', { compare: [0, 1], dims: true }),
+    S('11_releaser_2l', 'iso_front', { variant: '2L', labels: true }),
+    S('12_releaser_4l', 'iso_front', { variant: '4L', labels: true }),
+    S('13_in_a_high_tunnel', 'tunnel_iso', { tunnel: true, fov: true }),
+    S('14_along_the_row', 'tunnel_end', { tunnel: true, fov: true }),
+  ];
+  const shot = new Map();
+  async function postOk(url, body) {
+    for (let k = 1; ; k++) {
+      try {
+        const res = await fetch(url, { method: 'POST', body });
+        await res.text();
+        if (res.ok) return;
+        if (res.status < 500) k = 4;
+        throw new Error(`HTTP ${res.status}`);
+      } catch (e) {
+        if (k >= 4) { document.title = `capture-error ${url}`; status.textContent = `capture failed: ${url}`; throw e; }
+        await new Promise(r => setTimeout(r, 500 * k));
+      }
+    }
+  }
+  async function snap(withLabels) {
+    draw();
+    const blob = await new Promise(r => renderer.domElement.toBlob(r, 'image/png'));
+    if (!withLabels && mode !== 'status') return blob;
+    const img = await createImageBitmap(blob);
+    const c = document.createElement('canvas');
+    c.width = img.width; c.height = img.height;
+    const g = c.getContext('2d');
+    g.drawImage(img, 0, 0);
+    if (withLabels) drawLabels(g, img.width, img.height, 1.3);
+    if (mode === 'status') drawLegend(g, img.width, img.height, 1.3);
+    return new Promise(r => c.toBlob(r, 'image/png'));
+  }
+  function setState(s) {
+    mode = s.mode; applyLook(); setVariant(s.variant);
+    if (tunnelOn !== s.tunnel) setTunnel(s.tunnel);
+    fovOn = fovGroup.visible = s.fov; dimsOn = dimGroup.visible = s.dims; labelsOn = s.labels;
+    cmpSets.forEach((g, i) => g.visible = s.compare.includes(i));
+    anim.b = anim.bTo = s.burst; pose();
+  }
+  for (const s of onlyGifs ? [] : shots) {
+    setState(s);
+    frameView(s.view, camera.aspect);
+    const blob = await snap(s.labels || s.fov || s.dims || s.compare.length || s.tunnel);
+    shot.set(s.name, await createImageBitmap(blob));
+    await postOk(`/__capture__/${s.name}.png`, blob);
+    status.textContent = `captured ${s.name}`;
+  }
+  if (!onlyGifs) {
+    const tiles = [['01_iso_front', '3/4 front, 1 L releaser'], ['07_reuse_replace_add', 'reuse / replace / add'],
+                   ['08_burst', 'burst view'], ['09_sensor_fields_of_view', 'sensor fields of view'],
+                   ['10_size_vs_x500_and_starling', 'size vs X500 and Starling 2 Max'],
+                   ['13_in_a_high_tunnel', 'in a high tunnel (illustrative)'],
+                   ['14_along_the_row', 'along the row'], ['11_releaser_2l', '2 L releaser'], ['12_releaser_4l', '4 L releaser (not feasible)']];
+    const W = 640, H = 400, cols = 3;
+    const c = document.createElement('canvas');
+    c.width = W * cols; c.height = H * Math.ceil(tiles.length / cols);
+    const g = c.getContext('2d');
+    g.fillStyle = '#eef1f4'; g.fillRect(0, 0, c.width, c.height);
+    g.font = '18px system-ui, sans-serif';
+    tiles.forEach(([n, label], i) => {
+      const x = (i % cols) * W, y = Math.floor(i / cols) * H;
+      g.drawImage(shot.get(n), x, y, W, H);
+      g.fillStyle = '#ffffffd9'; g.fillRect(x + 8, y + 8, g.measureText(label).width + 18, 30);
+      g.fillStyle = '#222'; g.fillText(label, x + 17, y + 29);
+      g.strokeStyle = '#c3c9d0'; g.strokeRect(x + 0.5, y + 0.5, W - 1, H - 1);
+    });
+    await postOk('/__capture__/00_overview.png', await new Promise(r => c.toBlob(r, 'image/png')));
+  }
+
+  // Animations: each frame goes to serve_viewer.py with how long it shows; the server writes the GIF.
+  const place = s => {
+    camera.fov = s.fov; camera.up.copy(s.up); camera.position.copy(s.pos); camera.lookAt(s.target);
+    camera.updateProjectionMatrix(); controls.target.copy(s.target);
+  };
+  async function movie(name, frames, width = 800) {
+    for (let i = 0; i < frames.length; i++) {
+      frames[i].set();
+      draw();
+      const blob = await new Promise(r => renderer.domElement.toBlob(r, 'image/png'));
+      await postOk(`/__frame__/${name}/${i}.png?ms=${frames[i].ms}`, blob);
+      status.textContent = `recording ${name} ${i + 1}/${frames.length}`;
+    }
+    await postOk(`/__movie__/${name}.gif?w=${width}`);
+  }
+  function swing(set, n, ms, hold) {
+    const f = [{ set: () => set(0), ms: hold }];
+    for (let k = 1; k <= n; k++) f.push({ set: () => set(k / n), ms: k === n ? hold : ms });
+    for (let k = n - 1; k >= 1; k--) f.push({ set: () => set(k / n), ms });
+    return f;
+  }
+  function fitOver(view, states) {
+    const pts = [];
+    for (const st of states) { st(); for (const p of framePoints(view)) pts.push(p); }
+    return viewSpec(view, camera.aspect, pts);
+  }
+  function orbit(view, n) {
+    const f0 = view.dir.clone().normalize(), el = Math.asin(-f0.z), az0 = Math.atan2(f0.y, f0.x);
+    const fov = view.fov || 30, tv = Math.tan(rad(fov / 2)), th = tv * camera.aspect;
+    const pts = framePoints(view), t = new THREE.Box3().setFromPoints(pts).getCenter(V(0, 0, 0)), q = V(0, 0, 0);
+    let d = 0;
+    const axes = [];
+    for (let i = 0; i < n; i++) {
+      const az = az0 + 2 * Math.PI * i / n;
+      const f = V(Math.cos(az) * Math.cos(el), Math.sin(az) * Math.cos(el), -Math.sin(el));
+      const r = new THREE.Vector3().crossVectors(f, V(0, 0, 1)).normalize();
+      const u = new THREE.Vector3().crossVectors(r, f).normalize();
+      for (const p of pts) {
+        q.subVectors(p, t);
+        d = Math.max(d, Math.abs(q.dot(r)) / th - q.dot(f), Math.abs(q.dot(u)) / tv - q.dot(f));
+      }
+      axes.push([f, u]);
+    }
+    return axes.map(([f, u]) => ({ pos: t.clone().addScaledVector(f, -1.04 * d), target: t, up: u, fov }));
+  }
+  setState(S('rest', 'iso_front'));
+  labelsOn = false; gridOn = false;
+  const spin = orbit(VIEWS.iso_front, 60);
+  await movie('anim_turntable', spin.map((s, i) => ({ set: () => { place(s); props.forEach(p => p.rotation.z = p.userData.dir * i * 0.9); }, ms: 60 })));
+  const at = k => { anim.b = anim.bTo = k; pose(); };
+  place(fitOver(VIEWS.burst_iso, [() => at(0), () => at(1)]));
+  await movie('anim_burst', swing(at, 30, 45, 1200));
+  at(0);
+  await postOk('/__done__');
+  document.title = 'capture-done';
+  status.textContent = 'capture done';
+}
+</script>
+</body>
+</html>

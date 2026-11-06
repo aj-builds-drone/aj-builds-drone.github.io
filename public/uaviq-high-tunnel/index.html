@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>High-tunnel UAV for UAV-IQ: recommendation, flight demo and quote | AJ Builds Drone</title>
+<meta name="description" content="Why the X500 struggles with the releaser, the X650-class aircraft we recommend, an interactive flight simulation, and the cost breakdown with links to every part.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="GPS-denied high-tunnel UAV: recommendation and quote">
+<meta property="og:description" content="Prepared for UAV-IQ and the UCLA high-tunnel biocontrol project by AJ Builds Drone.">
+<meta property="og:image" content="https://aj-builds-drone.github.io/uaviq-high-tunnel/media/og.jpg">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+<script type="module" src="app.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="/"><img src="/favicon.svg" alt="" width="22" height="22"><span>AJ BUILDS DRONE</span></a>
+    <nav class="toc" aria-label="Sections">
+      <a href="#problem">Problem</a>
+      <a href="#solution">Solution</a>
+      <a href="#simulation">Simulation</a>
+      <a href="#control">Control</a>
+      <a href="#cost">Cost</a>
+      <a href="#next">Next steps</a>
+    </nav>
+    <a class="btn btn-sm" href="files/UAV-IQ_preliminary_recommendation.pdf" download>Slides (PDF)</a>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="kicker">Preliminary recommendation · 5 November 2026</p>
+      <h1 id="hero-title">A drone that carries the releaser through the tunnels, <span class="accent">without GPS</span></h1>
+      <p class="lede">Prepared for UAV-IQ and the UCLA high-tunnel biocontrol project: why the X500 struggles with the
+        releaser, the aircraft we recommend, how it flies, and what it costs.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#simulation">Try the flight demo</a>
+        <a class="btn" href="#cost">See the cost breakdown</a>
+      </div>
+    </div>
+    <figure class="hero-media">
+      <picture>
+        <source srcset="media/iso_front.webp" media="(prefers-reduced-motion: reduce)">
+        <img src="media/turntable.webp" width="800" height="500"
+             alt="3D model of the proposed quadcopter turning slowly, with the 1 litre releaser hanging below it">
+      </picture>
+      <figcaption>Proposed aircraft with the 1 L releaser (3D model)</figcaption>
+    </figure>
+  </div>
+  <div class="wrap kpis">
+    <div class="kpi">
+      <p class="kpi-label">Thrust-to-weight with the 1 L releaser</p>
+      <p class="kpi-val"><span class="bad">1.4–1.6</span><span class="to" aria-label="becomes">→</span><span class="good">2.3</span></p>
+      <p class="kpi-note">X500 → proposed · target 2.0 or more</p>
+    </div>
+    <div class="kpi">
+      <p class="kpi-label">Flight time with the releaser</p>
+      <p class="kpi-val"><span class="bad">≈ 5.6 min</span><span class="to" aria-label="becomes">→</span><span class="good">≈ 15 min</span></p>
+      <p class="kpi-note">releasing, landing with a 20 % reserve</p>
+    </div>
+    <div class="kpi">
+      <p class="kpi-label">Height lost in a hard dodge</p>
+      <p class="kpi-val"><span class="bad">0.56 m</span><span class="to" aria-label="becomes">→</span><span class="good">0.03 m</span></p>
+      <p class="kpi-note">simulation, 30 % battery, same controller</p>
+    </div>
+    <div class="kpi">
+      <p class="kpi-label">Base package</p>
+      <p class="kpi-val"><span class="accent" data-bind="baseRange">≈ $11,400–16,500</span></p>
+      <p class="kpi-note">hardware plus US-based assembly and integration</p>
+    </div>
+  </div>
+</section>
+
+<section id="problem" class="section" aria-labelledby="problem-title">
+  <div class="wrap">
+    <p class="sec-kicker">01 // The problem</p>
+    <h2 id="problem-title">The X500 runs out of thrust with the releaser</h2>
+    <div class="grid-2">
+      <div>
+        <ul class="facts">
+          <li><b>≈ 3.4 kg at take-off</b> with UCLA's autonomy kit, a 4S 5 Ah pack and the 1 L dummy on its mount.</li>
+          <li><b>Thrust-to-weight ≈ 1.4–1.6.</b> It hovers at about 72 % throttle, so little thrust is left for corrections.</li>
+          <li><b>≈ 5–6 minutes</b> of usable flight with a 20 % battery reserve.</li>
+          <li>That matches the trials: <b>altitude dips</b> during corrections, <b>wobble</b> in hover and slow flight,
+            and <b>close passes</b> that needed manual corrections.</li>
+          <li>A <b>stock X650</b> has the same problem: Holybro's 4.3 kg payload rating assumes no battery and 70 % hover throttle.</li>
+        </ul>
+        <p class="fine">X500 figures are our estimates. UCLA's weighed take-off mass and flight logs will confirm them.</p>
+      </div>
+      <figure class="card chart-card">
+        <figcaption class="card-title">Thrust-to-weight with the 1 L releaser</figcaption>
+        <svg class="chart" viewBox="0 0 560 318" role="img"
+             aria-label="Bar chart. Thrust-to-weight with the 1 litre releaser: UCLA X500 1.56, stock X650 1.47, proposed 2.28. The target is 2.0.">
+          <g class="grid">
+            <line x1="56" x2="545" y1="250" y2="250"/>
+            <line x1="56" x2="545" y1="204" y2="204"/>
+            <line x1="56" x2="545" y1="112" y2="112"/>
+            <line x1="56" x2="545" y1="20" y2="20"/>
+          </g>
+          <g class="axis-labels">
+            <text x="46" y="254">0</text><text x="46" y="208">0.5</text><text x="46" y="162">1.0</text>
+            <text x="46" y="116">1.5</text><text x="46" y="70">2.0</text><text x="46" y="24">2.5</text>
+          </g>
+          <line class="hover-line" x1="56" x2="545" y1="158" y2="158"/>
+          <text class="line-label" x="545" y="151">1.0 = only hovers</text>
+          <rect class="bar bar-x500" x="80" y="106.5" width="80" height="143.5" rx="3"/>
+          <rect class="bar bar-x650" x="210" y="114.8" width="80" height="135.2" rx="3"/>
+          <rect class="bar bar-prop" x="340" y="40.2" width="80" height="209.8" rx="3"/>
+          <line class="target-line" x1="56" x2="545" y1="66" y2="66"/>
+          <text class="line-label target-label" x="545" y="59">target 2.0</text>
+          <text class="val" x="120" y="97">1.56</text><text class="val" x="250" y="105">1.47</text><text class="val val-good" x="380" y="31">2.28</text>
+          <text class="cat" x="120" y="272">UCLA X500 (est.)</text><text class="cat" x="250" y="272">Stock X650</text><text class="cat cat-good" x="380" y="272">Proposed</text>
+          <text class="sub" x="120" y="292">hovers at ≈ 72 %</text><text class="sub" x="250" y="292">≈ 70 %</text><text class="sub" x="380" y="292">≈ 48 %</text>
+        </svg>
+        <p class="fine">Maximum thrust divided by take-off weight, at the motor test voltage. Two or more leaves room to correct, climb and fight gusts.</p>
+      </figure>
+    </div>
+
+    <div class="grid-2 mt-lg">
+      <article class="card">
+        <h3 class="card-title">Why not the Starling 2 Max?</h3>
+        <div class="split">
+          <div>
+            <p class="tag tag-good">Strengths</p>
+            <ul class="ticks">
+              <li>Mature visual-inertial navigation (VOXL 2 computer, dual fisheye tracking cameras)</li>
+              <li>Small: about 0.5 m tip to tip</li>
+              <li>40–55 min of flight without payload</li>
+            </ul>
+          </div>
+          <div>
+            <p class="tag tag-bad">Limits for this mission</p>
+            <ul class="crosses">
+              <li>Rated payload 500 g; the 1 L releaser alone is 1,073 g (2.1×), before its mount</li>
+              <li>43 Wh battery: the 60 W blower alone would drain it in about 43 min, before any flight power</li>
+              <li>Different computer (Qualcomm QRB5165): UCLA's Jetson models would need porting</li>
+              <li>Lead time about 60 business days</li>
+            </ul>
+          </div>
+        </div>
+        <p class="verdict">Useful as a navigation-only test aircraft; not suited to the combined navigation-and-payload mission.</p>
+      </article>
+      <article class="card">
+        <h3 class="card-title">How the new aircraft addresses the trial issues</h3>
+        <table class="tbl tbl-issues">
+          <thead><tr><th scope="col">Seen in UCLA's trials</th><th scope="col">What changes</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Altitude dips during corrections</th><td>Thrust-to-weight ≈ 2.3 instead of ≈ 1.5; height held with a downward rangefinder</td></tr>
+            <tr><th scope="row">Close passes and manual corrections</th><td>Scanning lidar and an upward rangefinder feed PX4 collision prevention, which stops the aircraft even if the Jetson stalls</td></tr>
+            <tr><th scope="row">Wobble in hover and slow flight</th><td>Lower hover throttle, vibration-isolated avionics, larger airframe</td></tr>
+            <tr><th scope="row">1–2 m landing error</th><td>Precision landing on a printed fiducial pad with a downward camera</td></tr>
+            <tr><th scope="row">Dust, sunlight and prop wash</th><td>Cameras mounted out of the rotor wash; IR-pass or IP65 camera options; ≈ 22 % lower downwash speed from larger props</td></tr>
+          </tbody>
+        </table>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="solution" class="section alt" aria-labelledby="solution-title">
+  <div class="wrap">
+    <p class="sec-kicker">02 // The recommendation</p>
+    <h2 id="solution-title">An X650-class quad on 6S, reusing UCLA's autonomy core</h2>
+    <p class="lede">About 2.3 times the X500's thrust, room for the releaser, and no change to UCLA's software stack.</p>
+    <div class="rra">
+      <article class="card rra-col rra-reuse">
+        <h3 class="card-title">Reuse from the X500</h3>
+        <ul>
+          <li>Pixhawk 6X + Jetson Orin NX baseboard (with NVMe and Wi-Fi)</li>
+          <li>RealSense D455 depth camera</li>
+          <li>GNSS/compass (outdoor backup only)</li>
+          <li>Telemetry radio and RC transmitter</li>
+          <li>UBEC 12A (Jetson power)</li>
+        </ul>
+      </article>
+      <article class="card rra-col rra-replace">
+        <h3 class="card-title">Replace</h3>
+        <ul>
+          <li>Frame and motors → X650 frame, T-Motor MN4014 KV400 motors, 45 A ESCs, 16×5.4 carbon props</li>
+          <li>4S packs → 6S 10 Ah LiPo (×3)</li>
+          <li>Optical-flow sensor → ARK Flow (flow + downward rangefinder)</li>
+        </ul>
+      </article>
+      <article class="card rra-col rra-add">
+        <h3 class="card-title">Add</h3>
+        <ul>
+          <li>Upward rangefinder (roof and lights)</li>
+          <li>LightWare SF45/B scanning lidar → PX4 collision prevention</li>
+          <li>12 V blower supply, switched by the flight controller, with an RC cut-off</li>
+          <li>Quick-release releaser mount</li>
+          <li>Remote ID module (if flown outdoors between tunnels)</li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="card viewer-card" id="viewerCard">
+      <div class="card-head">
+        <h3 class="card-title">Explore the aircraft in 3D</h3>
+        <a class="btn btn-sm" href="viewer/" target="_blank" rel="noopener">Open full screen ↗</a>
+      </div>
+      <div class="viewer-frame">
+        <iframe id="viewerFrame" title="Interactive 3D model of the proposed aircraft" allowfullscreen></iframe>
+        <a class="viewer-poster" id="viewerPoster" href="viewer/" target="_blank" rel="noopener">
+          <img src="media/iso_front.webp" width="1400" height="875" loading="lazy"
+               alt="3D model of the proposed aircraft seen from the front left">
+          <span class="btn btn-primary">Open the 3D viewer</span>
+        </a>
+      </div>
+      <p class="fine">Drag to orbit, scroll to zoom, hover a part for its status, mass and price. Try the "reuse / replace / add"
+        colours, the 2 L and 4 L releasers, the size comparison, or "Put it in a high tunnel". Releaser shapes are assumed
+        (the brief gives masses only) and the tunnel is illustrative.</p>
+    </div>
+
+    <div class="gallery">
+      <figure><a href="media/in_tunnel.webp" target="_blank" rel="noopener"><img src="media/in_tunnel.webp" width="1400" height="875" loading="lazy" alt="The aircraft flying between strawberry beds inside a high tunnel, seen from behind and above"></a><figcaption>In a high tunnel (illustrative)</figcaption></figure>
+      <figure><a href="media/along_row.webp" target="_blank" rel="noopener"><img src="media/along_row.webp" width="1400" height="875" loading="lazy" alt="View along a strawberry row with the aircraft above the canopy"></a><figcaption>Along the row</figcaption></figure>
+      <figure><a href="media/sensor_fov.webp" target="_blank" rel="noopener"><img src="media/sensor_fov.webp" width="1400" height="875" loading="lazy" alt="Sensor fields of view: forward depth camera, downward flow sensor, upward rangefinder and the lidar scan ring"></a><figcaption>Sensor fields of view</figcaption></figure>
+      <figure><a href="media/size_compare.webp" target="_blank" rel="noopener"><img src="media/size_compare.webp" width="1400" height="875" loading="lazy" alt="Size of the proposed aircraft against outlines of the X500 and the Starling 2 Max"></a><figcaption>Size against the X500 and Starling 2 Max</figcaption></figure>
+      <figure><a href="media/reuse_replace_add.webp" target="_blank" rel="noopener"><img src="media/reuse_replace_add.webp" width="1400" height="875" loading="lazy" alt="The aircraft coloured by reused, replaced and added parts"></a><figcaption>Reused (navy), replaced (amber) and added (green) parts</figcaption></figure>
+      <figure><a href="media/burst.webp" target="_blank" rel="noopener"><img src="media/burst.webp" width="800" height="500" loading="lazy" alt="Animated exploded view of the aircraft's parts"></a><figcaption>Exploded view</figcaption></figure>
+    </div>
+
+    <h3 class="sub-title">Estimated performance</h3>
+    <div class="table-scroll">
+      <table class="tbl tbl-perf">
+        <thead><tr><th scope="col">Payload (incl. mount)</th><th scope="col">Take-off weight</th><th scope="col">Thrust-to-weight</th><th scope="col">Flight time, navigating</th><th scope="col">Flight time, releasing</th><th scope="col">Verdict</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">None (navigation milestone)</th><td>4.0 kg</td><td>3.0</td><td>22–27 min</td><td>–</td><td><span class="tag tag-good">Yes</span></td></tr>
+          <tr class="hl"><th scope="row">1 L: 1.27 kg</th><td>5.3 kg</td><td>2.3</td><td>16–18 min</td><td>14.5–16 min</td><td><span class="tag tag-good">Yes, recommended</span></td></tr>
+          <tr><th scope="row">2 L: 2.10 kg</th><td>6.1 kg</td><td>2.0</td><td>13–14 min</td><td>12–13 min</td><td><span class="tag tag-warn">Yes, reduced margin</span></td></tr>
+          <tr><th scope="row">4 L: 2.99 kg</th><td>7.0 kg</td><td>1.7</td><td>10–11 min</td><td>≈ 10 min</td><td><span class="tag tag-bad">No: needs a larger aircraft</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="stats3">
+      <div class="stat"><p class="stat-val">≈ 2.0 kg</p><p>payload capacity left after the autonomy hardware, at thrust-to-weight 2.0 (mount included)</p></div>
+      <div class="stat"><p class="stat-val">15 A at 12 V</p><p>blower supply for the blower's 5 A (60 W) peak, switched by the flight controller</p></div>
+      <div class="stat"><p class="stat-val">≈ 1.06 m</p><p>tip-to-tip size: it must fit the tunnel envelope (one of the inputs we need)</p></div>
+    </div>
+    <p class="fine">6S 10 Ah LiPo, landing with a 20 % reserve. Based on manufacturer thrust-stand data, to be confirmed by weighing parts during the build. Mount mass assumed 200–300 g.</p>
+  </div>
+</section>
+
+<section id="simulation" class="section" aria-labelledby="sim-title">
+  <div class="wrap">
+    <p class="sec-kicker">03 // Simulation</p>
+    <h2 id="sim-title">Same pilot input, same controller, different aircraft</h2>
+    <p class="lede">Both aircraft carry the 1 L releaser and fly the same PX4-style controller in altitude-hold mode, the mode a
+      pilot uses for manual corrections. Replay the two hard dodges from our report, or fly it yourself.</p>
+
+    <div class="sim card" id="sandbox" tabindex="0"
+         aria-label="Flight demo. Use the buttons, or the left and right arrow keys to tilt and up and down to change height.">
+      <div class="sim-bar">
+        <div class="btn-row">
+          <button class="btn btn-primary" id="runTest" type="button">▶ Replay the report test</button>
+          <button class="btn" type="button" data-dodge="-1">◀ Dodge</button>
+          <button class="btn" type="button" data-dodge="1">Dodge ▶</button>
+          <button class="btn" type="button" data-climb="0.5">▲ Climb</button>
+          <button class="btn" type="button" data-climb="-0.5">▼ Descend</button>
+          <button class="btn" type="button" id="pause" aria-pressed="false">Pause</button>
+          <button class="btn" type="button" id="reset">Reset</button>
+        </div>
+        <div class="settings">
+          <fieldset class="seg">
+            <legend>Battery</legend>
+            <label><input type="radio" name="soc" value="0.95"><span>95 %</span></label>
+            <label><input type="radio" name="soc" value="0.6"><span>60 %</span></label>
+            <label><input type="radio" name="soc" value="0.3" checked><span>30 %</span></label>
+          </fieldset>
+          <fieldset class="seg">
+            <legend>Releaser</legend>
+            <label><input type="radio" name="rel" value="none"><span>none</span></label>
+            <label><input type="radio" name="rel" value="1L" checked><span>1 L</span></label>
+            <label><input type="radio" name="rel" value="2L"><span>2 L</span></label>
+            <label><input type="radio" name="rel" value="4L"><span>4 L</span></label>
+          </fieldset>
+          <label class="check"><input type="checkbox" id="blower"><span>Blower on (+65 W)</span></label>
+          <label class="check"><input type="checkbox" id="showX650"><span>Add a stock X650</span></label>
+        </div>
+        <div class="stick">
+          <label for="stick">Pilot stick (pitch): hold and drag</label>
+          <input type="range" id="stick" min="-100" max="100" step="1" value="0">
+          <span class="hint">or click the demo, then ← → to tilt and ↑ ↓ to change height</span>
+        </div>
+      </div>
+      <div class="lanes" id="lanes"></div>
+      <div class="strip-wrap">
+        <canvas id="strip" role="img" aria-label="Height of each aircraft over the last 10 seconds"></canvas>
+      </div>
+      <div class="sim-result" id="simResult" aria-live="polite"></div>
+      <noscript><p class="fine">The flight demo needs JavaScript. The same results are in the slides (PDF).</p></noscript>
+    </div>
+    <p class="fine">How it works: a 2-D side-view model (forward and back, height, pitch) using the manufacturers' thrust-stand
+      data scaled with battery voltage, first-order motor lag, LiPo voltage sag and drag. Pitch inertia, motor lag and pack
+      resistance are estimates, so read it as a comparison. It is the same model as in our report, and "Replay the report test"
+      reproduces its numbers. The X500 is modelled at an estimated 3.41 kg with the 1 L dummy. Outside the report test the
+      battery stays at the level you pick, so you compare like with like; the sortie below shows the drain.</p>
+
+    <h3 class="sub-title">A full two-tunnel sortie</h3>
+    <p>60 m tunnel → 20 m windy transit → 10 s to reorient → 60 m tunnel with the blower on. 160 seconds per sortie,
+      starting from a 98 % charge, flown by the same model.</p>
+    <div class="card sortie" id="sortie">
+      <div class="btn-row">
+        <button class="btn btn-primary" type="button" id="sortiePlay">▶ Play</button>
+        <button class="btn" type="button" id="sortieRestart">Restart</button>
+        <fieldset class="seg">
+          <legend>Speed</legend>
+          <label><input type="radio" name="speed" value="5"><span>5×</span></label>
+          <label><input type="radio" name="speed" value="10" checked><span>10×</span></label>
+          <label><input type="radio" name="speed" value="20"><span>20×</span></label>
+        </fieldset>
+        <span class="sortie-clock" id="sortieClock" aria-live="off">t = 0 s</span>
+      </div>
+      <canvas id="sortieCanvas" role="img"
+              aria-label="Animated two-tunnel sortie showing each aircraft's position and battery charge"></canvas>
+      <div class="sortie-stats" id="sortieStats"></div>
+    </div>
+  </div>
+</section>
+
+<section id="control" class="section alt" aria-labelledby="control-title">
+  <div class="wrap">
+    <p class="sec-kicker">04 // Flight control and safety</p>
+    <h2 id="control-title">Navigating without GPS, with the pilot always in charge</h2>
+    <div class="arch" role="group" aria-label="Control architecture">
+      <div class="arch-col">
+        <p class="arch-head">Sensors</p>
+        <div class="node"><b>RealSense D455</b><span>stereo depth + IMU, forward</span><em>→ Jetson: visual odometry</em></div>
+        <div class="node"><b>ARK Flow</b><span>optical flow + downward rangefinder</span><em>→ Pixhawk: velocity, height above the canopy</em></div>
+        <div class="node"><b>Upward rangefinder</b><span>time-of-flight</span><em>→ Pixhawk: roof and light clearance</em></div>
+        <div class="node"><b>LightWare SF45/B</b><span>scanning lidar</span><em>→ Pixhawk: obstacle distances</em></div>
+        <div class="node node-rc"><b>RC receiver</b><span>pilot's transmitter</span><em>→ Pixhawk directly: pilot override</em></div>
+      </div>
+      <div class="arch-arrow" aria-hidden="true">→</div>
+      <div class="arch-col arch-mid">
+        <p class="arch-head">Computers</p>
+        <div class="node node-jetson"><b>Jetson Orin NX</b><span>visual odometry · row following (UCLA's software)</span></div>
+        <div class="arch-down" aria-hidden="true">↓ pose + setpoints</div>
+        <div class="node node-px4"><b>Pixhawk 6X (PX4)</b><span>state estimator · collision prevention · failsafes</span></div>
+      </div>
+      <div class="arch-arrow" aria-hidden="true">→</div>
+      <div class="arch-col">
+        <p class="arch-head">Outputs</p>
+        <div class="node"><b>Motors</b><span>four 45 A ESCs</span></div>
+        <div class="node"><b>Blower switch</b><span>12 V supply enable, with its own RC cut-off</span></div>
+      </div>
+    </div>
+    <p class="arch-note">Heading comes from visual odometry because the steel hoops disturb the compass. GNSS is optional outdoors,
+      between tunnels. Recovery uses precision landing on a printed fiducial pad.</p>
+    <div class="grid-2 mt">
+      <article class="card">
+        <h3 class="card-title">Pilot authority</h3>
+        <ul class="ticks">
+          <li>RC receiver wired directly to the Pixhawk: it works even if the Jetson stops</li>
+          <li>One switch hands control from autonomy back to the pilot (Position, Altitude or Stabilized mode)</li>
+          <li>Dedicated kill switch and a physical arming switch</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3 class="card-title">Automatic protection</h3>
+        <ul class="ticks">
+          <li>Failsafes for RC loss, companion-computer loss, low battery and estimator faults: hold or land</li>
+          <li>Geofence on a local origin, so it works without GPS</li>
+          <li>Blower power on its own RC cut-off; anti-spark battery connector</li>
+          <li>Options: propeller guards (about 300 g), Remote ID broadcast module</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="cost" class="section" aria-labelledby="cost-title">
+  <div class="wrap">
+    <p class="sec-kicker">05 // Cost</p>
+    <h2 id="cost-title">What it costs</h2>
+    <p class="lede">Parts at vendor list prices checked on <span data-bind="checked">5 Nov 2026</span>, plus US-based assembly
+      and integration. Every part links to the page where you can buy it.</p>
+    <div class="cost-grid">
+      <div class="card">
+        <h3 class="card-title">Preliminary quote</h3>
+        <table class="tbl tbl-quote" id="quoteTable"></table>
+        <p class="fine" id="quoteNote"></p>
+      </div>
+      <div class="card">
+        <h3 class="card-title">Base package, low and high estimate</h3>
+        <div class="stack" id="stackBars"></div>
+        <h3 class="card-title mt">Where the hardware money goes</h3>
+        <div class="catbars" id="catBars"></div>
+      </div>
+    </div>
+
+    <div class="card bom" id="bom">
+      <div class="card-head">
+        <h3 class="card-title">Parts list: new parts</h3>
+        <div class="btn-row">
+          <label class="check"><input type="checkbox" id="showNotes"><span>Show notes</span></label>
+          <a class="btn btn-sm" href="files/UAV-IQ_BOM.xlsx" download>Download the BOM (Excel)</a>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="tbl tbl-bom" id="bomTable"></table>
+      </div>
+      <div class="bom-totals" id="bomTotals"></div>
+      <noscript><p>The parts list needs JavaScript. <a href="files/UAV-IQ_BOM.xlsx">Download the BOM (Excel)</a> instead.</p></noscript>
+    </div>
+
+    <details class="card fold">
+      <summary><span class="card-title">Reused from UCLA's X500: $0 in the quote</span><span class="fold-note" data-bind="reusedNote"></span></summary>
+      <div class="table-scroll"><table class="tbl tbl-reused" id="reusedTable"></table></div>
+    </details>
+    <details class="card fold">
+      <summary><span class="card-title">Options and alternatives</span><span class="fold-note">savings and add-ons, against the parts list</span></summary>
+      <div class="table-scroll"><table class="tbl tbl-options" id="optionsTable"></table></div>
+    </details>
+    <p class="fine">Assembled and integrated in the USA; most components are imported. The quote excludes autonomy software
+      development, flight and field testing, organisms, efficacy evaluation and sales tax. Prices and stock change: we re-check
+      them when you order.</p>
+  </div>
+</section>
+
+<section id="next" class="section alt" aria-labelledby="next-title">
+  <div class="wrap">
+    <p class="sec-kicker">06 // Next steps</p>
+    <h2 id="next-title">What we need to finalize the quote</h2>
+    <div class="grid-2">
+      <ol class="inputs">
+        <li><b>Tunnel envelope:</b> width, height, door size, bed spacing, and the heights of supports, irrigation and lights
+          (the aircraft is about 1.06 m wide).</li>
+        <li><b>Reuse or new:</b> will the X500's Pixhawk/Jetson, D455, GNSS and radios move to the new aircraft?</li>
+        <li><b>Software:</b> hardware only, or also a configured flight stack (PX4 sensor fusion, failsafes, Jetson drivers)?
+          Autonomy development stays with UCLA unless you want our support.</li>
+        <li><b>Funding:</b> are federal funds involved? Federal rules on foreign-made drone components could change the parts list.</li>
+        <li><b>Releaser:</b> mass, size, mounting points, 12 V inrush and duty cycle, control signal.</li>
+        <li><b>Acceptance:</b> bench-verified delivery, or a short builder hover and tune?</li>
+      </ol>
+      <div>
+        <ol class="steps">
+          <li class="active"><b>Your inputs</b><span>the six points on the left</span></li>
+          <li><b>Firm quote</b><span>fixed scope and price</span></li>
+          <li><b>Parts order</b><span>some items are on backorder: the lidar first</span></li>
+          <li><b>Build, bench integration and handover</b><span>as-built BOM, wiring diagram, parameter file, checklists</span></li>
+        </ol>
+        <p class="fine">Also helpful: the X500's weighed take-off mass and flight logs, the endurance target, peak tunnel
+          temperature, and the plan for the outdoor leg (Part 107, Remote ID).</p>
+      </div>
+    </div>
+    <div class="cta-box">
+      <p>Questions, or ready with the inputs?</p>
+      <a class="btn btn-primary" href="/contact/">Contact AJ Builds Drone</a>
+      <a class="btn" href="files/UAV-IQ_preliminary_recommendation.pdf" download>Download the slides (PDF)</a>
+    </div>
+
+    <details class="refs">
+      <summary>References</summary>
+      <ol>
+        <li>UAV-IQ, Engineering Quote Brief, 5 November 2026 (client document).</li>
+        <li>ModalAI, Starling 2 Max: <a href="https://www.modalai.com/products/starling-2-max" rel="noopener" target="_blank">product page</a> and <a href="https://docs.modalai.com/starling-2-max-datasheet/" rel="noopener" target="_blank">datasheet</a>.</li>
+        <li>Holybro, <a href="https://holybro.com/products/x500-v2-kits" rel="noopener" target="_blank">X500 V2 kits</a>.</li>
+        <li>Holybro, <a href="https://docs.holybro.com/drone-development-kit/x650-development-kit/overview" rel="noopener" target="_blank">X650 development kit: flight time and payload</a>.</li>
+        <li>Holybro, <a href="https://holybro.com/products/pixhawk-jetson-baseboard" rel="noopener" target="_blank">Pixhawk Jetson Baseboard bundle</a>.</li>
+        <li>T-Motor MN4014 <a href="https://docs.holybro.com/drone-development-kit/x650-development-kit/motor-specifications" rel="noopener" target="_blank">load-test report</a> (published by Holybro) and <a href="https://store.tmotor.com/product/mn4014-kv400-motor-navigator-type.html" rel="noopener" target="_blank">T-Motor store</a>.</li>
+        <li>Holybro, <a href="https://cdn.shopify.com/s/files/1/0604/5905/7341/files/X500MotorSpec.png" rel="noopener" target="_blank">X500 V2 motor specification</a> (AIR2216 II KV920).</li>
+        <li>RealSense, <a href="https://realsenseai.com/wp-content/uploads/2025/09/Intel-RealSense-D400-Series-Datasheet-October-2025.pdf" rel="noopener" target="_blank">D400 Series datasheet</a>, October 2025.</li>
+        <li>ARK Electronics, <a href="https://arkelectron.com/product/ark-flow/" rel="noopener" target="_blank">ARK Flow</a> and <a href="https://arkelectron.com/product/ark-dist-lr/" rel="noopener" target="_blank">ARK DIST LR</a>.</li>
+        <li>LightWare, <a href="https://lightwarelidar.com/shop/sf45-b-50-m/" rel="noopener" target="_blank">SF45/B scanning lidar</a>.</li>
+        <li>Livox, <a href="https://www.livoxtech.com/mid-360/specs" rel="noopener" target="_blank">Mid-360 specifications</a>.</li>
+        <li>NVIDIA, <a href="https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/" rel="noopener" target="_blank">Jetson Orin modules</a>.</li>
+        <li>Holybro, <a href="https://holybro.com/collections/power-modules-pdbs/products/dronecan-pm08-power-module-14s-200a" rel="noopener" target="_blank">PM08-CAN power module</a>.</li>
+        <li>Dronetag, <a href="https://dronetag.com/products/beacon/" rel="noopener" target="_blank">Beacon Remote ID module</a>.</li>
+        <li>Lumenier, <a href="https://www.lumenier.com/products/lumenier-10000mah-6s-25c-lipo-battery" rel="noopener" target="_blank">6S 10,000 mAh 25C LiPo (XT90)</a>.</li>
+        <li>Every other part: the links in the parts list above and in the BOM workbook.</li>
+      </ol>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-in">
+    <p><b>AJ Builds Drone</b> · Austin, TX · <a href="/">aj-builds-drone.github.io</a></p>
+    <p class="fine">Preliminary estimates for discussion, subject to the inputs above. Performance figures are derived from
+      manufacturer data and our sizing model.</p>
+  </div>
+</footer>
+</body>
+</html>

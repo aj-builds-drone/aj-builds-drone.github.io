@@ -1,0 +1,2374 @@
+{
+ "units": "mm",
+ "status": {
+  "reuse": {
+   "name": "Reused from UCLA's X500",
+   "color": "#1f2a44"
+  },
+  "replace": {
+   "name": "Replaces an X500 part (new)",
+   "color": "#b26a00"
+  },
+  "add": {
+   "name": "Added (new)",
+   "color": "#2e7d32"
+  },
+  "client": {
+   "name": "Client's releaser (assumed envelope)",
+   "color": "#c9cfd6"
+  }
+ },
+ "items": [
+  {
+   "name": "plate_top",
+   "shape": "box",
+   "size": [
+    160.0,
+    160.0,
+    2
+   ],
+   "pos": [
+    0,
+    0,
+    18.0
+   ],
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "frame",
+   "label": "Holybro X650 frame (carbon)",
+   "price": "$249 frame kit",
+   "role": "top centre plate; the arms clamp below it",
+   "burst": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "plate_bottom",
+   "shape": "box",
+   "size": [
+    160.0,
+    160.0,
+    2
+   ],
+   "pos": [
+    0,
+    0,
+    -18.0
+   ],
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "frame",
+   "label": "Holybro X650 frame (carbon)",
+   "price": "$249 frame kit",
+   "role": "bottom centre plate",
+   "burst": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "plate_upper",
+   "shape": "box",
+   "size": [
+    128.0,
+    120.0,
+    2
+   ],
+   "pos": [
+    0,
+    0,
+    68.0
+   ],
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "frame",
+   "label": "Holybro X650 frame (carbon)",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    0.0,
+    170.0
+   ],
+   "role": "upper plate: carries the Pixhawk + Jetson"
+  },
+  {
+   "name": "plate_battery",
+   "shape": "box",
+   "size": [
+    128.0,
+    120.0,
+    2
+   ],
+   "pos": [
+    0,
+    0,
+    -108.0
+   ],
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "frame",
+   "label": "Holybro X650 frame (carbon)",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    0.0,
+    -170.0
+   ],
+   "role": "battery plate at the bottom of the 90 mm cage; the releaser mount hangs under it"
+  },
+  {
+   "name": "standoff_11",
+   "shape": "tube",
+   "a": [
+    56.0,
+    52.0,
+    19.0
+   ],
+   "b": [
+    56.0,
+    52.0,
+    67.0
+   ],
+   "od": 6,
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    0.0,
+    170.0
+   ],
+   "role": "standoff to the upper plate"
+  },
+  {
+   "name": "cage_post_11",
+   "shape": "tube",
+   "a": [
+    56.0,
+    52.0,
+    -19.0
+   ],
+   "b": [
+    56.0,
+    52.0,
+    -107.0
+   ],
+   "od": 6,
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    0.0,
+    -85.0
+   ],
+   "role": "battery-cage post"
+  },
+  {
+   "name": "arm_11",
+   "shape": "tube",
+   "a": [
+    49.49747468305832,
+    49.49747468305832,
+    0
+   ],
+   "b": [
+    213.54624791833734,
+    213.54624791833734,
+    0
+   ],
+   "od": 20,
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "frame",
+   "label": "Holybro X650 frame (carbon)",
+   "price": "$249 frame kit",
+   "burst": [
+    120.21,
+    120.21,
+    0.0
+   ],
+   "role": "20 mm carbon arm"
+  },
+  {
+   "name": "fold_11",
+   "shape": "box",
+   "size": [
+    34,
+    26,
+    24
+   ],
+   "pos": [
+    77.78174593052022,
+    77.78174593052022,
+    0
+   ],
+   "yaw": 45.0,
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "burst": [
+    120.21,
+    120.21,
+    0.0
+   ],
+   "role": "folding arm joint"
+  },
+  {
+   "name": "motor_mount_11",
+   "shape": "box",
+   "size": [
+    46,
+    46,
+    22
+   ],
+   "pos": [
+    229.80970388562793,
+    229.80970388562793,
+    0
+   ],
+   "yaw": 45.0,
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "burst": [
+    120.21,
+    120.21,
+    0.0
+   ],
+   "role": "motor mount"
+  },
+  {
+   "name": "esc_11",
+   "shape": "box",
+   "size": [
+    55,
+    26,
+    9
+   ],
+   "pos": [
+    130.81475451951127,
+    130.81475451951127,
+    -15.5
+   ],
+   "yaw": 45.0,
+   "color": "#6a3fa0",
+   "status": "replace",
+   "group": "equip",
+   "label": "Holybro Tekko32 45 A ESC",
+   "burst": [
+    120.21,
+    120.21,
+    0.0
+   ],
+   "tag": null,
+   "mass_g": null,
+   "price": "$23.99 each",
+   "role": "one per motor, under its arm"
+  },
+  {
+   "name": "standoff_1-1",
+   "shape": "tube",
+   "a": [
+    56.0,
+    -52.0,
+    19.0
+   ],
+   "b": [
+    56.0,
+    -52.0,
+    67.0
+   ],
+   "od": 6,
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    0.0,
+    170.0
+   ],
+   "role": "standoff to the upper plate"
+  },
+  {
+   "name": "cage_post_1-1",
+   "shape": "tube",
+   "a": [
+    56.0,
+    -52.0,
+    -19.0
+   ],
+   "b": [
+    56.0,
+    -52.0,
+    -107.0
+   ],
+   "od": 6,
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    0.0,
+    -85.0
+   ],
+   "role": "battery-cage post"
+  },
+  {
+   "name": "arm_1-1",
+   "shape": "tube",
+   "a": [
+    49.49747468305832,
+    -49.49747468305832,
+    0
+   ],
+   "b": [
+    213.54624791833734,
+    -213.54624791833734,
+    0
+   ],
+   "od": 20,
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "frame",
+   "label": "Holybro X650 frame (carbon)",
+   "price": "$249 frame kit",
+   "burst": [
+    120.21,
+    -120.21,
+    0.0
+   ],
+   "role": "20 mm carbon arm"
+  },
+  {
+   "name": "fold_1-1",
+   "shape": "box",
+   "size": [
+    34,
+    26,
+    24
+   ],
+   "pos": [
+    77.78174593052022,
+    -77.78174593052022,
+    0
+   ],
+   "yaw": -45.0,
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "burst": [
+    120.21,
+    -120.21,
+    0.0
+   ],
+   "role": "folding arm joint"
+  },
+  {
+   "name": "motor_mount_1-1",
+   "shape": "box",
+   "size": [
+    46,
+    46,
+    22
+   ],
+   "pos": [
+    229.80970388562793,
+    -229.80970388562793,
+    0
+   ],
+   "yaw": -45.0,
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "burst": [
+    120.21,
+    -120.21,
+    0.0
+   ],
+   "role": "motor mount"
+  },
+  {
+   "name": "esc_1-1",
+   "shape": "box",
+   "size": [
+    55,
+    26,
+    9
+   ],
+   "pos": [
+    130.81475451951127,
+    -130.81475451951127,
+    -15.5
+   ],
+   "yaw": -45.0,
+   "color": "#6a3fa0",
+   "status": "replace",
+   "group": "equip",
+   "label": "Holybro Tekko32 45 A ESC",
+   "burst": [
+    120.21,
+    -120.21,
+    0.0
+   ],
+   "tag": "45 A ESC (x4)",
+   "mass_g": null,
+   "price": "$23.99 each",
+   "role": "one per motor, under its arm"
+  },
+  {
+   "name": "standoff_-11",
+   "shape": "tube",
+   "a": [
+    -56.0,
+    52.0,
+    19.0
+   ],
+   "b": [
+    -56.0,
+    52.0,
+    67.0
+   ],
+   "od": 6,
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    0.0,
+    170.0
+   ],
+   "role": "standoff to the upper plate"
+  },
+  {
+   "name": "cage_post_-11",
+   "shape": "tube",
+   "a": [
+    -56.0,
+    52.0,
+    -19.0
+   ],
+   "b": [
+    -56.0,
+    52.0,
+    -107.0
+   ],
+   "od": 6,
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    0.0,
+    -85.0
+   ],
+   "role": "battery-cage post"
+  },
+  {
+   "name": "arm_-11",
+   "shape": "tube",
+   "a": [
+    -49.49747468305832,
+    49.49747468305832,
+    0
+   ],
+   "b": [
+    -213.54624791833734,
+    213.54624791833734,
+    0
+   ],
+   "od": 20,
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "frame",
+   "label": "Holybro X650 frame (carbon)",
+   "price": "$249 frame kit",
+   "burst": [
+    -120.21,
+    120.21,
+    0.0
+   ],
+   "role": "20 mm carbon arm"
+  },
+  {
+   "name": "fold_-11",
+   "shape": "box",
+   "size": [
+    34,
+    26,
+    24
+   ],
+   "pos": [
+    -77.78174593052022,
+    77.78174593052022,
+    0
+   ],
+   "yaw": 135.0,
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "burst": [
+    -120.21,
+    120.21,
+    0.0
+   ],
+   "role": "folding arm joint"
+  },
+  {
+   "name": "motor_mount_-11",
+   "shape": "box",
+   "size": [
+    46,
+    46,
+    22
+   ],
+   "pos": [
+    -229.80970388562793,
+    229.80970388562793,
+    0
+   ],
+   "yaw": 135.0,
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "burst": [
+    -120.21,
+    120.21,
+    0.0
+   ],
+   "role": "motor mount"
+  },
+  {
+   "name": "esc_-11",
+   "shape": "box",
+   "size": [
+    55,
+    26,
+    9
+   ],
+   "pos": [
+    -130.81475451951127,
+    130.81475451951127,
+    -15.5
+   ],
+   "yaw": 135.0,
+   "color": "#6a3fa0",
+   "status": "replace",
+   "group": "equip",
+   "label": "Holybro Tekko32 45 A ESC",
+   "burst": [
+    -120.21,
+    120.21,
+    0.0
+   ],
+   "tag": null,
+   "mass_g": null,
+   "price": "$23.99 each",
+   "role": "one per motor, under its arm"
+  },
+  {
+   "name": "standoff_-1-1",
+   "shape": "tube",
+   "a": [
+    -56.0,
+    -52.0,
+    19.0
+   ],
+   "b": [
+    -56.0,
+    -52.0,
+    67.0
+   ],
+   "od": 6,
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    0.0,
+    170.0
+   ],
+   "role": "standoff to the upper plate"
+  },
+  {
+   "name": "cage_post_-1-1",
+   "shape": "tube",
+   "a": [
+    -56.0,
+    -52.0,
+    -19.0
+   ],
+   "b": [
+    -56.0,
+    -52.0,
+    -107.0
+   ],
+   "od": 6,
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    0.0,
+    -85.0
+   ],
+   "role": "battery-cage post"
+  },
+  {
+   "name": "arm_-1-1",
+   "shape": "tube",
+   "a": [
+    -49.49747468305832,
+    -49.49747468305832,
+    0
+   ],
+   "b": [
+    -213.54624791833734,
+    -213.54624791833734,
+    0
+   ],
+   "od": 20,
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "frame",
+   "label": "Holybro X650 frame (carbon)",
+   "price": "$249 frame kit",
+   "burst": [
+    -120.21,
+    -120.21,
+    0.0
+   ],
+   "role": "20 mm carbon arm"
+  },
+  {
+   "name": "fold_-1-1",
+   "shape": "box",
+   "size": [
+    34,
+    26,
+    24
+   ],
+   "pos": [
+    -77.78174593052022,
+    -77.78174593052022,
+    0
+   ],
+   "yaw": -135.0,
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "burst": [
+    -120.21,
+    -120.21,
+    0.0
+   ],
+   "role": "folding arm joint"
+  },
+  {
+   "name": "motor_mount_-1-1",
+   "shape": "box",
+   "size": [
+    46,
+    46,
+    22
+   ],
+   "pos": [
+    -229.80970388562793,
+    -229.80970388562793,
+    0
+   ],
+   "yaw": -135.0,
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "burst": [
+    -120.21,
+    -120.21,
+    0.0
+   ],
+   "role": "motor mount"
+  },
+  {
+   "name": "esc_-1-1",
+   "shape": "box",
+   "size": [
+    55,
+    26,
+    9
+   ],
+   "pos": [
+    -130.81475451951127,
+    -130.81475451951127,
+    -15.5
+   ],
+   "yaw": -135.0,
+   "color": "#6a3fa0",
+   "status": "replace",
+   "group": "equip",
+   "label": "Holybro Tekko32 45 A ESC",
+   "burst": [
+    -120.21,
+    -120.21,
+    0.0
+   ],
+   "tag": null,
+   "mass_g": null,
+   "price": "$23.99 each",
+   "role": "one per motor, under its arm"
+  },
+  {
+   "name": "rail_1",
+   "shape": "tube",
+   "a": [
+    -160.0,
+    38.0,
+    -26.0
+   ],
+   "b": [
+    160.0,
+    38.0,
+    -26.0
+   ],
+   "od": 10,
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "frame",
+   "label": "Holybro X650 frame (carbon)",
+   "price": "$249 frame kit",
+   "role": "10 mm accessory rail",
+   "burst": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "rail_clamp_11",
+   "shape": "box",
+   "size": [
+    14,
+    16,
+    10
+   ],
+   "pos": [
+    60,
+    38.0,
+    -24.0
+   ],
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "role": "rail clamp",
+   "burst": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "rail_clamp_-11",
+   "shape": "box",
+   "size": [
+    14,
+    16,
+    10
+   ],
+   "pos": [
+    -60,
+    38.0,
+    -24.0
+   ],
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "role": "rail clamp",
+   "burst": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "leg_1",
+   "shape": "tube",
+   "a": [
+    0,
+    58.0,
+    -109.0
+   ],
+   "b": [
+    0,
+    158.88,
+    -296.5
+   ],
+   "od": 16,
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 landing gear",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    130.0,
+    -280.0
+   ],
+   "role": "landing-gear leg"
+  },
+  {
+   "name": "gear_tee_1",
+   "shape": "box",
+   "size": [
+    30,
+    30,
+    24
+   ],
+   "pos": [
+    0,
+    158.88,
+    -308.5
+   ],
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 landing gear",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    130.0,
+    -280.0
+   ],
+   "role": "leg-to-skid tee"
+  },
+  {
+   "name": "skid_1",
+   "shape": "tube",
+   "a": [
+    -163.0,
+    158.88,
+    -314.5
+   ],
+   "b": [
+    163.0,
+    158.88,
+    -314.5
+   ],
+   "od": 16,
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 landing gear",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    130.0,
+    -280.0
+   ],
+   "role": "skid"
+  },
+  {
+   "name": "skid_foam_1",
+   "shape": "cyl",
+   "r": 14,
+   "h": 240,
+   "pos": [
+    0,
+    158.88,
+    -314.5
+   ],
+   "axis": [
+    1,
+    0,
+    0
+   ],
+   "color": "#3a3d41",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 landing gear",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    130.0,
+    -280.0
+   ],
+   "role": "foam grip"
+  },
+  {
+   "name": "rail_-1",
+   "shape": "tube",
+   "a": [
+    -160.0,
+    -38.0,
+    -26.0
+   ],
+   "b": [
+    160.0,
+    -38.0,
+    -26.0
+   ],
+   "od": 10,
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "frame",
+   "label": "Holybro X650 frame (carbon)",
+   "price": "$249 frame kit",
+   "role": "10 mm accessory rail",
+   "burst": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "rail_clamp_1-1",
+   "shape": "box",
+   "size": [
+    14,
+    16,
+    10
+   ],
+   "pos": [
+    60,
+    -38.0,
+    -24.0
+   ],
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "role": "rail clamp",
+   "burst": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "rail_clamp_-1-1",
+   "shape": "box",
+   "size": [
+    14,
+    16,
+    10
+   ],
+   "pos": [
+    -60,
+    -38.0,
+    -24.0
+   ],
+   "color": "#aab2bb",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 frame hardware (aluminium)",
+   "price": "$249 frame kit",
+   "role": "rail clamp",
+   "burst": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "leg_-1",
+   "shape": "tube",
+   "a": [
+    0,
+    -58.0,
+    -109.0
+   ],
+   "b": [
+    0,
+    -158.88,
+    -296.5
+   ],
+   "od": 16,
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 landing gear",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    -130.0,
+    -280.0
+   ],
+   "role": "landing-gear leg"
+  },
+  {
+   "name": "gear_tee_-1",
+   "shape": "box",
+   "size": [
+    30,
+    30,
+    24
+   ],
+   "pos": [
+    0,
+    -158.88,
+    -308.5
+   ],
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 landing gear",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    -130.0,
+    -280.0
+   ],
+   "role": "leg-to-skid tee"
+  },
+  {
+   "name": "skid_-1",
+   "shape": "tube",
+   "a": [
+    -163.0,
+    -158.88,
+    -314.5
+   ],
+   "b": [
+    163.0,
+    -158.88,
+    -314.5
+   ],
+   "od": 16,
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 landing gear",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    -130.0,
+    -280.0
+   ],
+   "role": "skid"
+  },
+  {
+   "name": "skid_foam_-1",
+   "shape": "cyl",
+   "r": 14,
+   "h": 240,
+   "pos": [
+    0,
+    -158.88,
+    -314.5
+   ],
+   "axis": [
+    1,
+    0,
+    0
+   ],
+   "color": "#3a3d41",
+   "status": "replace",
+   "group": "frame",
+   "label": "X650 landing gear",
+   "price": "$249 frame kit",
+   "burst": [
+    0.0,
+    -130.0,
+    -280.0
+   ],
+   "role": "foam grip"
+  },
+  {
+   "name": "baseboard",
+   "shape": "box",
+   "size": [
+    126,
+    80,
+    38
+   ],
+   "pos": [
+    14,
+    0,
+    88.0
+   ],
+   "color": "#2f3a46",
+   "status": "reuse",
+   "group": "equip",
+   "burst": [
+    0.0,
+    0.0,
+    170.0
+   ],
+   "label": "Pixhawk 6X + Jetson Orin NX baseboard",
+   "tag": "Pixhawk 6X + Jetson Orin NX",
+   "primary": true,
+   "mass_g": 243,
+   "price": "reused ($2,299 new as the Holybro bundle)",
+   "role": "flight controller and onboard computer, with the NVMe SSD and Wi-Fi; runs UCLA's software"
+  },
+  {
+   "name": "d455",
+   "shape": "box",
+   "size": [
+    29,
+    124,
+    26
+   ],
+   "pos": [
+    95.5,
+    0,
+    36.0
+   ],
+   "color": "#b9c0c8",
+   "status": "reuse",
+   "group": "sensor",
+   "burst": [
+    150.0,
+    0.0,
+    30.0
+   ],
+   "label": "RealSense D455 depth camera",
+   "tag": "RealSense D455",
+   "primary": true,
+   "mass_g": 116,
+   "price": "reused ($499 new)",
+   "role": "forward stereo depth + IMU for visual-inertial odometry; 87 x 58 deg, 0.6-6 m ideal range"
+  },
+  {
+   "name": "d455_bracket",
+   "shape": "box",
+   "size": [
+    40,
+    70,
+    4
+   ],
+   "pos": [
+    90,
+    0,
+    21.0
+   ],
+   "color": "#aab2bb",
+   "status": "add",
+   "group": "equip",
+   "burst": [
+    150.0,
+    0.0,
+    30.0
+   ],
+   "label": "Rigid camera bracket",
+   "mass_g": 30,
+   "price": "part of the $50.59 sensor mounts",
+   "role": "holds the D455 ahead of the centre plate, just outside the prop discs"
+  },
+  {
+   "name": "sf45_mast",
+   "shape": "tube",
+   "a": [
+    -58,
+    0,
+    69.0
+   ],
+   "b": [
+    -58,
+    0,
+    200
+   ],
+   "od": 12,
+   "color": "#1d1f22",
+   "status": "add",
+   "group": "equip",
+   "burst": [
+    0.0,
+    0.0,
+    260.0
+   ],
+   "label": "Lidar mast",
+   "role": "lifts the scan plane above the props, the GPS and the camera"
+  },
+  {
+   "name": "sf45",
+   "shape": "box",
+   "size": [
+    48,
+    51,
+    44
+   ],
+   "pos": [
+    -58,
+    0,
+    222
+   ],
+   "color": "#25282c",
+   "status": "add",
+   "group": "sensor",
+   "burst": [
+    0.0,
+    0.0,
+    260.0
+   ],
+   "label": "LightWare SF45/B scanning lidar",
+   "tag": "SF45/B scanning lidar",
+   "primary": true,
+   "mass_g": 69,
+   "price": "$519 (on backorder)",
+   "role": "320 deg obstacle scan, 0.2-50 m; feeds PX4 collision prevention directly"
+  },
+  {
+   "name": "gps_mast",
+   "shape": "tube",
+   "a": [
+    -50,
+    -48,
+    69.0
+   ],
+   "b": [
+    -50,
+    -48,
+    165
+   ],
+   "od": 10,
+   "color": "#1d1f22",
+   "status": "replace",
+   "group": "equip",
+   "burst": [
+    0.0,
+    0.0,
+    230.0
+   ],
+   "label": "GPS mast (X650 kit)",
+   "role": "GPS mast"
+  },
+  {
+   "name": "gps",
+   "shape": "cyl",
+   "r": 25,
+   "h": 14.4,
+   "pos": [
+    -50,
+    -48,
+    172.2
+   ],
+   "axis": [
+    0,
+    0,
+    1
+   ],
+   "color": "#2a2d31",
+   "status": "reuse",
+   "group": "sensor",
+   "burst": [
+    0.0,
+    0.0,
+    230.0
+   ],
+   "label": "GNSS + compass",
+   "tag": "GNSS + compass",
+   "mass_g": 32,
+   "price": "reused ($43.99 new, M10)",
+   "role": "outdoor backup only: no GPS in the tunnel, and the steel hoops upset the compass"
+  },
+  {
+   "name": "ark_dist",
+   "shape": "box",
+   "size": [
+    20,
+    28,
+    14
+   ],
+   "pos": [
+    55,
+    72,
+    26.0
+   ],
+   "color": "#30343a",
+   "status": "add",
+   "group": "sensor",
+   "burst": [
+    0.0,
+    0.0,
+    110.0
+   ],
+   "label": "ARK DIST LR rangefinder (up)",
+   "tag": "ARK DIST LR (up)",
+   "primary": true,
+   "mass_g": 4,
+   "price": "$395",
+   "role": "time-of-flight up to 80 m: clearance to the roof and the lights"
+  },
+  {
+   "name": "rc_rx",
+   "shape": "box",
+   "size": [
+    22,
+    16,
+    8
+   ],
+   "pos": [
+    25,
+    70,
+    23.0
+   ],
+   "color": "#3c4048",
+   "status": "replace",
+   "group": "equip",
+   "burst": [
+    0.0,
+    0.0,
+    110.0
+   ],
+   "label": "RC receiver",
+   "tag": "RC receiver",
+   "mass_g": 5,
+   "price": "$17.99 (RadioMaster R81; must match UCLA's transmitter)",
+   "role": "wired straight to the Pixhawk: pilot override works even if the Jetson stops"
+  },
+  {
+   "name": "remote_id",
+   "shape": "box",
+   "size": [
+    37,
+    26,
+    16
+   ],
+   "pos": [
+    -40,
+    70,
+    27.0
+   ],
+   "color": "#d35400",
+   "status": "add",
+   "group": "equip",
+   "burst": [
+    0.0,
+    0.0,
+    110.0
+   ],
+   "label": "Dronetag Beacon Remote ID",
+   "tag": "Remote ID",
+   "mass_g": 16,
+   "price": "$149",
+   "role": "broadcast Remote ID, needed only if the outdoor leg is a Part 107 flight"
+  },
+  {
+   "name": "telemetry",
+   "shape": "box",
+   "size": [
+    53,
+    28,
+    11
+   ],
+   "pos": [
+    -40,
+    -70,
+    24.5
+   ],
+   "color": "#1f6fb2",
+   "status": "reuse",
+   "group": "equip",
+   "burst": [
+    0.0,
+    0.0,
+    110.0
+   ],
+   "label": "Telemetry radio",
+   "tag": "Telemetry radio",
+   "mass_g": 24,
+   "price": "reused ($58.99 new)",
+   "role": "MAVLink link to the ground station"
+  },
+  {
+   "name": "telemetry_antenna",
+   "shape": "cyl",
+   "r": 4,
+   "h": 95,
+   "pos": [
+    -20,
+    -70,
+    77.5
+   ],
+   "axis": [
+    0,
+    0,
+    1
+   ],
+   "color": "#26292d",
+   "status": "reuse",
+   "group": "equip",
+   "burst": [
+    0.0,
+    0.0,
+    110.0
+   ],
+   "label": "Telemetry antenna",
+   "role": "telemetry antenna"
+  },
+  {
+   "name": "power_module",
+   "shape": "box",
+   "size": [
+    64,
+    32,
+    14
+   ],
+   "pos": [
+    -30,
+    0,
+    -26.0
+   ],
+   "color": "#3d6b9e",
+   "status": "replace",
+   "group": "equip",
+   "burst": [
+    0.0,
+    0.0,
+    -60.0
+   ],
+   "label": "Holybro PM08-CAN power module",
+   "tag": "PM08-CAN power module",
+   "mass_g": 185,
+   "price": "$85",
+   "role": "200 A continuous, 8 AWG leads, XT90; replaces the PM02D and its 30 A leads"
+  },
+  {
+   "name": "ubec",
+   "shape": "box",
+   "size": [
+    48,
+    34,
+    16
+   ],
+   "pos": [
+    40,
+    0,
+    -27.0
+   ],
+   "color": "#3a7d44",
+   "status": "reuse",
+   "group": "equip",
+   "burst": [
+    0.0,
+    0.0,
+    -60.0
+   ],
+   "label": "UBEC 12A (Jetson supply)",
+   "tag": "UBEC 12A",
+   "mass_g": 48,
+   "price": "reused",
+   "role": "7.2 V for the baseboard, which takes only 7-21 V"
+  },
+  {
+   "name": "battery",
+   "shape": "box",
+   "size": [
+    180,
+    66,
+    55
+   ],
+   "pos": [
+    0,
+    0,
+    -79.5
+   ],
+   "color": "#e8b923",
+   "status": "replace",
+   "group": "equip",
+   "burst": [
+    0.0,
+    0.0,
+    -170.0
+   ],
+   "label": "Lumenier 6S 10 Ah 25C LiPo (XT90)",
+   "tag": "6S 10 Ah LiPo",
+   "primary": true,
+   "mass_g": 1245,
+   "price": "$251.49 each (3 packs quoted)",
+   "role": "about 222 Wh; XT90-S anti-spark connector"
+  },
+  {
+   "name": "reg_plate",
+   "shape": "box",
+   "size": [
+    60,
+    90,
+    3
+   ],
+   "pos": [
+    -125,
+    0,
+    -32.5
+   ],
+   "color": "#1d1f22",
+   "status": "add",
+   "group": "equip",
+   "burst": [
+    -90.0,
+    0.0,
+    -40.0
+   ],
+   "label": "Regulator plate",
+   "role": "bridges the rails behind the cage"
+  },
+  {
+   "name": "blower_reg",
+   "shape": "box",
+   "size": [
+    50,
+    30,
+    15
+   ],
+   "pos": [
+    -125,
+    0,
+    -41.5
+   ],
+   "color": "#4e7c2f",
+   "status": "add",
+   "group": "equip",
+   "burst": [
+    -90.0,
+    0.0,
+    -40.0
+   ],
+   "label": "12 V / 10 A blower supply",
+   "tag": "12 V / 10 A blower supply",
+   "primary": true,
+   "mass_g": 35,
+   "price": "$79.95 (Pololu D24V150F12, rated 15 A)",
+   "role": "120 W for the 60 W blower; switched from a Pixhawk output, with its own RC cut-off"
+  },
+  {
+   "name": "flow_plate",
+   "shape": "box",
+   "size": [
+    40,
+    90,
+    3
+   ],
+   "pos": [
+    160,
+    0,
+    -32.5
+   ],
+   "color": "#1d1f22",
+   "status": "add",
+   "group": "equip",
+   "burst": [
+    90.0,
+    0.0,
+    -40.0
+   ],
+   "label": "Flow-sensor plate",
+   "role": "holds the ARK Flow ahead of the battery and the releaser"
+  },
+  {
+   "name": "ark_flow",
+   "shape": "box",
+   "size": [
+    30,
+    30,
+    14
+   ],
+   "pos": [
+    165,
+    0,
+    -41.0
+   ],
+   "color": "#30343a",
+   "status": "replace",
+   "group": "sensor",
+   "burst": [
+    90.0,
+    0.0,
+    -40.0
+   ],
+   "label": "ARK Flow (optical flow + range down)",
+   "tag": "ARK Flow (flow + range down)",
+   "primary": true,
+   "mass_g": 5,
+   "price": "$250",
+   "role": "velocity from optical flow and height above the canopy from a 30 m time-of-flight sensor"
+  },
+  {
+   "name": "releaser_mount",
+   "shape": "box",
+   "size": [
+    140,
+    100,
+    5
+   ],
+   "pos": [
+    -15,
+    0,
+    -111.5
+   ],
+   "color": "#4b5560",
+   "status": "add",
+   "group": "releaser",
+   "variant": "any",
+   "burst": [
+    0.0,
+    0.0,
+    -260.0
+   ],
+   "label": "Quick-release releaser mount",
+   "tag": "quick-release mount",
+   "price": "about $120 in materials",
+   "role": "carbon plate on hard points below the centre of gravity"
+  },
+  {
+   "name": "bottle_1L",
+   "shape": "cyl",
+   "r": 40.0,
+   "h": 200.0,
+   "pos": [
+    -20.0,
+    0,
+    -155.0
+   ],
+   "axis": [
+    1,
+    0,
+    0
+   ],
+   "color": "#eef2f5",
+   "status": "client",
+   "group": "releaser",
+   "variant": "1L",
+   "burst": [
+    0.0,
+    0.0,
+    -380.0
+   ],
+   "label": "1 L releaser container (assumed envelope)",
+   "tag": "1 L releaser",
+   "primary": true,
+   "mass_g": 1073,
+   "price": "supplied by the client",
+   "role": "loaded mass 1,073 g from the brief, plus about 200 g of mount; bottle-style container, size assumed"
+  },
+  {
+   "name": "strap_a_1L",
+   "shape": "cyl",
+   "r": 42.0,
+   "h": 10,
+   "pos": [
+    40.0,
+    0,
+    -155.0
+   ],
+   "axis": [
+    1,
+    0,
+    0
+   ],
+   "color": "#4b5560",
+   "status": "client",
+   "group": "releaser",
+   "variant": "1L",
+   "burst": [
+    0.0,
+    0.0,
+    -380.0
+   ],
+   "label": "Cradle strap",
+   "role": "holds the container to the mount"
+  },
+  {
+   "name": "strap_b_1L",
+   "shape": "cyl",
+   "r": 42.0,
+   "h": 10,
+   "pos": [
+    -80.0,
+    0,
+    -155.0
+   ],
+   "axis": [
+    1,
+    0,
+    0
+   ],
+   "color": "#4b5560",
+   "status": "client",
+   "group": "releaser",
+   "variant": "1L",
+   "burst": [
+    0.0,
+    0.0,
+    -380.0
+   ],
+   "label": "Cradle strap",
+   "role": "holds the container to the mount"
+  },
+  {
+   "name": "blower_1L",
+   "shape": "cyl",
+   "r": 35,
+   "h": 60,
+   "pos": [
+    -150.0,
+    0,
+    -155.0
+   ],
+   "axis": [
+    1,
+    0,
+    0
+   ],
+   "color": "#c9cfd6",
+   "status": "client",
+   "group": "releaser",
+   "variant": "1L",
+   "burst": [
+    0.0,
+    0.0,
+    -380.0
+   ],
+   "label": "Blower (60 W at 12 V)",
+   "role": "60 W maximum at 12 V / 5 A, from the 12 V supply"
+  },
+  {
+   "name": "nozzle_1L",
+   "shape": "tube",
+   "a": [
+    -180.0,
+    0,
+    -165.0
+   ],
+   "b": [
+    -215.0,
+    0,
+    -240.0
+   ],
+   "od": 16,
+   "color": "#59616b",
+   "status": "client",
+   "group": "releaser",
+   "variant": "1L",
+   "burst": [
+    0.0,
+    0.0,
+    -380.0
+   ],
+   "label": "Outlet nozzle",
+   "role": "release outlet, below and behind the rotor discs"
+  },
+  {
+   "name": "bottle_2L",
+   "shape": "cyl",
+   "r": 50.0,
+   "h": 260.0,
+   "pos": [
+    -30.0,
+    0,
+    -165.0
+   ],
+   "axis": [
+    1,
+    0,
+    0
+   ],
+   "color": "#eef2f5",
+   "status": "client",
+   "group": "releaser",
+   "variant": "2L",
+   "burst": [
+    0.0,
+    0.0,
+    -380.0
+   ],
+   "label": "2 L releaser container (assumed envelope)",
+   "tag": "2 L releaser",
+   "primary": true,
+   "mass_g": 1847,
+   "price": "supplied by the client",
+   "role": "loaded mass 1,847 g from the brief, plus about 250 g of mount; bottle-style container, size assumed"
+  },
+  {
+   "name": "strap_a_2L",
+   "shape": "cyl",
+   "r": 52.0,
+   "h": 10,
+   "pos": [
+    48.0,
+    0,
+    -165.0
+   ],
+   "axis": [
+    1,
+    0,
+    0
+   ],
+   "color": "#4b5560",
+   "status": "client",
+   "group": "releaser",
+   "variant": "2L",
+   "burst": [
+    0.0,
+    0.0,
+    -380.0
+   ],
+   "label": "Cradle strap",
+   "role": "holds the container to the mount"
+  },
+  {
+   "name": "strap_b_2L",
+   "shape": "cyl",
+   "r": 52.0,
+   "h": 10,
+   "pos": [
+    -108.0,
+    0,
+    -165.0
+   ],
+   "axis": [
+    1,
+    0,
+    0
+   ],
+   "color": "#4b5560",
+   "status": "client",
+   "group": "releaser",
+   "variant": "2L",
+   "burst": [
+    0.0,
+    0.0,
+    -380.0
+   ],
+   "label": "Cradle strap",
+   "role": "holds the container to the mount"
+  },
+  {
+   "name": "blower_2L",
+   "shape": "cyl",
+   "r": 35,
+   "h": 60,
+   "pos": [
+    -190.0,
+    0,
+    -165.0
+   ],
+   "axis": [
+    1,
+    0,
+    0
+   ],
+   "color": "#c9cfd6",
+   "status": "client",
+   "group": "releaser",
+   "variant": "2L",
+   "burst": [
+    0.0,
+    0.0,
+    -380.0
+   ],
+   "label": "Blower (60 W at 12 V)",
+   "role": "60 W maximum at 12 V / 5 A, from the 12 V supply"
+  },
+  {
+   "name": "nozzle_2L",
+   "shape": "tube",
+   "a": [
+    -220.0,
+    0,
+    -175.0
+   ],
+   "b": [
+    -255.0,
+    0,
+    -250.0
+   ],
+   "od": 16,
+   "color": "#59616b",
+   "status": "client",
+   "group": "releaser",
+   "variant": "2L",
+   "burst": [
+    0.0,
+    0.0,
+    -380.0
+   ],
+   "label": "Outlet nozzle",
+   "role": "release outlet, below and behind the rotor discs"
+  },
+  {
+   "name": "bottle_4L",
+   "shape": "cyl",
+   "r": 65.0,
+   "h": 300.0,
+   "pos": [
+    -30.0,
+    0,
+    -180.0
+   ],
+   "axis": [
+    1,
+    0,
+    0
+   ],
+   "color": "#eef2f5",
+   "status": "client",
+   "group": "releaser",
+   "variant": "4L",
+   "burst": [
+    0.0,
+    0.0,
+    -380.0
+   ],
+   "label": "4 L releaser container (assumed envelope)",
+   "tag": "4 L releaser",
+   "primary": true,
+   "mass_g": 2693,
+   "price": "supplied by the client",
+   "role": "loaded mass 2,693 g from the brief, plus about 300 g of mount; bottle-style container, size assumed"
+  },
+  {
+   "name": "strap_a_4L",
+   "shape": "cyl",
+   "r": 67.0,
+   "h": 10,
+   "pos": [
+    60.0,
+    0,
+    -180.0
+   ],
+   "axis": [
+    1,
+    0,
+    0
+   ],
+   "color": "#4b5560",
+   "status": "client",
+   "group": "releaser",
+   "variant": "4L",
+   "burst": [
+    0.0,
+    0.0,
+    -380.0
+   ],
+   "label": "Cradle strap",
+   "role": "holds the container to the mount"
+  },
+  {
+   "name": "strap_b_4L",
+   "shape": "cyl",
+   "r": 67.0,
+   "h": 10,
+   "pos": [
+    -120.0,
+    0,
+    -180.0
+   ],
+   "axis": [
+    1,
+    0,
+    0
+   ],
+   "color": "#4b5560",
+   "status": "client",
+   "group": "releaser",
+   "variant": "4L",
+   "burst": [
+    0.0,
+    0.0,
+    -380.0
+   ],
+   "label": "Cradle strap",
+   "role": "holds the container to the mount"
+  },
+  {
+   "name": "blower_4L",
+   "shape": "cyl",
+   "r": 35,
+   "h": 60,
+   "pos": [
+    -210.0,
+    0,
+    -180.0
+   ],
+   "axis": [
+    1,
+    0,
+    0
+   ],
+   "color": "#c9cfd6",
+   "status": "client",
+   "group": "releaser",
+   "variant": "4L",
+   "burst": [
+    0.0,
+    0.0,
+    -380.0
+   ],
+   "label": "Blower (60 W at 12 V)",
+   "role": "60 W maximum at 12 V / 5 A, from the 12 V supply"
+  },
+  {
+   "name": "nozzle_4L",
+   "shape": "tube",
+   "a": [
+    -240.0,
+    0,
+    -190.0
+   ],
+   "b": [
+    -275.0,
+    0,
+    -265.0
+   ],
+   "od": 16,
+   "color": "#59616b",
+   "status": "client",
+   "group": "releaser",
+   "variant": "4L",
+   "burst": [
+    0.0,
+    0.0,
+    -380.0
+   ],
+   "label": "Outlet nozzle",
+   "role": "release outlet, below and behind the rotor discs"
+  }
+ ],
+ "motors": [
+  {
+   "name": "motor_1-1",
+   "pos": [
+    229.80970388562793,
+    -229.80970388562793,
+    11.0
+   ],
+   "dir": 1,
+   "burst": [
+    120.20815280171307,
+    -120.20815280171307,
+    0
+   ],
+   "tag": null
+  },
+  {
+   "name": "motor_-11",
+   "pos": [
+    -229.80970388562793,
+    229.80970388562793,
+    11.0
+   ],
+   "dir": 1,
+   "burst": [
+    -120.20815280171307,
+    120.20815280171307,
+    0
+   ],
+   "tag": null
+  },
+  {
+   "name": "motor_11",
+   "pos": [
+    229.80970388562793,
+    229.80970388562793,
+    11.0
+   ],
+   "dir": -1,
+   "burst": [
+    120.20815280171307,
+    120.20815280171307,
+    0
+   ],
+   "tag": "MN4014 KV400, 16 in prop"
+  },
+  {
+   "name": "motor_-1-1",
+   "pos": [
+    -229.80970388562793,
+    -229.80970388562793,
+    11.0
+   ],
+   "dir": -1,
+   "burst": [
+    -120.20815280171307,
+    -120.20815280171307,
+    0
+   ],
+   "tag": null
+  }
+ ],
+ "motor": {
+  "r": 23,
+  "h": 26.5,
+  "label": "T-Motor MN4014 KV400",
+  "price": "$96.90 each",
+  "mass_g": 171,
+  "role": "900 W / 30 A continuous; 3.0 kg static thrust each on a 16x5.4 prop at 22.2 V"
+ },
+ "prop": {
+  "d": 406.4,
+  "z": 44.0,
+  "burst_z": 90.0,
+  "label": "T-Motor P16x5.4 carbon prop",
+  "price": "$62.90 per pair (a spare set quoted)"
+ },
+ "ground_z": -328.5,
+ "fly_z": 1500.0,
+ "fov": {
+  "d455": {
+   "apex": [
+    110,
+    0,
+    36.0
+   ],
+   "h": 87,
+   "v": 58,
+   "far_air": 650,
+   "far_tunnel": 6000
+  },
+  "flow": {
+   "apex": [
+    165,
+    0,
+    -48.0
+   ],
+   "cone": 42,
+   "beam": 2,
+   "to_air": -328.5,
+   "to_tunnel": -900.0
+  },
+  "dist": {
+   "apex": [
+    55,
+    72,
+    33.0
+   ],
+   "beam": 2,
+   "len_air": 500,
+   "len_tunnel": 2400
+  },
+  "sf45": {
+   "center": [
+    -58,
+    0,
+    222
+   ],
+   "arc": 320,
+   "r_air": 650,
+   "r_tunnel": 4000
+  }
+ },
+ "dims": [
+  {
+   "a": [
+    229.80970388562793,
+    -433.0097038856279,
+    44.0
+   ],
+   "b": [
+    229.80970388562793,
+    433.0097038856279,
+    44.0
+   ],
+   "text": "0.87 m across (flying forward)"
+  },
+  {
+   "a": [
+    -373.4938018227343,
+    -373.4938018227343,
+    44.0
+   ],
+   "b": [
+    373.4938018227343,
+    373.4938018227343,
+    44.0
+   ],
+   "text": "1.06 m tip to tip"
+  },
+  {
+   "a": [
+    0,
+    -493.0097038856279,
+    -328.5
+   ],
+   "b": [
+    0,
+    -493.0097038856279,
+    244.0
+   ],
+   "text": "0.57 m tall"
+  }
+ ],
+ "compare": [
+  {
+   "name": "UCLA X500 v2",
+   "color": "#1a73e8",
+   "prop_d": 254,
+   "body": [
+    144,
+    144
+   ],
+   "motors": [
+    [
+     176.77669529663686,
+     176.77669529663686
+    ],
+    [
+     176.77669529663686,
+     -176.77669529663686
+    ],
+    [
+     -176.77669529663686,
+     176.77669529663686
+    ],
+    [
+     -176.77669529663686,
+     -176.77669529663686
+    ]
+   ]
+  },
+  {
+   "name": "Starling 2 Max",
+   "color": "#c62828",
+   "prop_d": 180,
+   "body": [
+    190,
+    260
+   ],
+   "motors": [
+    [
+     100,
+     135
+    ],
+    [
+     100,
+     -135
+    ],
+    [
+     -100,
+     135
+    ],
+    [
+     -100,
+     -135
+    ]
+   ]
+  }
+ ],
+ "variants": {
+  "none": {
+   "title": "No releaser (navigation milestone)",
+   "tow": 4.0,
+   "tw": 3.0,
+   "nav": "22-27 min",
+   "rel": null,
+   "verdict": "Yes",
+   "color": "#2e7d32"
+  },
+  "1L": {
+   "title": "1 L releaser + mount (1.27 kg)",
+   "tow": 5.3,
+   "tw": 2.3,
+   "nav": "16-18 min",
+   "rel": "14.5-16 min",
+   "verdict": "Yes, recommended",
+   "color": "#2e7d32"
+  },
+  "2L": {
+   "title": "2 L releaser + mount (2.10 kg)",
+   "tow": 6.1,
+   "tw": 2.0,
+   "nav": "13-14 min",
+   "rel": "12-13 min",
+   "verdict": "Yes, reduced margin",
+   "color": "#b26a00"
+  },
+  "4L": {
+   "title": "4 L releaser + mount (2.99 kg)",
+   "tow": 7.0,
+   "tw": 1.7,
+   "nav": "10-11 min",
+   "rel": "about 10 min",
+   "verdict": "No: needs a larger aircraft",
+   "color": "#c62828"
+  }
+ },
+ "tunnel": {
+  "length": 14640,
+  "width": 9140,
+  "wall": 1500,
+  "ridge": 4000,
+  "hoop_pitch": 1830,
+  "hoop_od": 42,
+  "beds": {
+   "y": [
+    -3200,
+    -1600,
+    0,
+    1600,
+    3200
+   ],
+   "width": 800,
+   "height": 250,
+   "length": 13400,
+   "rows": [
+    -200,
+    200
+   ],
+   "pitch": 300,
+   "plant_r": 200,
+   "canopy": 600
+  },
+  "lights": {
+   "z": 2800,
+   "pitch": 3660,
+   "size": [
+    1200,
+    150,
+    80
+   ]
+  },
+  "irrigation": {
+   "z": 2400,
+   "y": [
+    -800,
+    800
+   ],
+   "od": 32
+  },
+  "supports": {
+   "height": 800,
+   "pitch": 3660,
+   "od": 20
+  },
+  "aircraft_x": -1500
+ }
+}
