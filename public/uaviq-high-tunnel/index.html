@@ -62,12 +62,12 @@
   <div class="wrap kpis">
     <div class="kpi">
       <p class="kpi-label">Thrust-to-weight with the 1 L releaser</p>
-      <p class="kpi-val"><span class="bad">1.4–1.6</span><span class="to" aria-label="becomes">→</span><span class="good">2.3</span></p>
-      <p class="kpi-note">X500 → proposed · target 2.0 or more</p>
+      <p class="kpi-val"><span class="bad">1.3</span><span class="to" aria-label="becomes">→</span><span class="good">2.3</span></p>
+      <p class="kpi-note">X500 → proposed, at nominal battery voltage · target 2.0 or more</p>
     </div>
     <div class="kpi">
       <p class="kpi-label">Flight time with the releaser</p>
-      <p class="kpi-val"><span class="bad">≈ 5.6 min</span><span class="to" aria-label="becomes">→</span><span class="good">≈ 15 min</span></p>
+      <p class="kpi-val"><span class="bad">≈ 5 min</span><span class="to" aria-label="becomes">→</span><span class="good">≈ 15 min</span></p>
       <p class="kpi-note">releasing, landing with a 20 % reserve</p>
     </div>
     <div class="kpi">
@@ -91,18 +91,20 @@
       <div>
         <ul class="facts">
           <li><b>≈ 3.4 kg at take-off</b> with UCLA's autonomy kit, a 4S 5 Ah pack and the 1 L dummy on its mount.</li>
-          <li><b>Thrust-to-weight ≈ 1.4–1.6.</b> It hovers at about 72 % throttle, so little thrust is left for corrections.</li>
+          <li><b>Thrust-to-weight ≈ 1.3</b> at nominal battery voltage (≈ 1.6 on a full pack). It hovers at about 80 % throttle,
+            so little thrust is left for corrections.</li>
           <li><b>≈ 5–6 minutes</b> of usable flight with a 20 % battery reserve.</li>
           <li>That matches the trials: <b>altitude dips</b> during corrections, <b>wobble</b> in hover and slow flight,
             and <b>close passes</b> that needed manual corrections.</li>
-          <li>A <b>stock X650</b> has the same problem: Holybro's 4.3 kg payload rating assumes no battery and 70 % hover throttle.</li>
+          <li>A <b>stock X650</b> does better (≈ 1.5) and copes with the 1 L releaser in our simulation, but has no margin for
+            the 2 L or 4 L releaser. Holybro's 4.3 kg payload rating assumes no battery and 70 % hover throttle.</li>
         </ul>
         <p class="fine">X500 figures are our estimates. UCLA's weighed take-off mass and flight logs will confirm them.</p>
       </div>
       <figure class="card chart-card">
         <figcaption class="card-title">Thrust-to-weight with the 1 L releaser</figcaption>
         <svg class="chart" viewBox="0 0 560 318" role="img"
-             aria-label="Bar chart. Thrust-to-weight with the 1 litre releaser: UCLA X500 1.56, stock X650 1.47, proposed 2.28. The target is 2.0.">
+             aria-label="Bar chart. Thrust-to-weight with the 1 litre releaser at nominal battery voltage: UCLA X500 1.34, stock X650 1.47, proposed 2.28. The target is 2.0.">
           <g class="grid">
             <line x1="56" x2="545" y1="250" y2="250"/>
             <line x1="56" x2="545" y1="204" y2="204"/>
@@ -115,16 +117,16 @@
           </g>
           <line class="hover-line" x1="56" x2="545" y1="158" y2="158"/>
           <text class="line-label" x="545" y="151">1.0 = only hovers</text>
-          <rect class="bar bar-x500" x="80" y="106.5" width="80" height="143.5" rx="3"/>
+          <rect class="bar bar-x500" x="80" y="126.7" width="80" height="123.3" rx="3"/>
           <rect class="bar bar-x650" x="210" y="114.8" width="80" height="135.2" rx="3"/>
           <rect class="bar bar-prop" x="340" y="40.2" width="80" height="209.8" rx="3"/>
           <line class="target-line" x1="56" x2="545" y1="66" y2="66"/>
           <text class="line-label target-label" x="545" y="59">target 2.0</text>
-          <text class="val" x="120" y="97">1.56</text><text class="val" x="250" y="105">1.47</text><text class="val val-good" x="380" y="31">2.28</text>
+          <text class="val" x="120" y="117">1.34</text><text class="val" x="250" y="105">1.47</text><text class="val val-good" x="380" y="31">2.28</text>
           <text class="cat" x="120" y="272">UCLA X500 (est.)</text><text class="cat" x="250" y="272">Stock X650</text><text class="cat cat-good" x="380" y="272">Proposed</text>
-          <text class="sub" x="120" y="292">hovers at ≈ 72 %</text><text class="sub" x="250" y="292">≈ 70 %</text><text class="sub" x="380" y="292">≈ 48 %</text>
+          <text class="sub" x="120" y="292">hovers at ≈ 80 %</text><text class="sub" x="250" y="292">≈ 70 %</text><text class="sub" x="380" y="292">≈ 48 %</text>
         </svg>
-        <p class="fine">Maximum thrust divided by take-off weight, at the motor test voltage. Two or more leaves room to correct, climb and fight gusts.</p>
+        <p class="fine">Maximum thrust divided by take-off weight, at nominal battery voltage (3.7 V per cell). Two or more leaves room to correct, climb and fight gusts.</p>
       </figure>
     </div>
 
@@ -157,7 +159,7 @@
         <table class="tbl tbl-issues">
           <thead><tr><th scope="col">Seen in UCLA's trials</th><th scope="col">What changes</th></tr></thead>
           <tbody>
-            <tr><th scope="row">Altitude dips during corrections</th><td>Thrust-to-weight ≈ 2.3 instead of ≈ 1.5; height held with a downward rangefinder</td></tr>
+            <tr><th scope="row">Altitude dips during corrections</th><td>Thrust-to-weight ≈ 2.3 instead of ≈ 1.3; height held with a downward rangefinder</td></tr>
             <tr><th scope="row">Close passes and manual corrections</th><td>Scanning lidar and an upward rangefinder feed PX4 collision prevention, which stops the aircraft even if the Jetson stalls</td></tr>
             <tr><th scope="row">Wobble in hover and slow flight</th><td>Lower hover throttle, vibration-isolated avionics, larger airframe</td></tr>
             <tr><th scope="row">1–2 m landing error</th><td>Precision landing on a printed fiducial pad with a downward camera</td></tr>
@@ -173,7 +175,7 @@
   <div class="wrap">
     <p class="sec-kicker">02 // The recommendation</p>
     <h2 id="solution-title">An X650-class quad on 6S, reusing UCLA's autonomy core</h2>
-    <p class="lede">About 2.3 times the X500's thrust, room for the releaser, and no change to UCLA's software stack.</p>
+    <p class="lede">More than twice the X500's thrust, room for the releaser, and no change to UCLA's software stack.</p>
     <div class="rra">
       <article class="card rra-col rra-reuse">
         <h3 class="card-title">Reuse from the X500</h3>
@@ -258,7 +260,8 @@
     <p class="sec-kicker">03 // Simulation</p>
     <h2 id="sim-title">Same pilot input, same controller, different aircraft</h2>
     <p class="lede">Both aircraft carry the 1 L releaser and fly the same PX4-style controller in altitude-hold mode, the mode a
-      pilot uses for manual corrections. Replay the two hard dodges from our report, or fly it yourself.</p>
+      pilot uses for manual corrections. Replay the two hard dodges from our report, or fly it yourself. To see where a
+      stock X650 runs short, tick "Add a stock X650" and pick the 2 L releaser.</p>
 
     <div class="sim card" id="sandbox" tabindex="0"
          aria-label="Flight demo. Use the buttons, or the left and right arrow keys to tilt and up and down to change height.">
@@ -310,7 +313,9 @@
 
     <h3 class="sub-title">A full two-tunnel sortie</h3>
     <p>60 m tunnel → 20 m windy transit → 10 s to reorient → 60 m tunnel with the blower on. 160 seconds per sortie,
-      starting from a 98 % charge, flown by the same model.</p>
+      flown by the same model. The animation shows the first sortie from a 98 % charge; the table keeps flying sorties
+      back to back down to the 20 % reserve. The route is gentle, so all three aircraft hold height and the sortie mainly
+      compares battery use. Thrust margin shows in the peak motor load, and in the dodge test above.</p>
     <div class="card sortie" id="sortie">
       <div class="btn-row">
         <button class="btn btn-primary" type="button" id="sortiePlay">▶ Play</button>

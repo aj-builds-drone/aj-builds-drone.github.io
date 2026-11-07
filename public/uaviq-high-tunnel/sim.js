@@ -269,17 +269,40 @@ export function missionWind(t) {
 
 export const missionAux = (t) => AVIONICS_W + (t >= 92 && t < 152 ? BLOWER_W : 0);
 
-export function runMission(ac, logDt = 0.02) {
-  const log = simulate(ac, MISSION_END, missionRef, { wind: missionWind, aux: missionAux, soc: 0.98, dt: 0.004,
+export function runMission(ac, logDt = 0.02, soc = 0.98) {
+  const log = simulate(ac, MISSION_END, missionRef, { wind: missionWind, aux: missionAux, soc, dt: 0.004,
     onGround: true, logDt });
-  const used = log.soc[0] - log.soc[log.soc.length - 1];
+  const start = log.soc[0], end = log.soc[log.soc.length - 1];
   const air = log.t.map((t, i) => (t >= 8 && t <= 152 ? i : -1)).filter((i) => i >= 0);
   return {
     log,
-    used,
-    sorties: (log.soc[0] - RESERVE) / used,
+    start,
+    end,
+    used: start - end,
     minCellV: Math.min(...log.cellV),
     minTw: Math.min(...air.map((i) => log.tw[i])),
     maxErr: Math.max(...air.map((i) => Math.abs(log.z[i] - log.zr[i]))),
+    peakLoad: Math.min(1, Math.max(...log.load)),
+  };
+}
+
+/**
+ * Flies sorties back to back from 98 % until one would land below the reserve; `first` is the first sortie if
+ * already flown, and `pause` runs between sorties (the page passes a timeout so the animation keeps running).
+ */
+export async function runSorties(ac, first = runMission(ac), pause = async () => {}) {
+  const runs = [first];
+  while (runs.at(-1).end >= RESERVE && runs.length < 30) {
+    await pause();
+    runs.push(runMission(ac, 0.02, runs.at(-1).end));
+  }
+  const full = runs.filter((r) => r.end >= RESERVE);
+  const next = runs[full.length] ?? runs.at(-1);
+  const last = full.at(-1) ?? first;
+  return {
+    sorties: full.length + (next.start - RESERVE) / (next.start - next.end),
+    lastTw: last.minTw,
+    lastLoad: last.peakLoad,
+    maxErr: Math.max(...(full.length ? full : runs).map((r) => r.maxErr)),
   };
 }

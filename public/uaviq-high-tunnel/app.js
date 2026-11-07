@@ -1,6 +1,6 @@
 import {
   Aircraft, Flyer, SPECS, payloadKg, FLY_Z, CANOPY, AVIONICS_W, BLOWER_W, RESERVE, DODGES, DODGE_TILT, T_DODGE,
-  doubletTilt, runMission, MISSION_END,
+  doubletTilt, runMission, runSorties, MISSION_END,
 } from "./sim.js";
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -633,17 +633,31 @@ class Sortie {
       const ac = new Aircraft(SPECS[key], payloadKg(SPECS[key], "1L"));
       return { ac, ...runMission(ac) };
     });
+    this.statsEl.replaceChildren(el("p", { class: "fine", text: "Flying the following sorties down to the 20 % reserve…" }));
+    const pause = () => new Promise((resolve) => setTimeout(resolve));
+    Promise.all(this.runs.map((r) => runSorties(r.ac, r, pause))).then((stats) => {
+      stats.forEach((s, i) => Object.assign(this.runs[i], s));
+      this.showStats();
+      this.draw();
+    });
+  }
+
+  showStats() {
+    const pct = (v) => (v * 100).toFixed(0);
     this.statsEl.replaceChildren(el("div", { class: "table-scroll" }, el("table", { class: "tbl" },
-      el("thead", {}, el("tr", {}, ["Per sortie", "Battery used", "Sorties per charge", "Lowest thrust/weight",
-        "Worst height error"].map((h, i) => el("th", { scope: "col", class: i ? "num" : null, text: h })))),
+      el("thead", {}, el("tr", {}, ["Per sortie", "Battery used", "Sorties per charge", "Thrust/weight",
+        "Peak motor load", "Worst height error"].map((h, i) => el("th", { scope: "col", class: i ? "num" : null, text: h })))),
       el("tbody", {}, this.runs.map((r) => el("tr", { class: r.ac.key === "proposed" ? "hl" : null },
         el("th", { scope: "row", style: `color:${r.ac.color}`, text: r.ac.name }),
-        el("td", { class: "num", text: `${(r.used * 100).toFixed(0)} %` }),
+        el("td", { class: "num", text: `${pct(r.used)} %` }),
         el("td", { class: "num", text: r.sorties.toFixed(1) }),
-        el("td", { class: "num", text: r.minTw.toFixed(2) }),
+        el("td", { class: "num", text: `${r.minTw.toFixed(2)} → ${r.lastTw.toFixed(2)}` }),
+        el("td", { class: "num", text: `${pct(r.peakLoad)} → ${pct(r.lastLoad)} %` }),
         el("td", { class: "num", text: `${r.maxErr.toFixed(2)} m` })))))),
-    el("p", { class: "fine", text: "Sorties per charge count down to a 20 % reserve (the orange tick on each battery bar). "
-      + "The X500 runs on its 4S 5 Ah pack, the X650s on a 6S 10 Ah pack." }));
+    el("p", { class: "fine", text: "Sorties are flown back to back from a 98 % charge, and one counts if it lands above the 20 % "
+      + "reserve (the orange tick on each battery bar). Arrows run from the first sortie to the last full one. Peak motor "
+      + "load is the busiest motors' thrust as a share of their maximum at that moment's battery voltage. The X500 runs on "
+      + "its 4S 5 Ah pack, the X650s on a 6S 10 Ah pack." }));
   }
 
   play() {
@@ -768,7 +782,8 @@ class Sortie {
         ctx.fillStyle = r.ac.color;
         ctx.font = `700 ${narrow ? 9 : 11}px ${MONO}`;
         ctx.textAlign = "right";
-        ctx.fillText(`${(r.used * 100).toFixed(0)} % used → ${r.sorties.toFixed(1)} sorties per charge`, W - pr - 8, y0 + 16);
+        const tail = r.sorties == null ? "" : ` → ${r.sorties.toFixed(1)} sorties per charge`;
+        ctx.fillText(`${(r.used * 100).toFixed(0)} % used${tail}`, W - pr - 8, y0 + 16);
       }
     });
     ctx.textAlign = "left";
