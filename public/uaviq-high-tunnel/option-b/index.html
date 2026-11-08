@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Option B: custom side-pod frame (draft) | AJ Builds Drone</title>
-<meta name="description" content="Draft: a custom carbon and 3-D printed frame for the UAV-IQ high-tunnel aircraft, in eight variants.">
+<title>Option B: custom side-pod frame | AJ Builds Drone</title>
+<meta name="description" content="A custom carbon and 3-D printed frame for the UAV-IQ high-tunnel aircraft in eight variants: 3D models, simulated flights, estimated performance and a priced parts list.">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0a0a0a">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -38,11 +38,14 @@
 
 <section class="hero" aria-labelledby="hero-title">
   <div class="wrap">
-    <p class="kicker">Draft for internal review · not linked from the client page</p>
+    <p class="kicker">Option B · custom-frame alternative · 8 November 2026</p>
     <h1 id="hero-title">Option B: a <span class="accent">custom side-pod frame</span> around the same core</h1>
     <p class="lede">Option A's motors, propellers, battery, flight electronics and UCLA's autonomy core, on a carbon and 3-D
       printed frame that carries the releaser in pods on rails beside the aircraft. The lidar depends on the frame. Pick a
       frame: every section below follows the choice.</p>
+    <p class="fine">Values marked <span class="est-tag">est.</span> are estimates: masses and performance from our CAD, the
+      motor load test and simulations, and prices without a dealer quote yet. They will be confirmed by quotes, by weighing
+      the built frame and by flight tests.</p>
     <div class="picker-slot" id="pickerSlot">
       <div class="card picker" id="picker">
         <div class="picker-row">
@@ -91,7 +94,8 @@
     <h2 id="compare-title">The Option A sortie table, with Option B added</h2>
     <p class="lede">The same side-view model, controller and two-tunnel sortie as on the Option A page (60 m tunnel, 20 m windy
       transit, 60 m tunnel with the blower on, 160 s), flown back to back from a 98 % charge down to the 20 % reserve. Option B
-      uses its CAD mass and pitch inertia and Option A's motors, propellers and battery.</p>
+      uses its CAD mass and pitch inertia and Option A's motors, propellers and battery. Every value here is a simulated
+      estimate.</p>
     <div class="card">
       <h3 class="card-title">With the 1 L releaser</h3>
       <div id="sortie1L" class="sortie-stats"><p class="fine">Flying the sorties…</p></div>
@@ -114,7 +118,8 @@
     <h2 id="flight-title">The selected frame on the two-tunnel mission</h2>
     <p class="lede">A recording of the 3-D simulation, not an animation: Gazebo Harmonic renders every image from its physics,
       and the aircraft is flown by PX4 v1.17, the real autopilot firmware, in software in the loop. No GPS: it navigates on
-      vision odometry and optical flow, releases six doses over the rows, crosses the windy gap and lands.</p>
+      vision odometry and optical flow, releases six doses over the rows, crosses the windy gap and lands. The results are
+      simulated estimates until the frame is built and flown.</p>
     <div class="flight-grid">
       <figure class="card video-card">
         <div class="video-wrap">
@@ -127,7 +132,7 @@
         <figcaption class="fine" id="videoCap"></figcaption>
       </figure>
       <div class="card">
-        <h3 class="card-title">Mission results</h3>
+        <h3 class="card-title">Mission results <span class="est-tag">simulated estimates</span></h3>
         <div class="table-scroll"><table class="tbl" id="gzTable"></table></div>
       </div>
     </div>
@@ -142,10 +147,14 @@
       <div class="card">
         <h3 class="card-title">From the CAD and the motor load test</h3>
         <div class="table-scroll"><table class="tbl" id="numbersTable"></table></div>
+        <p class="fine">Dimensions are the design. Masses, thrust, currents and endurance are estimates until the frame is
+          built and weighed.</p>
       </div>
       <div class="card">
         <h3 class="card-title">Design checks</h3>
         <div class="table-scroll"><table class="tbl" id="checksTable"></table></div>
+        <p class="fine">Clearances come from the CAD geometry; checks marked est. rest on a model (arm vibration, tip-over
+          from the estimated centre of gravity, motor currents from the T-Motor load test).</p>
       </div>
     </div>
   </div>
@@ -155,10 +164,11 @@
   <div class="wrap">
     <p class="sec-kicker">05 // Parts</p>
     <h2 id="bom-title">Parts list for this frame</h2>
-    <p class="lede">Every item links to the store page we read the price from: Option A's parts on
+    <p class="lede">Items with a store price link to the page we read it from: Option A's parts on
       <span data-bind="checked"></span>, the frame materials on <span data-bind="checkedB"></span> (US dollars, before tax and
-      shipping). Cut-to-order plates and the allowances stay estimates until quoted. UCLA's autonomy core is reused, as in
-      Option A.</p>
+      shipping). Items marked est. have no dealer price yet and link to the vendor instead: cut-to-order plates (priced when
+      our cut files are uploaded), the wiring and harness allowances, and the Livox Mid-360, which has no US list price.
+      UCLA's autonomy core is reused, as in Option A.</p>
     <div class="card bom">
       <div class="card-head">
         <h3 class="card-title">New parts</h3>
@@ -169,7 +179,8 @@
     </div>
     <div class="card mt">
       <h3 class="card-title">Reused from UCLA's X500 (not in the total)</h3>
-      <div class="table-scroll"><table class="tbl" id="reusedTable"></table></div>
+      <div class="table-scroll"><table class="tbl tbl-reused" id="reusedTable"></table></div>
+      <p class="fine" id="reusedNote"></p>
     </div>
   </div>
 </section>
@@ -238,7 +249,7 @@
     </div>
     <p class="fine">Lengths are cut lengths, packed into the tubes we buy (1,000 mm; 500 mm for the 10 mm mast tube) with 3 mm
       per saw cut. Cut carbon tube with a fine-tooth or abrasive blade, taped at the cut. Plate sizes are the outline's
-      bounding box.</p>
+      bounding box; masses are estimates from the CAD.</p>
   </div>
 </section>
 
@@ -246,8 +257,9 @@
 
 <footer class="section optb-foot">
   <div class="wrap">
-    <p class="fine">Prepared by AJ Builds Drone for UAV-IQ and the UCLA high-tunnel biocontrol project. Draft: numbers come
-      from our CAD and simulations and will be confirmed by weighing the built frame.</p>
+    <p class="fine">Prepared by AJ Builds Drone for UAV-IQ and the UCLA high-tunnel biocontrol project. Masses, performance
+      and flight results are estimates from our CAD and simulations, to be confirmed by weighing and flight-testing the built
+      frame. Prices are store prices on the dates shown, except the items marked est.</p>
   </div>
 </footer>
 </body>

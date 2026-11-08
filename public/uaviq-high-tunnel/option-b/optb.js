@@ -33,6 +33,7 @@ const FLAG_TAG = { ref: "tag-bad", warn: "tag-warn", info: "tag-info", good: "ta
 const KIND_TAG = { Replace: "tag-warn", Add: "tag-good", Spare: "tag-info", Allowance: "tag-muted", Make: "tag-info" };
 const B_COLOR = "#00d4ff";
 const safeUrl = (u) => (typeof u === "string" && u.startsWith("https://") ? u : null);
+const estTag = () => el("span", { class: "est-tag", text: "est." });
 
 let DATA, A_BOM, cur;
 let viewerLive = false;
@@ -46,8 +47,18 @@ function stockClass(text) {
   return "";
 }
 
-const head = (cols, num = []) => el("thead", {}, el("tr", {}, cols.map((h, i) =>
-  el("th", { scope: "col", class: num.includes(i) ? "num" : null, text: h }))));
+const head = (cols, num = [], est = []) => el("thead", {}, el("tr", {}, cols.map((h, i) =>
+  el("th", { scope: "col", class: num.includes(i) ? "num" : null }, h, est.includes(i) ? estTag() : null))));
+
+function scrollable(box, label) {                  // keyboard users can scroll a wide table too
+  let h = box.previousElementSibling;              // named after its own heading, so every region is unique
+  while (h && !h.classList.contains("card-title")) h = h.previousElementSibling;
+  box.tabIndex = 0;
+  box.setAttribute("role", "region");
+  box.setAttribute("aria-label", label || h?.textContent.trim()
+    || box.closest(".card")?.querySelector(".card-title")?.textContent.trim() || "Table");
+  return box;
+}
 
 // ---- per-sortie tables: sim.js runMission / runSorties, with each aircraft's own blower power -----------------
 function mission(ac, soc = 0.98) {
@@ -110,9 +121,9 @@ function renderSortie(vol) {
   const rows = SORTIES[vol];
   const box = $(`#sortie${vol}`);
   if (!rows) return;
-  box.replaceChildren(el("div", { class: "table-scroll" }, el("table", { class: "tbl" },
+  box.replaceChildren(scrollable(el("div", { class: "table-scroll" }, el("table", { class: "tbl" },
     head(["Per sortie", "Battery used", "Sorties per charge", "Thrust/weight", "Peak motor load", "Worst height error"],
-      [1, 2, 3, 4, 5]),
+      [1, 2, 3, 4, 5], [1, 2, 3, 4, 5]),
     el("tbody", {}, rows.map((r) => {
       const m = r.model && DATA.models[r.model];
       const res = r.res;
@@ -127,7 +138,7 @@ function renderSortie(vol) {
         el("td", { class: "num", text: `${res.minTw.toFixed(2)} → ${res.lastTw.toFixed(2)}` }),
         el("td", { class: "num", text: `${Math.round(100 * res.peakLoad)} → ${Math.round(100 * res.lastLoad)} %` }),
         el("td", { class: "num", text: `${res.maxErr.toFixed(2)} m` }));
-    })))));
+    })))), `With the ${vol.replace("L", " L")} releaser`));
   $$(".rowpick", box).forEach((b) => b.addEventListener("click", () => {
     $("#model").value = b.dataset.model;
     show(b.dataset.model, true);
@@ -185,23 +196,24 @@ function kpis(m) {
   const aKg = a.baseKg + payloadKg(a, m.vol);
   const aTw = (4 * a.test.at(-1)[0]) / 1000 / aKg;
   const tile = (label, val, note, cls) => el("div", { class: "kpi" },
-    el("p", { class: "kpi-label", text: label }), el("p", { class: `kpi-val ${cls || ""}`, text: val }),
+    el("p", { class: "kpi-label" }, label, estTag()), el("p", { class: `kpi-val ${cls || ""}`, text: val }),
     el("p", { class: "kpi-note", text: note }));
   const twCls = m.perf.tw >= 2 ? "good" : m.perf.tw >= 1.8 ? "warn" : "bad";
-  const L = m.load;
+  const L = m.load, T = m.bom_totals;
   const loadCls = L.peak_share <= 0.8 ? "good" : L.peak_share <= 0.9 ? "warn" : "bad";
   $("#kpis").replaceChildren(
     tile("Take-off mass, full releaser", `${(m.mass.full_g / 1000).toFixed(2)} kg`,
-      `Option A with the ${m.vol.replace("L", " L")}: ${aKg.toFixed(2)} kg`),
+      `from the CAD · Option A with the ${m.vol.replace("L", " L")}: ${aKg.toFixed(2)} kg`),
     tile("Thrust-to-weight", m.perf.tw.toFixed(2), `nominal battery voltage · Option A ${aTw.toFixed(2)} · target 2.0`, twCls),
     tile("Hover throttle", `${m.perf.hover_pct.toFixed(0)} %`, "full releaser, from the motor load test"),
-    tile("Peak motor load (estimated)", pct(L.peak_share),
+    tile("Peak motor load", pct(L.peak_share),
       `busiest motor's share of full thrust in the Gazebo mission · about ${L.peak_a.toFixed(0)} A of the ESC's ${L.esc_a} A`,
       loadCls),
     tile("Endurance", `${m.perf.end_rel_min.toFixed(1)} / ${m.perf.end_nav_min.toFixed(1)} min`,
-      "releasing / navigating, using 80 % of the pack"),
-    tile("New parts at list", usd0.format(m.bom_totals.list),
-      `${A_BOM ? `Option A ${usd0.format(A_BOM.totals.list)} · ` : ""}plates and allowances estimated`));
+      "releasing with a full releaser / flying back empty, using 80 % of the pack"),
+    tile("New parts, total", usd0.format(T.list),
+      `${usd0.format(T.verified)} at store prices + ${usd0.format(T.estimates)} estimated`
+      + (A_BOM ? ` · Option A ${usd0.format(A_BOM.totals.list)}` : "")));
 }
 
 function flight(m) {
@@ -255,12 +267,12 @@ function flight(m) {
 }
 
 function numbers(m) {
-  $("#numbersTable").replaceChildren(el("tbody", {}, m.numbers.map(([a, b]) =>
-    el("tr", {}, el("th", { scope: "row", text: a }), el("td", { class: "num", text: b })))));
+  $("#numbersTable").replaceChildren(el("tbody", {}, m.numbers.map(([a, b, est]) =>
+    el("tr", {}, el("th", { scope: "row" }, a, est ? estTag() : null), el("td", { class: "num", text: b })))));
   $("#checksTable").replaceChildren(head(["Check", "Value"], [1]), el("tbody", {}, m.checks.map((c) =>
     el("tr", {}, el("th", { scope: "row", text: c.name }),
-      el("td", { class: "num" }, `${c.value} `, el("span", { class: c.ok ? "ok" : "bad", text: c.ok ? "✓" : "✗",
-        "aria-label": c.ok ? "passes" : "fails" }))))));
+      el("td", { class: "num" }, c.est ? estTag() : null, `${c.value} `, el("span", { class: c.ok ? "ok" : "bad",
+        text: c.ok ? "✓" : "✗", role: "img", "aria-label": c.ok ? "passes" : "fails" }))))));
 }
 
 function bom(m) {
@@ -275,16 +287,18 @@ function bom(m) {
     head(["#", "Item", "Vendor", "Qty", "Unit", "Extended", "Stock when checked", "Type"], [3, 4, 5]),
     el("tbody", {}, groups.flatMap((g) => [
       el("tr", { class: "group" }, el("th", { colspan: "8", scope: "colgroup" }, g.cat,
-        el("span", { text: usd2.format(g.items.reduce((s, b) => s + b.ext, 0)) }))),
+        el("span", { text: usd2.format(g.items.reduce((s, b) => s + b.ext, 0))
+          + (g.items.some((b) => b.estimate) ? " incl. estimates" : "") }))),
       ...g.items.map((b) => el("tr", { class: b.src === "B" ? "row-b" : null },
         el("td", { class: "num", text: b.n }),
         el("td", { class: "item" }, link(b), b.sku ? el("span", { class: "sku", text: b.sku }) : null,
           b.notes ? el("span", { class: "note", text: b.notes }) : null),
         el("td", { text: b.vendor || "–" }),
         el("td", { class: "num", text: b.qty }),
-        el("td", { class: "num", text: usd2.format(b.unit) }),
-        el("td", { class: "num", text: usd2.format(b.ext) }),
-        el("td", { class: `stock ${stockClass(b.stock)}`, text: b.estimate ? "Estimate" : b.stock || "–" }),
+        el("td", { class: "num" }, b.estimate ? estTag() : null, usd2.format(b.unit)),
+        el("td", { class: "num" }, b.estimate ? estTag() : null, usd2.format(b.ext)),
+        el("td", { class: `stock ${b.estimate ? "warn" : stockClass(b.stock)}`,
+          text: b.estimate ? `Estimate: ${(b.stock || "allowance").toLowerCase()}` : b.stock || "–" }),
         el("td", {}, el("span", { class: `tag ${KIND_TAG[b.kind] || ""}`, text: b.kind })))),
     ])));
   const T = m.bom_totals;
@@ -295,10 +309,25 @@ function bom(m) {
   $("#bomTotals").replaceChildren(
     el("div", {}, el("span", { text: "At store prices (each item links to the page we checked)" }),
       el("b", { text: usd2.format(T.verified) })),
-    el("div", {}, el("span", { text: `Estimates: ${est.join(", ")}` }), el("b", { text: usd2.format(T.estimates) })),
-    el("div", { class: "grand" }, el("span", { text: `Option B ${m.name}, total at list` }), el("b", { text: usd2.format(T.list) })),
-    el("div", {}, el("span", { text: "Option A (X650 kit, SF45/B), at list" }),
+    el("div", {}, el("span", { text: `Estimates, no dealer price yet: ${est.join(", ")}` }),
+      el("b", { text: usd2.format(T.estimates) })),
+    el("div", { class: "grand" }, el("span", { text: `Option B ${m.name}: store prices + estimates` }),
+      el("b", { text: usd2.format(T.list) })),
+    el("div", {}, el("span", { text: "Option A (X650 kit, SF45/B): store prices + "
+      + (A_BOM ? `${usd0.format(A_BOM.totals.allowances)} of estimated allowances` : "estimates") }),
       el("b", { text: A_BOM ? usd2.format(A_BOM.totals.list) : "–" })));
+}
+
+function reused() {
+  $("#reusedTable").replaceChildren(head(["Item", "Price new", "Notes"], [1]),
+    el("tbody", {}, DATA.reused.map((r) => el("tr", {},
+      el("td", { class: "item" }, safeUrl(r.url)
+        ? el("a", { href: r.url, target: "_blank", rel: "noopener noreferrer", text: r.item }) : r.item,
+      r.vendor ? el("span", { class: "sku", text: r.vendor }) : null),
+      el("td", { class: "num", text: r.unit == null ? "–" : usd2.format(r.unit) }),
+      el("td", { text: r.notes || "" })))));
+  $("#reusedNote").textContent = `Together ${usd2.format(DATA.reusedCore)} new at store prices on ${DATA.checked}; `
+    + "UCLA moves them over from the X500, so they are not in the totals above.";
 }
 
 function prints(m) {
@@ -314,7 +343,7 @@ function prints(m) {
     return line ? `${line.qty} × ${line.item.split(", ").at(-1).replace(" spool", "")}` : "–";
   };
   const used = FILS.filter((f) => tot[f].prints);
-  $("#filTable").replaceChildren(head(["Filament", "Parts", "Prints", "Grams", "Buy"], [1, 2, 3, 4]),
+  $("#filTable").replaceChildren(head(["Filament", "Parts", "Prints", "Grams", "Buy"], [1, 2, 3, 4], [3]),
     el("tbody", {}, used.map((f) => el("tr", {},
       el("th", { scope: "row" }, sw(f), f),
       el("td", { class: "num", text: tot[f].parts }), el("td", { class: "num", text: tot[f].prints }),
@@ -323,7 +352,7 @@ function prints(m) {
       el("td", { class: "num", text: used.reduce((s, f) => s + tot[f].parts, 0) }),
       el("td", { class: "num", text: used.reduce((s, f) => s + tot[f].prints, 0) }),
       el("td", { class: "num", text: Math.round(used.reduce((s, f) => s + tot[f].g, 0)) }), el("td"))));
-  $("#printTable").replaceChildren(head(["Part", "Qty", "g each", "g"], [1, 2, 3]),
+  $("#printTable").replaceChildren(head(["Part", "Qty", "g each", "g"], [1, 2, 3], [2, 3]),
     el("tbody", {}, used.flatMap((f) => [
       el("tr", { class: "sub" }, el("th", { scope: "row" }, sw(f), f), el("td"), el("td"),
         el("td", { class: "num", text: Math.round(tot[f].g) })),
@@ -337,7 +366,7 @@ function prints(m) {
 }
 
 function carbon(m) {
-  $("#tubeTable").replaceChildren(head(["Part", "Stock", "Qty × mm", "g each"], [2, 3]),
+  $("#tubeTable").replaceChildren(head(["Part", "Stock", "Qty × mm", "g each"], [2, 3], [3]),
     el("tbody", {}, m.tubes.map((t) => el("tr", {},
       el("th", { scope: "row", class: "part", text: t.label }), el("td", { text: t.stock.replace("CF tube ", "") + " mm" }),
       el("td", { class: "num", text: `${t.qty} × ${t.len_mm.toFixed(0)}` }), el("td", { class: "num", text: t.g.toFixed(0) })))));
@@ -347,7 +376,7 @@ function carbon(m) {
       el("td", { class: "num", text: `${b.lengths} × ${b.tube_mm.toLocaleString("en-US")} mm`
         + (b.per_pack > 1 ? ` (${b.packs} pack${b.packs > 1 ? "s" : ""} of ${b.per_pack})` : "") }),
       el("td", { class: "cuts", text: b.cuts.map((c) => c.join(" + ")).join("  |  ") })))));
-  $("#plateTable").replaceChildren(head(["Plate", "Sheet", "Qty", "Size, mm", "g each"], [2, 3, 4]),
+  $("#plateTable").replaceChildren(head(["Plate", "Sheet", "Qty", "Size, mm", "g each"], [2, 3, 4], [4]),
     el("tbody", {}, m.plates.map((p) => el("tr", {},
       el("th", { scope: "row", class: "part", text: p.label.split(",")[0] }), el("td", { text: p.stock.replace("CF sheet ", "") }),
       el("td", { class: "num", text: p.qty }), el("td", { class: "num", text: `${p.size_mm[0]} × ${p.size_mm[1]}` }),
@@ -377,8 +406,9 @@ function plateWays(m) {
       + " Glue a 1:1 print of the outline on, cut with a diamond or carbide blade, drill the holes, sand the edges. Cut wet"
       + " or with dust extraction and wear a P2/N95 mask: carbon dust irritates."),
     el("li", {}, el("b", { text: "Print them in PA-CF on the Kobra S1. " }),
-      `Same stiffness needs thicker plates (${thick}): ${pr.pacf_g} g of PA-CF (${pr.spools} × 0.5 kg spool${pr.spools > 1 ? "s" : ""}), `
-      + `${pr.extra_g} g heavier, thrust-to-weight ${pr.tw_now.toFixed(2)} → ${pr.tw.toFixed(2)}. Nylon is weaker and creeps under `
+      `Same stiffness needs thicker plates (${thick}). By our estimate that takes ${pr.pacf_g} g of PA-CF `
+      + `(${pr.spools} × 0.5 kg spool${pr.spools > 1 ? "s" : ""}), adds ${pr.extra_g} g and lowers thrust-to-weight from `
+      + `${pr.tw_now.toFixed(2)} to ${pr.tw.toFixed(2)}. Nylon is weaker and creeps under `
       + "the clamp bolts, so this suits a test frame; the CAD needs the thicker plates and longer bolts first."
       + (noBed.length ? ` The ${noBed.join(", ")} is longer than the 250 mm bed and would have to be split.` : "")));
 }
@@ -399,7 +429,7 @@ function show(name, push) {
   prints(m);
   carbon(m);
   for (const vol of ["1L", "2L"]) renderSortie(vol);
-  document.title = `Option B ${name}: custom side-pod frame (draft) | AJ Builds Drone`;
+  document.title = `Option B ${name}: custom side-pod frame | AJ Builds Drone`;
   if (push) {
     const u = new URL(location);
     u.searchParams.set("model", name);
@@ -439,6 +469,8 @@ async function main() {
     v.play().catch(() => {});
   });
   show(sel.value, false);
+  reused();
+  $$(".table-scroll").forEach((b) => scrollable(b));
   initViewer();
   floatPicker();
   setTimeout(async () => {

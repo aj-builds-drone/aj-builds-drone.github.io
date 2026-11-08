@@ -7,6 +7,12 @@ html { scroll-padding-top: 140px; }          /* section links land below the top
 .picker.floating .flags { display: none; }
 .picker.floating .picker-row { flex-wrap: nowrap; }
 .picker.floating select { flex-basis: 0; }
+.est-tag { display: inline-block; margin-left: 6px; padding: 0 5px; border: 1px solid rgba(245, 165, 36, 0.5); border-radius: 4px;
+  color: var(--amber); font: 600 0.66rem/1.5 var(--mono); letter-spacing: 0.03em; text-transform: none; vertical-align: 1px;
+  white-space: nowrap; }
+td.num .est-tag { margin: 0 6px 0 0; }
+.bom-totals span { color: var(--muted); }            /* --dim on the totals cards is 4.4:1, under AA */
+.table-scroll:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
 .picker-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; min-width: 0; }
 .picker label { font: 700 0.78rem var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--orange); }
 .picker select {
@@ -30,7 +36,7 @@ html { scroll-padding-top: 140px; }          /* section links land below the top
 .tbl tr.sel th, .tbl tr.sel td { background: rgba(0, 212, 255, 0.09); }
 .tbl tr.sel th { box-shadow: inset 3px 0 0 var(--cyan); }
 .tbl tr.ref-a th, .tbl tr.ref-a td { background: rgba(47, 224, 122, 0.05); }
-.rowpick { background: none; border: 0; padding: 0; font: inherit; font-weight: 600; cursor: pointer;
+.rowpick { background: none; border: 0; padding: 0; font: inherit; font-weight: 600; cursor: pointer; text-align: left;
   border-bottom: 1px dashed currentColor; }
 .rowpick:hover, .rowpick:focus-visible { filter: brightness(1.25); }
 
@@ -57,6 +63,7 @@ html { scroll-padding-top: 140px; }          /* section links land below the top
 .fil-pacf { background: #3a6ea5; }
 .fil-tpu { background: #8e5bb5; }
 b.fil { padding: 0 6px; border-radius: 3px; color: #0a0a0a; }
+b.fil.fil-pacf, b.fil.fil-tpu { color: #fff; }       /* black on these two is under 4.5:1 */
 .fil-why { margin: 14px 0 0; padding-left: 18px; }
 .fil-why li { margin-bottom: 6px; }
 .plate-ways { margin: 8px 0 0; padding-left: 18px; }

@@ -53,6 +53,7 @@
   <div class="row" id="cfgRow">Frame <select id="cfg"></select></div>
   <div class="row note" id="cfgNote"></div>
   <div class="row kpi" id="kpi"></div>
+  <div class="row note">Estimates from the CAD and the motor load test.</div>
   <div class="row">
     <button data-view="iso_front">3/4 front</button><button data-view="iso_rear">3/4 rear</button>
     <button data-view="front">Front</button><button data-view="rear">Rear</button>
@@ -90,7 +91,8 @@
   <div class="row" id="batRow">Battery at <input type="range" id="bat" min="0" max="1" step="1"> <span id="batv"></span>
     <button id="autoBal">balance</button></div>
   <div class="row motors" id="motors"></div>
-  <div class="row note">Hover a part for its name, material and mass; double-click to zoom to it.</div>
+  <div class="row note">Hover throttle per motor, estimated from the motor load test. Hover a part for its name, material and
+    estimated mass; double-click to zoom to it.</div>
 </div>
 <canvas id="overlay"></canvas>
 <div id="tip"></div>
@@ -426,7 +428,7 @@ async function showFrame(name, view) {
 function statusLine() {
   const man = curFrame().userData.man, t = filTotals(man);
   const prints = Object.values(t).reduce((a, r) => a + r.prints, 0), parts = Object.values(t).reduce((a, r) => a + r.parts, 0);
-  status.textContent = `${man.name}: ${prints} printed parts (${parts} designs) · ` +
+  status.textContent = `${man.name}: ${prints} printed parts (${parts} designs) · filament, estimated: ` +
     FILS.filter(f => t[f]).map(f => `${f} ${Math.round(t[f].g)} g`).join(' · ') + ' · drag to orbit, scroll to zoom';
 }
 
@@ -532,11 +534,11 @@ function pick(e) {
 }
 function tipText(u) {
   const p = u.part, head = p.label;
-  const each = `${p.mass_g.toFixed(0)} g`;
+  const each = `${p.mass_g.toFixed(0)} g`, est = `${each} (est.)`;
   if (p.kind === 'printed')
-    return `${head}\nPrinted in ${p.mat} · ${each} each · ${p.qty} per aircraft\n${FIL_WHY[p.mat] || ''}`;
-  if (p.kind === 'cf_tube') return `${head}\n${p.stock}, cut to ${p.cut_len_mm.toFixed(0)} mm · ${each} · ${p.qty} per aircraft`;
-  if (p.kind === 'cf_plate') return `${head}\nCarbon plate, CNC-cut · ${each}`;
+    return `${head}\nPrinted in ${p.mat} · ${est} each · ${p.qty} per aircraft\n${FIL_WHY[p.mat] || ''}`;
+  if (p.kind === 'cf_tube') return `${head}\n${p.stock}, cut to ${p.cut_len_mm.toFixed(0)} mm · ${est} · ${p.qty} per aircraft`;
+  if (p.kind === 'cf_plate') return `${head}\nCarbon plate, cut to order · ${est}`;
   if (p.kind === 'payload' || p.kind === 'material') return `${head}\nReleaser, client supplied · ${each}`;
   return `${head}\nBought or reused · ${each}`;
 }
