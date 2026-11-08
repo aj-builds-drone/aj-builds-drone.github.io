@@ -7,6 +7,7 @@ import AxeBuilder from "@axe-core/playwright";
 const PAGES = [
   { path: "/", name: "Home" },
   { path: "/projects/", name: "Projects" },
+  { path: "/projects/vtol-plane/", name: "VTOL plane" },
   { path: "/services/", name: "Services" },
   { path: "/contact/", name: "Contact" },
 ];

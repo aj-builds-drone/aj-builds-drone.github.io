@@ -1,5 +1,32 @@
 [
   {
+    "id": "vtol-plane",
+    "title": "TILT-ROTOR VTOL PLANE",
+    "subtitle": "3D-Printed Tricopter VTOL, Designed in Python",
+    "thumbnail": "/projects/vtol-plane/card.webp",
+    "image": "/projects/vtol-plane/card.webp",
+    "status": "IN DEVELOPMENT",
+    "bom": [
+      "Pixhawk 6C Flight Controller (PX4)",
+      "3x Emax ECOII 2807 Motors (2 Tilting)",
+      "3x 50A DShot ESCs + 4S 5000mAh LiPo",
+      "2x Direct-Drive Tilt Servos + 6x Control Servos",
+      "M10 GPS, Airspeed Sensor + Pitot, ELRS",
+      "LW-PLA Vase Skins, PETG Structure, Carbon Spars"
+    ],
+    "softwareStack": ["Python", "build123d", "PX4", "Gazebo", "Slicer CLI", "GitHub Actions"],
+    "description": "A 3D-printed tilt-rotor tricopter that takes off like a drone and flies like a plane. Every part is generated in Python from one parameter file, sliced from the command line and checked by a 123-check verification gate. PX4 flies the whole mission in Gazebo simulation, transitions included, on a model generated from the same design.",
+    "specs": {
+      "config": "Tilt-Rotor VTOL",
+      "span": "1478 mm",
+      "autopilot": "PX4 / Pixhawk 6C",
+      "verification": "123-Check Gate"
+    },
+    "links": {
+      "full build": "/projects/vtol-plane/"
+    }
+  },
+  {
     "id": "stm32-rth-drone",
     "title": "STM32 RETURN-TO-HOME DRONE",
     "subtitle": "Custom PCB Flight Controller on F450 Frame",

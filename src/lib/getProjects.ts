@@ -13,6 +13,8 @@ export interface Project {
   title: string;
   subtitle: string;
   thumbnail: string;
+  /** Card image for projects without a YouTube video. */
+  image?: string;
   status: string;
   bom: string[];
   softwareStack: string[];

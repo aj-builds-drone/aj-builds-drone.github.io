@@ -6,6 +6,7 @@ import { test, expect } from "@playwright/test";
 const PAGES = [
   { path: "/", title: "AJ Builds Drone" },
   { path: "/projects/", title: "Hangar" },
+  { path: "/projects/vtol-plane/", title: "VTOL" },
   { path: "/services/", title: "Service" },
   { path: "/contact/", title: "AJ Builds Drone" },
 ];

@@ -38,7 +38,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
   const ytId = getYouTubeId(project.links?.youtube);
   const thumbUrl = ytId
     ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`
-    : null;
+    : project.image ?? null;
 
   return (
     <motion.article
@@ -149,8 +149,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
               <a
                 key={key}
                 href={url}
-                target="_blank"
-                rel="noopener noreferrer"
+                {...(url.startsWith("/") ? {} : { target: "_blank", rel: "noopener noreferrer" })}
                 className="font-mono text-[11px] tracking-wider text-text-secondary hover:text-accent-orange transition-colors uppercase"
               >
                 {key === 'youtube' ? '▶ VIDEO' : key === 'hackster' ? '◈ HACKSTER' : key === 'grabcad' ? '⬡ CAD' : key === 'pitch' ? '▶ PITCH' : `▸ ${key.toUpperCase()}`}
