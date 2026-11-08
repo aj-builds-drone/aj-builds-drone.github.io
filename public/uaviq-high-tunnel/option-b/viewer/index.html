@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Option B: 3D model of the custom side-pod frame</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #eef1f4; font: 13px system-ui, "Segoe UI", sans-serif; color: #1f2933; }
+  canvas { display: block; }
+  #ui { position: absolute; top: 8px; left: 8px; z-index: 2; background: #ffffffeb; border-radius: 8px; padding: 8px 10px;
+        box-shadow: 0 1px 4px #0003; width: 384px; max-width: calc(100% - 36px); max-height: calc(100% - 56px);
+        overflow-y: auto; box-sizing: border-box; }
+  #ui h1 { font-size: 14px; margin: 0 0 6px; cursor: pointer; user-select: none; }
+  #ui h1::after { content: " \25BE"; color: #888; }
+  #ui.min h1 { margin: 0; }
+  #ui.min h1::after { content: " \25B8  (show controls)"; font-weight: normal; font-size: 12px; }
+  #ui.min > :not(h1) { display: none; }
+  #ui button { margin: 2px 2px 2px 0; padding: 3px 7px; font-size: 12px; cursor: pointer; }
+  #ui button.big { font-weight: 600; }
+  #ui label { display: inline-block; margin: 3px 8px 3px 0; }
+  #ui select { font-size: 12px; max-width: 262px; }
+  #ui .row { margin: 4px 0; }
+  #ui .hd { font-weight: 600; margin-top: 8px; padding-top: 6px; border-top: 1px solid #dde2e8; }
+  #ui .note { color: #666; font-size: 12px; }
+  #ui input[type=range] { vertical-align: middle; width: 120px; }
+  .kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  .kpi div { background: #f3f5f8; border-radius: 6px; padding: 3px 6px; }
+  .kpi b { display: block; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .kpi span { color: #5f6b7a; font-size: 11px; }
+  .motors { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; font-size: 11px; }
+  .bar { height: 4px; background: #e3e7ec; border-radius: 2px; margin-top: 2px; overflow: hidden; }
+  .bar i { display: block; height: 100%; }
+  .bad { color: #c62828; font-weight: 600; }
+  .sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -2px; margin: 0 4px 0 10px; }
+  .sw.first { margin-left: 0; }
+  #status { position: absolute; bottom: 8px; left: 8px; color: #555; z-index: 2; max-width: calc(100% - 560px); }
+  #legend { position: absolute; bottom: 8px; right: 8px; background: #ffffffe6; border-radius: 8px; padding: 6px 10px; z-index: 2; }
+  #overlay { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 1; }
+  #tip { position: absolute; pointer-events: none; background: #1f2630ee; color: #fff; padding: 5px 8px; border-radius: 4px;
+         font-size: 12px; display: none; white-space: pre-line; max-width: 400px; z-index: 3; }
+  @media (max-width: 900px) { #status { display: none; } }
+</style>
+<script type="importmap">
+{ "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+</head>
+<body>
+<div id="ui">
+  <h1 id="h1">Option B: 3D model</h1>
+  <div class="row" id="cfgRow">Frame <select id="cfg"></select></div>
+  <div class="row note" id="cfgNote"></div>
+  <div class="row kpi" id="kpi"></div>
+  <div class="row">
+    <button data-view="iso_front">3/4 front</button><button data-view="iso_rear">3/4 rear</button>
+    <button data-view="front">Front</button><button data-view="rear">Rear</button>
+    <button data-view="left">Left</button><button data-view="right">Right</button>
+    <button data-view="top">Top</button><button data-view="bottom">Bottom</button>
+    <button data-view="pod">Pod close-up</button>
+  </div>
+  <div class="row">Colours:
+    <label><input type="radio" name="mode" value="printed" checked> as printed</label>
+    <label><input type="radio" name="mode" value="paint"> one colour</label>
+    <label><input type="radio" name="mode" value="parts"> by part</label>
+  </div>
+  <div class="row">
+    <label><input type="checkbox" id="xray"> x-ray: printed parts only</label>
+    <label><input type="checkbox" id="edges" checked> part edges</label>
+  </div>
+  <div class="row">
+    <label><input type="checkbox" id="bought" checked> bought parts</label>
+    <label><input type="checkbox" id="payload" checked> releaser</label>
+    <label><input type="checkbox" id="discs" checked> rotor discs</label>
+    <label><input type="checkbox" id="wash"> downwash</label>
+    <label><input type="checkbox" id="cg" checked> CG</label>
+    <label><input type="checkbox" id="spin"> spin props</label>
+  </div>
+  <div class="row">Labels:
+    <label><input type="radio" name="labels" value="none"> none</label>
+    <label><input type="radio" name="labels" value="equip" checked> equipment</label>
+    <label><input type="radio" name="labels" value="printed"> printed parts</label>
+  </div>
+  <div class="row hd">Burst view</div>
+  <div class="row"><button id="burst" class="big">Burst ▸</button>
+    <input type="range" id="explode" min="0" max="100" value="0"> <span id="explodev">0 %</span></div>
+  <div class="row hd">Trim and load</div>
+  <div class="row">Releaser fill <input type="range" id="fill" min="0" max="100" value="100"> <span id="fillv">100 %</span></div>
+  <div class="row" id="batRow">Battery at <input type="range" id="bat" min="0" max="1" step="1"> <span id="batv"></span>
+    <button id="autoBal">balance</button></div>
+  <div class="row motors" id="motors"></div>
+  <div class="row note">Hover a part for its name, material and mass; double-click to zoom to it.</div>
+</div>
+<canvas id="overlay"></canvas>
+<div id="tip"></div>
+<div id="legend"></div>
+<div id="status">loading…</div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const Q = new URLSearchParams(location.search);
+const OUT = 'models/';
+const EMBED = Q.get('embed') === '1' && window.parent !== window;
+const $ = id => document.getElementById(id);
+const status = $('status');
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+// MN4014 KV400 + 16x5.4 at 22.2 V (T-Motor load test): % throttle, g thrust per motor
+const LOAD = [[0, 0], [50, 1410], [65, 1920], [75, 2380], [85, 2790], [100, 3020]];
+const FIL = { 'ASA': '#f28c28', 'PA-CF': '#3a6ea5', 'TPU': '#8e5bb5' };
+const FILS = ['ASA', 'PA-CF', 'TPU'];
+const FIL_WHY = {
+  'ASA': 'ASA keeps its shape in a hot tunnel and in sun (no PLA or PETG on this aircraft).',
+  'PA-CF': 'PA-CF (carbon-filled nylon): stiff and heat-proof, for the parts that carry motors, arms, payload and the Jetson.',
+  'TPU': 'TPU 95A: soft foot caps.',
+};
+const ORDER = ['1L', '1L_twin', '1L_naive', '1L_sf45b', '1L_mid360', '2L', '2L_twin', '2L_sf45b'];
+
+// ---- renderer, scene, camera: CAD frame (x forward, y left, z up), millimetres ------------------
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+const overlay = $('overlay'), octx = overlay.getContext('2d');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xeef1f4);
+const camera = new THREE.PerspectiveCamera(30, 1, 5, 80000);
+camera.up.set(0, 0, 1);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+const hemi = new THREE.HemisphereLight(0xffffff, 0x8a8f99, 1.1);
+hemi.position.set(0, 0, 1);
+const keyL = new THREE.DirectionalLight(0xffffff, 2.0);
+keyL.position.set(-500, -700, 900);
+const fillL = new THREE.DirectionalLight(0xffffff, 0.6);
+fillL.position.set(700, 500, 300);
+scene.add(hemi, keyL, fillL);
+const grid = new THREE.GridHelper(3000, 30, 0xb9c0c8, 0xd5dae0);
+grid.rotation.x = Math.PI / 2;
+grid.position.z = -0.5;
+scene.add(grid);
+const world = new THREE.Group(); scene.add(world);
+
+const S = {
+  configs: [], cur: null, frames: {},
+  mode: 'printed', xray: false, edges: true, bought: true, payload: true, discs: true, wash: false, cg: true,
+  spin: false, labels: 'equip', anim: 0, bTo: 0, explode: 0, fill: 1, batDy: 0, batY0: 0,
+  dirty: true, nav: 0,
+};
+const cache = {};
+
+// ---- loading ------------------------------------------------------------------------------
+async function fetchBuf(url) {
+  for (let k = 1; ; k++) {
+    try {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`${r.status} ${url}`);
+      return await r.arrayBuffer();
+    } catch (e) { if (k >= 3) throw e; await new Promise(res => setTimeout(res, 300 * k)); }
+  }
+}
+async function getConfig(name) {
+  if (cache[name]) return cache[name];
+  const [manBuf, glbBuf] = await Promise.all([fetchBuf(`${OUT}${name}/manifest.json`), fetchBuf(`${OUT}${name}/parts.glb`)]);
+  const man = JSON.parse(new TextDecoder().decode(manBuf));
+  const gltf = await new GLTFLoader().parseAsync(glbBuf, '');
+  const geoms = {};
+  gltf.scene.traverse(o => {
+    if (!o.isMesh) return;
+    o.geometry.computeVertexNormals();
+    o.geometry.computeBoundingBox();
+    geoms[o.name] = o.geometry;
+    geoms[o.name.replace(/_\d+$/, '')] ??= o.geometry;
+  });
+  return (cache[name] = { man, geoms, edges: {} });
+}
+
+// ---- looks ----------------------------------------------------------------------------------
+const matCache = new Map();
+function std(k, o) {
+  let m = matCache.get(k);
+  if (!m) { m = new THREE.MeshStandardMaterial(o); matCache.set(k, m); }
+  return m;
+}
+const filMat = f => std('f_' + f, { color: FIL[f] || FIL.ASA, roughness: f === 'TPU' ? 0.6 : 0.8, metalness: 0 });
+const ghost = new THREE.MeshStandardMaterial({ color: 0x9aa3ad, transparent: true, opacity: 0.07, depthWrite: false });
+const edgeMat = new THREE.LineBasicMaterial({ color: 0x1b1f24, transparent: true, opacity: 0.35 });
+const hues = {};
+const hueOf = k => (hues[k] ??= (Object.keys(hues).length * 0.618) % 1);
+function lookMat(part, k) {
+  if (k === 'bottle') return std('bottle', { color: 0xffffff, roughness: 0.1, transparent: true, opacity: 0.3,
+                                            depthWrite: false, side: THREE.DoubleSide });
+  if (S.xray && part.kind !== 'printed') return ghost;
+  if (S.mode === 'paint') return part.kind === 'material' ? std('m_paint', { color: 0xc8a45c, roughness: 0.9 })
+                                                          : std('paint', { color: 0xd8dbdf, roughness: 0.55 });
+  if (S.mode === 'parts') return std('h_' + k, { color: new THREE.Color().setHSL(hueOf(k), 0.55, 0.6), roughness: 0.6 });
+  if (part.kind === 'printed') return filMat(part.mat);
+  if (part.kind === 'cf_tube' || part.kind === 'cf_plate') return std('carbon', { color: 0x1c1e22, roughness: 0.35, metalness: 0.25 });
+  if (k === 'motor') return std('motor', { color: 0x9aa3ad, roughness: 0.35, metalness: 0.6 });
+  return std('c_' + part.color, { color: part.color, roughness: 0.55, metalness: 0.05 });
+}
+
+// ---- one frame: instances, rotor discs, downwash, CG marker, label anchors -----------------------
+const EQUIP = { battery: 'Battery, 6S 10 Ah', jetson: 'Jetson Orin NX + Pixhawk 6X', d455: 'RealSense D455',
+                ark_flow: 'ARK Flow (optical flow + range)', ark_dist: 'ARK DIST (range up)', gps: 'GNSS + compass',
+                lidar: null, bottle: 'Releaser pod', bottle_right: 'Releaser pod, right', bottle_left: 'Releaser pod, left' };
+function buildFrame(name, C) {
+  const man = C.man, P = man.params;
+  const F = new THREE.Group();
+  F.userData = { name, man, objs: [], equip: [], printed: [] };
+  const seen = new Set();
+  for (const inst of man.instances) {
+    const part = man.parts[inst.part], geo = C.geoms[inst.part];
+    if (!geo) continue;
+    const m = new THREE.Mesh(geo, lookMat(part, inst.part));
+    m.matrixAutoUpdate = false;
+    m.userData = { inst, part, key: inst.part, base: new THREE.Matrix4().fromArray(inst.matrix) };
+    if (part.kind === 'printed') {
+      m.add(new THREE.LineSegments(C.edges[inst.part] ??= new THREE.EdgesGeometry(geo, 25), edgeMat));
+      if (!seen.has(inst.part)) { seen.add(inst.part); F.userData.printed.push([m, `${part.label} · ${part.mat}`]); }
+    }
+    if (inst.name in EQUIP) F.userData.equip.push([m, EQUIP[inst.name] || part.label]);
+    F.add(m);
+    F.userData.objs.push(m);
+  }
+  const discMat = new THREE.MeshBasicMaterial({ color: 0x4a90d9, transparent: true, opacity: 0.14, side: THREE.DoubleSide, depthWrite: false });
+  const ringMat = new THREE.LineBasicMaterial({ color: 0x4a90d9, transparent: true, opacity: 0.7 });
+  const washMat = new THREE.MeshBasicMaterial({ color: 0x4a90d9, transparent: true, opacity: 0.07, side: THREE.DoubleSide, depthWrite: false });
+  const discs = new THREE.Group(), wash = new THREE.Group();
+  for (const r of man.rotors) {
+    const disc = new THREE.Mesh(new THREE.CircleGeometry(r.r, 72), discMat);
+    disc.position.set(r.x, r.y, r.z + 2);
+    const ring = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(
+      Array.from({ length: 96 }, (_, i) => V(Math.cos(i / 96 * 2 * Math.PI) * r.r, Math.sin(i / 96 * 2 * Math.PI) * r.r, 0))), ringMat);
+    ring.position.copy(disc.position);
+    discs.add(disc, ring);
+    const h = r.z - P.ground_z;
+    const col = new THREE.Mesh(new THREE.CylinderGeometry(r.r, r.r * 0.78, h, 48, 1, true), washMat);
+    col.rotation.x = Math.PI / 2;
+    col.position.set(r.x, r.y, r.z - h / 2);
+    wash.add(col);
+  }
+  const cgMark = new THREE.Group();
+  const ball = new THREE.Mesh(new THREE.SphereGeometry(13, 24, 16), new THREE.MeshBasicMaterial({ color: 0xd62828, depthTest: false }));
+  ball.renderOrder = 10;
+  const axis = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 900, 8),
+                              new THREE.MeshBasicMaterial({ color: 0xd62828, transparent: true, opacity: 0.6 }));
+  axis.rotation.x = Math.PI / 2;
+  cgMark.add(ball, axis);
+  F.add(discs, wash, cgMark);
+  Object.assign(F.userData, { discs, wash, cgMark });
+  return F;
+}
+
+const m4 = new THREE.Matrix4(), m4b = new THREE.Matrix4(), m4c = new THREE.Matrix4(), m4e = new THREE.Matrix4();
+const v3 = new THREE.Vector3();
+function explodeVec(inst, P) {
+  const g = inst.group, n = inst.name, t = inst.tags || {};
+  const e = V(0, 0, 0).setFromMatrixPosition(m4e.fromArray(inst.matrix));
+  const twin = P.pods === 'twin';
+  if (n === 'plate_top') return [0, 0, 140];
+  if (n === 'plate_bottom') return [0, 0, -70];
+  if (g === 'lidar') return [0, 0, 260];
+  if (t.sensor === 'flow' || n === 'flow_mount') return twin ? [0, 0, -330] : [0, 0, -100];
+  if (g === 'avionics') return e.z > 10 ? [0, 0, 170] : e.z < -10 ? [0, 0, -100] : [0, 0, 40];
+  if (t.slider === 'pod') return [0, (t.side ?? P.pod_sign) * 260, -60];
+  if (t.slider === 'battery') return twin ? [0, 0, -200] : [0, -P.pod_sign * 260, -60];
+  if (g === 'gear') return [0, 0, -240];
+  if (/^rail_/.test(n)) return [0, 0, -90];
+  const r = Math.hypot(e.x, e.y) || 1;
+  const k = /^motor_|^prop_/.test(n) ? 230 : /clamp/.test(n) ? 40 : 150;
+  const up = /^prop_/.test(n) ? 120 : /^motor_/.test(n) ? 60 : /clamp_top/.test(n) ? 30 : /clamp_bot/.test(n) ? -30 : 0;
+  return [e.x / r * k, e.y / r * k, up];
+}
+function poseFrame(F, t) {
+  const man = F.userData.man, P = man.params;
+  const z0 = -P.bottle_h + 42;
+  let M = 0;
+  const C = V(0, 0, 0);
+  for (const o of F.userData.objs) {
+    const { inst, part, base } = o.userData;
+    const place = m4.copy(base);
+    if (S.batDy && inst.tags.slider === 'battery') place.premultiply(m4b.makeTranslation(0, S.batDy, 0));
+    let mass = part.mass_g, comL = part.com_mm;
+    if (part.kind === 'material') { mass *= S.fill; comL = [0, 0, z0 + (part.com_mm[2] - z0) * S.fill]; }
+    C.addScaledVector(v3.fromArray(comL).applyMatrix4(place), mass);
+    M += mass;
+    if (part.kind === 'material')
+      place.multiply(m4b.makeTranslation(0, 0, z0)).multiply(m4c.makeScale(1, 1, Math.max(S.fill, 0.001)))
+           .multiply(m4b.makeTranslation(0, 0, -z0));
+    if (S.explode > 0) {
+      const e = explodeVec(inst, P);
+      place.premultiply(m4b.makeTranslation(e[0] * S.explode, e[1] * S.explode, e[2] * S.explode));
+    }
+    if (inst.group === 'rotor' && S.spin) place.multiply(m4b.makeRotationZ((inst.tags.spin === 'ccw' ? 1 : -1) * t * 25));
+    o.matrix.copy(place);
+    o.matrixWorldNeedsUpdate = true;
+  }
+  C.divideScalar(M);
+  F.userData.cg = C;
+  F.userData.mass = M;
+  F.userData.cgMark.position.copy(C);
+}
+const curFrame = () => S.frames[S.cur];
+function poseAll(t) { if (curFrame()) poseFrame(curFrame(), t); }
+
+function applyLook() {
+  const F = curFrame();
+  if (!F) return;
+  for (const o of F.userData.objs) {
+    const { part, key } = o.userData;
+    o.material = lookMat(part, key);
+    let vis = true;
+    if (part.kind === 'purchased' && !S.bought) vis = false;
+    if ((part.kind === 'payload' || part.kind === 'material') && !S.payload) vis = false;
+    if (part.kind === 'material' && S.fill < 0.01) vis = false;
+    o.visible = vis;
+    for (const c of o.children) c.visible = S.edges;
+  }
+  F.userData.discs.visible = S.discs;
+  F.userData.wash.visible = S.wash;
+  F.userData.cgMark.visible = S.cg;
+  legend();
+}
+function legend() {
+  const sw = (c, t, first) => `<span class="sw${first ? ' first' : ''}" style="background:${c}"></span>${t}`;
+  if (S.mode === 'paint') { $('legend').innerHTML = 'One colour: shape only (the bottle stays clear)'; return; }
+  if (S.mode === 'parts') { $('legend').innerHTML = 'One colour per part'; return; }
+  $('legend').innerHTML = '<b>Printed:</b> ' + FILS.map((f, i) => sw(FIL[f], f, i === 0)).join('') +
+    (S.xray ? ' &nbsp;· everything else ghosted' :
+     sw('#1c1e22', 'carbon') + sw('#9aa3ad', 'bought / reused') + sw('#f4f6f8;border:1px solid #bbb', 'releaser (client)'));
+}
+
+// ---- describe a configuration ---------------------------------------------------------------------
+function desc(name, pods, batY, lidar) {
+  const vol = name.startsWith('2L') ? 2 : 1;
+  let s = pods === 'twin' ? `${vol} L split into two ${vol === 2 ? '1 L' : '500 mL'} pods, battery on the centreline`
+        : batY < 1 ? `${vol} L pod on the right, battery centred: no counterweight (reference only)`
+        : `${vol} L pod on the right, battery on the left as counterweight`;
+  if (lidar === 'sf45b') s += ', SF45/B scanning lidar';
+  else if (lidar === 'mid360') s += ', Mid-360 3-D lidar';
+  return s;
+}
+const descOf = man => desc(man.name, man.params.pods, man.mass.battery_y_mm, man.params.lidar);
+function filTotals(man) {
+  const t = {};
+  for (const p of Object.values(man.parts)) {
+    if (p.kind !== 'printed') continue;
+    const r = (t[p.mat] ??= { parts: 0, prints: 0, g: 0 });
+    r.parts += 1; r.prints += p.qty; r.g += p.qty * p.mass_g;
+  }
+  return t;
+}
+
+// ---- views ----------------------------------------------------------------------------------------
+const DIRS = { iso_front: [1, -0.85, 0.7], iso_rear: [-1, 0.85, 0.7], front: [1, 0, 0.06], rear: [-1, 0, 0.06],
+               left: [0, 1, 0.06], right: [0, -1, 0.06], top: [-0.02, 0, 1], bottom: [-0.02, 0, -1] };
+function meshBox(objs) {
+  const box = new THREE.Box3();
+  for (const o of objs) if (o.visible) box.expandByObject(o);
+  return box;
+}
+function panelW() {                     // screen width hidden by the control panel
+  const ui = $('ui');
+  return ui.classList.contains('min') || innerWidth < 760 ? 0 : ui.offsetWidth + 16;
+}
+function fit(box, dir, pad = 1.06) {     // nearest camera distance along dir that shows every box corner
+  const c = box.getCenter(V(0, 0, 0)), f = V(...dir).normalize();
+  const right = f.clone().negate().cross(V(0, 0, 1)).normalize(), up = right.clone().cross(f.clone().negate());
+  const tv = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), th = tv * (innerWidth - panelW()) / innerHeight;
+  let d = 50;
+  for (let i = 0; i < 8; i++) {
+    const q = V(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z).sub(c);
+    d = Math.max(d, q.dot(f) + pad * Math.max(Math.abs(q.dot(right)) / th, Math.abs(q.dot(up)) / tv));
+  }
+  camera.position.copy(c).addScaledVector(f, d);
+  controls.target.copy(c);
+  controls.update();
+  S.userMoved = false;
+}
+function setView(v) {
+  const F = curFrame();
+  if (!F) return;
+  S.view = v;
+  world.updateMatrixWorld(true);
+  if (v === 'pod') {
+    const P = F.userData.man.params;
+    const side = P.pods === 'twin' ? -1 : P.pod_sign;
+    fit(meshBox(F.userData.objs.filter(o => o.userData.inst.tags.slider === 'pod' && o.userData.inst.tags.side === side)),
+        [0.55, side, 0.35], 1.25);
+    return;
+  }
+  fit(meshBox(F.userData.objs), DIRS[v] || DIRS.iso_front, 1.08);
+}
+document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
+
+// ---- show one frame ---------------------------------------------------------------------------------
+async function showFrame(name, view) {
+  const tok = ++S.nav;
+  status.textContent = `loading ${name}…`;
+  let C;
+  try { C = await getConfig(name); } catch (e) { status.textContent = `${name} could not be loaded`; throw e; }
+  if (tok !== S.nav) return;                   // another frame was picked meanwhile
+  S.frames[name] ??= buildFrame(name, C);
+  S.cur = name;
+  world.clear();
+  const F = S.frames[name];
+  F.position.set(0, 0, -C.man.params.ground_z);
+  world.add(F);
+  const P = C.man.params, batY = C.man.mass.battery_y_mm;
+  S.batY0 = batY; S.batDy = 0;
+  const bat = $('bat');
+  bat.min = Math.round(Math.min(P.plate_half_y + 45, batY)); bat.max = Math.round(P.rail_half_len - 30); bat.value = batY;
+  $('batRow').style.display = P.pods === 'twin' ? 'none' : '';
+  $('cfg').value = name;
+  $('cfgNote').textContent = descOf(C.man) + '.';
+  applyLook();
+  poseAll(0);
+  kpis();
+  setView(view || S.view || 'iso_front');
+  statusLine();
+  const u = new URL(location); u.searchParams.set('cfg', name); history.replaceState(null, '', u);
+  if (EMBED) parent.postMessage({ type: 'ajb-viewer-shown', cfg: name }, location.origin);
+}
+function statusLine() {
+  const man = curFrame().userData.man, t = filTotals(man);
+  const prints = Object.values(t).reduce((a, r) => a + r.prints, 0), parts = Object.values(t).reduce((a, r) => a + r.parts, 0);
+  status.textContent = `${man.name}: ${prints} printed parts (${parts} designs) · ` +
+    FILS.filter(f => t[f]).map(f => `${f} ${Math.round(t[f].g)} g`).join(' · ') + ' · drag to orbit, scroll to zoom';
+}
+
+// ---- readouts ---------------------------------------------------------------------------------------
+function solve4(A, b) {
+  const n = 4, a = A.map((r, i) => [...r, b[i]]);
+  for (let c = 0; c < n; c++) {
+    let p = c;
+    for (let r = c + 1; r < n; r++) if (Math.abs(a[r][c]) > Math.abs(a[p][c])) p = r;
+    [a[c], a[p]] = [a[p], a[c]];
+    for (let r = 0; r < n; r++) if (r !== c) { const f = a[r][c] / a[c][c]; for (let k = c; k <= n; k++) a[r][k] -= f * a[c][k]; }
+  }
+  return a.map((r, i) => r[n] / r[i]);
+}
+function throttleFor(g) {
+  for (let i = 1; i < LOAD.length; i++) if (g <= LOAD[i][1]) {
+    const [t0, g0] = LOAD[i - 1], [t1, g1] = LOAD[i];
+    return t0 + (t1 - t0) * (g - g0) / (g1 - g0);
+  }
+  return 100 + (g - LOAD.at(-1)[1]) / 30;
+}
+function kpis() {
+  const F = curFrame();
+  if (!F) return;
+  const man = F.userData.man, P = man.params, C = F.userData.cg, M = F.userData.mass;
+  const R = man.rotors;
+  const A = [R.map(() => 1), R.map(r => r.x), R.map(r => r.y), R.map(r => (r.spin === 'ccw' ? 1 : -1))];
+  const T = solve4(A, [M, M * C.x, M * C.y, 0]);
+  const names = ['front right', 'rear left', 'front left', 'rear right'];
+  $('motors').innerHTML = T.map((g, i) => {
+    const th = throttleFor(g);
+    return `<div>${names[i]}<br><b>${th.toFixed(0)} %</b><div class="bar"><i style="width:${Math.min(100, th)}%;` +
+           `background:${th > 60 ? '#c62828' : th > 55 ? '#e0a020' : '#2e7d32'}"></i></div></div>`;
+  }).join('');
+  const thrMax = Math.max(...T.map(throttleFor));
+  $('kpi').innerHTML = `<div><span>Take-off mass</span><b>${(M / 1000).toFixed(2)} kg</b></div>` +
+    `<div><span>Thrust / weight</span><b>${(4 * P.max_thrust_g / M).toFixed(2)}</b></div>` +
+    `<div><span>CG x / y</span><b>${C.x.toFixed(0)} / <span class="${Math.abs(C.y) > 15 ? 'bad' : ''}">${C.y.toFixed(0)}</span></b></div>` +
+    `<div><span>Hover, max motor</span><b class="${thrMax > 60 ? 'bad' : ''}">${thrMax.toFixed(0)} %</b></div>`;
+  $('fillv').textContent = `${Math.round(S.fill * 100)} %`;
+  $('batv').textContent = `y = ${Math.round(S.batY0 + S.batDy * -P.pod_sign) * -P.pod_sign} mm`;
+}
+
+// ---- labels on the overlay ----------------------------------------------------------------------
+function labels() {
+  const L = [];
+  const F = curFrame();
+  if (S.labels === 'none' || !F) return L;
+  const mid = F.localToWorld(F.userData.cg.clone());
+  for (const [m, text] of (S.labels === 'printed' ? F.userData.printed : F.userData.equip)) {
+    if (!m.visible) continue;
+    L.push({ pos: m.geometry.boundingBox.getCenter(V(0, 0, 0)).applyMatrix4(m.matrixWorld), lines: [text], mid });
+  }
+  return L;
+}
+function drawOverlay() {
+  const w = innerWidth, h = innerHeight;
+  octx.clearRect(0, 0, w, h);
+  octx.textBaseline = 'middle';
+  octx.lineJoin = 'round';
+  const placed = [];
+  const x0 = panelW();
+  const free = r => r.x > x0 && r.x + r.w < w && !placed.some(q => r.x < q.x + q.w && r.x + r.w > q.x && r.y < q.y + q.h && r.y + r.h > q.y);
+  const scr = p => { v3.copy(p).project(camera); return v3.z > 1 || v3.z < -1 ? null : [(v3.x + 1) / 2 * w, (1 - v3.y) / 2 * h]; };
+  for (const l of labels()) {
+    const a = scr(l.pos);
+    if (!a) continue;
+    octx.font = '12px system-ui, sans-serif';
+    const bw = octx.measureText(l.lines[0]).width + 6, bh = 15;
+    const m = scr(l.mid) || a;            // leader pointing away from the CG, longer until the text fits
+    let dx = a[0] - m[0], dy = a[1] - m[1];
+    const n = Math.hypot(dx, dy) || 1;
+    dx = n > 4 ? dx / n : 0.7; dy = n > 4 ? dy / n : -0.7;
+    let box = null, end = null;
+    const right = dx >= -0.2;
+    for (const len of [22, 40, 58, 76, 94]) {
+      const e = [a[0] + dx * len, a[1] + dy * len];
+      const r = { x: right ? e[0] + 3 : e[0] - 3 - bw, y: e[1] - bh / 2, w: bw, h: bh };
+      if (free(r)) { box = r; end = e; break; }
+    }
+    if (!box) continue;
+    placed.push(box);
+    octx.strokeStyle = '#1f2933'; octx.lineWidth = 1;
+    octx.beginPath(); octx.moveTo(a[0], a[1]); octx.lineTo(end[0], end[1]); octx.stroke();
+    octx.fillStyle = '#1f2933';
+    octx.beginPath(); octx.arc(a[0], a[1], 3, 0, 2 * Math.PI); octx.fill();
+    const tx = box.x + 3, ty = box.y + 8;
+    octx.strokeStyle = 'rgba(255,255,255,0.92)'; octx.lineWidth = 4; octx.strokeText(l.lines[0], tx, ty);
+    octx.fillStyle = '#1f2933'; octx.fillText(l.lines[0], tx, ty);
+  }
+}
+
+// ---- hover tooltip, double-click --------------------------------------------------------------------
+const ray = new THREE.Raycaster(), pointer = new THREE.Vector2();
+function pick(e) {
+  const F = curFrame();
+  if (!F) return null;
+  const r = renderer.domElement.getBoundingClientRect();
+  pointer.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  ray.setFromCamera(pointer, camera);
+  const objs = F.userData.objs.filter(o => o.visible && !(S.xray && o.userData.part.kind !== 'printed'));
+  return ray.intersectObjects(objs, false)[0];
+}
+function tipText(u) {
+  const p = u.part, head = p.label;
+  const each = `${p.mass_g.toFixed(0)} g`;
+  if (p.kind === 'printed')
+    return `${head}\nPrinted in ${p.mat} · ${each} each · ${p.qty} per aircraft\n${FIL_WHY[p.mat] || ''}`;
+  if (p.kind === 'cf_tube') return `${head}\n${p.stock}, cut to ${p.cut_len_mm.toFixed(0)} mm · ${each} · ${p.qty} per aircraft`;
+  if (p.kind === 'cf_plate') return `${head}\nCarbon plate, CNC-cut · ${each}`;
+  if (p.kind === 'payload' || p.kind === 'material') return `${head}\nReleaser, client supplied · ${each}`;
+  return `${head}\nBought or reused · ${each}`;
+}
+renderer.domElement.addEventListener('pointermove', e => {
+  const hit = pick(e), tip = $('tip');
+  if (!hit) { tip.style.display = 'none'; return; }
+  tip.textContent = tipText(hit.object.userData);
+  tip.style.display = 'block';
+  tip.style.left = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8) + 'px';
+  tip.style.top = Math.min(e.clientY + 14, innerHeight - tip.offsetHeight - 8) + 'px';
+});
+renderer.domElement.addEventListener('pointerleave', () => { $('tip').style.display = 'none'; });
+renderer.domElement.addEventListener('dblclick', e => {
+  const hit = pick(e);
+  if (hit) fit(new THREE.Box3().setFromObject(hit.object), camera.position.clone().sub(controls.target).toArray(), 1.6);
+});
+
+// ---- controls ---------------------------------------------------------------------------------------
+$('h1').onclick = () => { $('ui').classList.toggle('min'); applyOffset(); };
+$('cfg').onchange = e => showFrame(e.target.value);
+document.querySelectorAll('input[name=mode]').forEach(r => r.onchange = () => { S.mode = r.value; applyLook(); });
+document.querySelectorAll('input[name=labels]').forEach(r => r.onchange = () => { S.labels = r.value; });
+for (const k of ['xray', 'edges', 'bought', 'payload', 'discs', 'wash', 'cg'])
+  $(k).onchange = e => { S[k] = e.target.checked; applyLook(); };
+$('spin').onchange = e => { S.spin = e.target.checked; S.dirty = true; };
+$('burst').onclick = () => { S.bTo = S.bTo > 0.5 ? 0 : 1; };
+$('explode').oninput = e => { S.anim = S.bTo = S.explode = e.target.value / 100; syncExplode(); S.dirty = true; };
+$('fill').oninput = e => { S.fill = e.target.value / 100; applyLook(); poseAll(0); kpis(); };
+$('bat').oninput = e => { S.batDy = (+e.target.value - S.batY0) * -curFrame().userData.man.params.pod_sign; poseAll(0); kpis(); };
+$('autoBal').onclick = () => {
+  const F = curFrame(), P = F.userData.man.params;
+  poseAll(0);
+  const mb = F.userData.objs.filter(o => o.userData.inst.tags.slider === 'battery').reduce((s, o) => s + o.userData.part.mass_g, 0);
+  const dy = -F.userData.cg.y * F.userData.mass / mb;
+  const bat = $('bat');
+  const y = Math.min(+bat.max, Math.max(+bat.min, S.batY0 + (S.batDy + dy) * -P.pod_sign));
+  bat.value = y;
+  S.batDy = (y - S.batY0) * -P.pod_sign;
+  poseAll(0); kpis();
+};
+function syncExplode() {
+  $('explode').value = Math.round(S.explode * 100);
+  $('explodev').textContent = `${Math.round(S.explode * 100)} %`;
+  $('burst').textContent = S.bTo > 0.5 ? 'Assemble ◂' : 'Burst ▸';
+}
+// the Option B page picks the frame: same-origin messages only
+addEventListener('message', e => {
+  if (e.origin !== location.origin || e.data?.type !== 'ajb-cfg' || e.data.cfg === S.cur) return;
+  if (S.configs.some(c => c.name === e.data.cfg)) showFrame(e.data.cfg);
+});
+
+function resize() {
+  const w = innerWidth, h = innerHeight, dpr = renderer.getPixelRatio();
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  applyOffset();
+  overlay.width = w * dpr; overlay.height = h * dpr;
+  overlay.style.width = w + 'px'; overlay.style.height = h + 'px';
+  octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+function applyOffset() {                // centre the scene in the space right of the panel
+  const s = panelW() / 2;
+  if (s > 0) camera.setViewOffset(innerWidth, innerHeight, -s, 0, innerWidth, innerHeight);
+  else camera.clearViewOffset();
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', () => { resize(); if (!S.userMoved && S.view) setView(S.view); });   // keep the framing
+controls.addEventListener('start', () => { S.userMoved = true; });
+resize();
+
+const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+let last = performance.now();
+function loop(now) {
+  requestAnimationFrame(loop);
+  const dt = Math.min(0.05, (now - last) / 1000);
+  last = now;
+  if (S.anim !== S.bTo) {
+    S.anim = S.anim < S.bTo ? Math.min(S.bTo, S.anim + dt / 1.4) : Math.max(S.bTo, S.anim - dt / 1.4);
+    S.explode = ease(S.anim);
+    syncExplode();
+    S.dirty = true;
+  }
+  if (S.spin) S.dirty = true;
+  if (S.dirty) { poseAll(now / 1000); S.dirty = false; }
+  controls.update();
+  renderer.render(scene, camera);
+  drawOverlay();
+}
+
+// ---- start ------------------------------------------------------------------------------------------
+try {
+  const list = await (await fetch(`${OUT}configs.json`)).json();
+  list.sort((a, b) => (ORDER.indexOf(a.name) + 1 || 99) - (ORDER.indexOf(b.name) + 1 || 99));
+  S.configs = list;
+  $('cfg').innerHTML = list.map(c => `<option value="${c.name}">${c.name}: ${desc(c.name, c.pods, c.battery_y_mm ?? 1, c.lidar)}</option>`).join('');
+} catch (e) {
+  status.textContent = 'The 3D models could not be loaded.';
+  throw e;
+}
+if (Q.get('ui') === '0' || (EMBED && innerWidth < 640)) { $('ui').classList.add('min'); applyOffset(); }   // a narrow embed would be all panel
+if (EMBED) $('cfgRow').style.display = 'none';
+const want = Q.get('cfg');
+await showFrame(S.configs.find(c => c.name === want) ? want : S.configs[0].name, Q.get('view') || undefined);
+window.viewer = { S, camera, controls, world, meshBox };
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Option B: custom side-pod frame (draft) | AJ Builds Drone</title>
+<meta name="description" content="Draft: a custom carbon and 3-D printed frame for the UAV-IQ high-tunnel aircraft, in eight variants.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="optb.css">
+<script type="module" src="optb.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="/"><img src="/favicon.svg" alt="" width="22" height="22"><span>AJ BUILDS DRONE</span></a>
+    <nav class="toc" aria-label="Sections">
+      <a href="#model3d">3D</a>
+      <a href="#compare">Per sortie</a>
+      <a href="#flight">Flight</a>
+      <a href="#numbers">Numbers</a>
+      <a href="#bom">Parts</a>
+      <a href="#prints">Prints</a>
+      <a href="#carbon">Carbon</a>
+    </nav>
+    <a class="btn btn-sm" href="../">Option A page</a>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap">
+    <p class="kicker">Draft for internal review · not linked from the client page</p>
+    <h1 id="hero-title">Option B: a <span class="accent">custom side-pod frame</span> around the same core</h1>
+    <p class="lede">Option A's motors, propellers, battery, flight electronics and UCLA's autonomy core, on a carbon and 3-D
+      printed frame that carries the releaser in pods on rails beside the aircraft. The lidar depends on the frame. Pick a
+      frame: every section below follows the choice.</p>
+    <div class="picker-slot" id="pickerSlot">
+      <div class="card picker" id="picker">
+        <div class="picker-row">
+          <label for="model">Frame</label>
+          <select id="model"></select>
+        </div>
+        <ul class="flags" id="flags" aria-label="Notes on this frame"></ul>
+      </div>
+    </div>
+    <div class="optb-grid">
+      <figure class="hero-media optb-render">
+        <img id="render" width="1100" height="800" alt="">
+        <figcaption id="renderCap"></figcaption>
+      </figure>
+      <div class="optb-kpis" id="kpis"></div>
+    </div>
+  </div>
+</section>
+
+<section id="model3d" class="section alt" aria-labelledby="model3d-title">
+  <div class="wrap">
+    <p class="sec-kicker">01 // 3D model</p>
+    <h2 id="model3d-title">Explore the selected frame in 3D</h2>
+    <div class="card viewer-card">
+      <div class="card-head">
+        <h3 class="card-title" id="viewerTitle"></h3>
+        <a class="btn btn-sm" id="viewerFull" href="viewer/" target="_blank" rel="noopener">Open full screen ↗</a>
+      </div>
+      <div class="viewer-frame" id="viewerWrap">
+        <iframe id="viewerFrame" title="Interactive 3D model of the selected frame" allowfullscreen></iframe>
+        <a class="viewer-poster" id="viewerPoster" href="viewer/" target="_blank" rel="noopener">
+          <img id="viewerPosterImg" width="1100" height="800" loading="lazy" alt="">
+          <span class="btn btn-primary">Open the 3D viewer</span>
+        </a>
+      </div>
+      <p class="fine">Drag to orbit, scroll to zoom, hover a part for its name, material and mass, double-click to zoom to it.
+        The panel at the top left has the views, colours, x-ray, labels and the burst view, and the releaser fill and
+        battery position with their effect on the balance and the motors. Click its title to fold it away.</p>
+    </div>
+  </div>
+</section>
+
+<section id="compare" class="section" aria-labelledby="compare-title">
+  <div class="wrap">
+    <p class="sec-kicker">02 // Per sortie</p>
+    <h2 id="compare-title">The Option A sortie table, with Option B added</h2>
+    <p class="lede">The same side-view model, controller and two-tunnel sortie as on the Option A page (60 m tunnel, 20 m windy
+      transit, 60 m tunnel with the blower on, 160 s), flown back to back from a 98 % charge down to the 20 % reserve. Option B
+      uses its CAD mass and pitch inertia and Option A's motors, propellers and battery.</p>
+    <div class="card">
+      <h3 class="card-title">With the 1 L releaser</h3>
+      <div id="sortie1L" class="sortie-stats"><p class="fine">Flying the sorties…</p></div>
+      <h3 class="card-title mt">With the 2 L releaser</h3>
+      <div id="sortie2L" class="sortie-stats"><p class="fine">Flying the sorties…</p></div>
+    </div>
+    <p class="fine">Arrows run from the first sortie to the last full one. Peak motor load is the busiest motors' thrust as a share
+      of their maximum at that moment's battery voltage. The 3-D Gazebo flight below peaks higher (the peak motor load at the
+      top of the page): it flies in three dimensions with the full PX4 controller, crosses the gusty gap and includes the
+      take-off. The X500 runs on its 4S 5 Ah pack, every other aircraft on a 6S 10 Ah pack. Option A and the X650 carry the
+      releaser on a 200–250 g mount; on Option B the pod hardware is part of the frame.
+      The X500 is left out of the 2 L table: it cannot carry it. The side-view model sees mass and pitch only, so the
+      battery-centred reference flies like the 1L here; its sideways imbalance shows in the Gazebo flight below.</p>
+  </div>
+</section>
+
+<section id="flight" class="section alt" aria-labelledby="flight-title">
+  <div class="wrap">
+    <p class="sec-kicker">03 // Flight in Gazebo with PX4</p>
+    <h2 id="flight-title">The selected frame on the two-tunnel mission</h2>
+    <p class="lede">A recording of the 3-D simulation, not an animation: Gazebo Harmonic renders every image from its physics,
+      and the aircraft is flown by PX4 v1.17, the real autopilot firmware, in software in the loop. No GPS: it navigates on
+      vision odometry and optical flow, releases six doses over the rows, crosses the windy gap and lands.</p>
+    <div class="flight-grid">
+      <figure class="card video-card">
+        <div class="video-wrap">
+          <video id="video" controls preload="none" playsinline width="1280" height="720"></video>
+          <button class="video-start" id="videoStart" type="button">
+            <img id="videoPoster" width="1280" height="720" alt="">
+            <span class="btn btn-primary">▶ Play the flight</span>
+          </button>
+        </div>
+        <figcaption class="fine" id="videoCap"></figcaption>
+      </figure>
+      <div class="card">
+        <h3 class="card-title">Mission results</h3>
+        <div class="table-scroll"><table class="tbl" id="gzTable"></table></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="numbers" class="section" aria-labelledby="numbers-title">
+  <div class="wrap">
+    <p class="sec-kicker">04 // Numbers</p>
+    <h2 id="numbers-title">Numbers and design checks</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3 class="card-title">From the CAD and the motor load test</h3>
+        <div class="table-scroll"><table class="tbl" id="numbersTable"></table></div>
+      </div>
+      <div class="card">
+        <h3 class="card-title">Design checks</h3>
+        <div class="table-scroll"><table class="tbl" id="checksTable"></table></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="bom" class="section alt" aria-labelledby="bom-title">
+  <div class="wrap">
+    <p class="sec-kicker">05 // Parts</p>
+    <h2 id="bom-title">Parts list for this frame</h2>
+    <p class="lede">Every item links to the store page we read the price from: Option A's parts on
+      <span data-bind="checked"></span>, the frame materials on <span data-bind="checkedB"></span> (US dollars, before tax and
+      shipping). Cut-to-order plates and the allowances stay estimates until quoted. UCLA's autonomy core is reused, as in
+      Option A.</p>
+    <div class="card bom">
+      <div class="card-head">
+        <h3 class="card-title">New parts</h3>
+        <label class="check"><input type="checkbox" id="showNotes"><span>Show notes</span></label>
+      </div>
+      <div class="table-scroll"><table class="tbl tbl-bom" id="bomTable"></table></div>
+      <div class="bom-totals" id="bomTotals"></div>
+    </div>
+    <div class="card mt">
+      <h3 class="card-title">Reused from UCLA's X500 (not in the total)</h3>
+      <div class="table-scroll"><table class="tbl" id="reusedTable"></table></div>
+    </div>
+  </div>
+</section>
+
+<section id="prints" class="section" aria-labelledby="prints-title">
+  <div class="wrap">
+    <p class="sec-kicker">06 // Printed parts</p>
+    <h2 id="prints-title">Print list by filament</h2>
+    <div class="grid-2 prints-grid">
+      <div class="card">
+        <h3 class="card-title">Filament</h3>
+        <div class="table-scroll"><table class="tbl" id="filTable"></table></div>
+        <ul class="fine fil-why">
+          <li><b class="fil fil-asa">ASA</b> keeps its shape in a hot tunnel and in sun (no PLA or PETG on this aircraft).</li>
+          <li><b class="fil fil-pacf">PA-CF</b> (carbon-filled nylon): stiff and heat-proof, for the parts that carry motors,
+            arms, payload and the Jetson.</li>
+          <li><b class="fil fil-tpu">TPU 95A</b>: soft foot caps.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 class="card-title">Printed parts</h3>
+        <div class="table-scroll"><table class="tbl" id="printTable"></table></div>
+      </div>
+    </div>
+    <div class="card mt">
+      <h3 class="card-title">Printing on an Anycubic Kobra S1 or Kobra X</h3>
+      <div class="table-scroll"><table class="tbl" id="printerTable">
+        <thead><tr><th scope="col">Filament</th><th scope="col">Kobra S1 (enclosed, 320 °C)</th>
+          <th scope="col">Kobra X (open bed-slinger, 300 °C)</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><b class="fil fil-asa">ASA</b></th><td>Yes: the enclosure keeps it from warping</td>
+            <td>Supported, but large parts may warp or crack in open air: print them on the S1</td></tr>
+          <tr><th scope="row"><b class="fil fil-pacf">PA-CF</b></th><td>Yes, after fitting the
+            <a id="hotendLink" href="#" target="_blank" rel="noopener noreferrer">hardened-steel hotend</a> (carbon fibre wears a
+            brass nozzle out); dry the spool first</td>
+            <td>No: not on its supported list (PLA-CF and PETG-CF are), and nylon needs an enclosure</td></tr>
+          <tr><th scope="row"><b class="fil fil-tpu">TPU 95A</b></th><td>Yes, from the external spool holder (not through
+            the ACE Pro)</td><td>Yes</td></tr>
+        </tbody>
+      </table></div>
+      <p class="fine" id="printFit"></p>
+    </div>
+  </div>
+</section>
+
+<section id="carbon" class="section alt" aria-labelledby="carbon-title">
+  <div class="wrap">
+    <p class="sec-kicker">07 // Carbon and fasteners</p>
+    <h2 id="carbon-title">Carbon cut list</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3 class="card-title">Tubes</h3>
+        <div class="table-scroll"><table class="tbl" id="tubeTable"></table></div>
+        <h3 class="card-title mt">Tube stock to buy</h3>
+        <div class="table-scroll"><table class="tbl" id="tubeBuyTable"></table></div>
+      </div>
+      <div class="card">
+        <h3 class="card-title">Plates</h3>
+        <div class="table-scroll"><table class="tbl" id="plateTable"></table></div>
+        <p class="fine">No CNC needed. Stock frame plates will not fit: the arm clamps, motor spacing, rails and pod spine are
+          specific to this frame. Three ways to get them:</p>
+        <ul class="fine plate-ways" id="plateWays"></ul>
+        <h3 class="card-title mt">Fasteners</h3>
+        <div class="table-scroll"><table class="tbl" id="fastTable"></table></div>
+      </div>
+    </div>
+    <p class="fine">Lengths are cut lengths, packed into the tubes we buy (1,000 mm; 500 mm for the 10 mm mast tube) with 3 mm
+      per saw cut. Cut carbon tube with a fine-tooth or abrasive blade, taped at the cut. Plate sizes are the outline's
+      bounding box.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="section optb-foot">
+  <div class="wrap">
+    <p class="fine">Prepared by AJ Builds Drone for UAV-IQ and the UCLA high-tunnel biocontrol project. Draft: numbers come
+      from our CAD and simulations and will be confirmed by weighing the built frame.</p>
+  </div>
+</footer>
+</body>
+</html>
