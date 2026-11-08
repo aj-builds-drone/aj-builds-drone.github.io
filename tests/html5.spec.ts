@@ -7,6 +7,7 @@ const PAGES = [
   { path: "/", title: "AJ Builds Drone" },
   { path: "/projects/", title: "Hangar" },
   { path: "/projects/vtol-plane/", title: "VTOL" },
+  { path: "/projects/bwb-vtol/", title: "Blended-Wing" },
   { path: "/services/", title: "Service" },
   { path: "/contact/", title: "AJ Builds Drone" },
 ];
