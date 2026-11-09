@@ -116,8 +116,8 @@ const NEXT_STEPS = [
 
 const PRINT_JOBS = [
   ["Kobra X · LW-PLA skins", "15 plates, one vase-mode skin each: 167 g, about 29½ hours"],
-  ["Kobra X · LW-PLA fins", "one plate, both fins with two walls: 55 g, about 11 hours"],
-  ["Kobra S1 · PETG", "6 plates, one per assembly group: 396 g with 88 g of support, about 18½ hours"],
+  ["Kobra X · LW-PLA fins", "two plates, one fin each with two walls: 55 g, about 11 hours"],
+  ["Kobra S1 · PETG", "6 plates, one per assembly group: 398 g with 87 g of support, about 18½ hours"],
   ["Audited", "supports only under the 17 parts that need them and none inside a carbon tube's bore, brims clear of the next part, and every plate re-sliced from its project and compared"],
 ];
 
