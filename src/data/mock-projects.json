@@ -15,7 +15,7 @@
       "LW-PLA Vase Skins, PETG Structure + Feet, Carbon Spars"
     ],
     "softwareStack": ["Python", "manifold3d", "PX4", "Gazebo", "C++", "three.js"],
-    "description": "A 3D-printed blended-wing delivery drone with two props and nothing that tilts. It stands on its tail, climbs like a rocket, pitches over and flies as a flying wing, then zooms back up into a hover to drop a 250 g parcel from a bay on its centre of gravity. Generated in Python, checked by a 23-point gate and a premortem, and flown through a full delivery in PX4 + Gazebo simulation, with a custom Gazebo plugin for its aerodynamics and a small PX4 patch for its back transition.",
+    "description": "A 3D-printed blended-wing delivery drone with two props and nothing that tilts. It stands on its tail, climbs like a rocket, pitches over and flies as a flying wing, then zooms back up into a hover to drop a 250 g parcel from a bay on its centre of gravity. Generated in Python, checked by a 23-point gate and a premortem, and flown through a full delivery in PX4 + Gazebo simulation, with a custom Gazebo plugin for its aerodynamics and a small PX4 patch for its back transition. Sliced for a Kobra X and a Kobra S1: printing next.",
     "specs": {
       "config": "BWB Twin-Prop Tailsitter",
       "span": "900 mm",

@@ -7,7 +7,7 @@ import { SectionHeader, StatBox } from "@/components/HUDElements";
 const MEDIA = "/projects/bwb-vtol";
 const PAGE_URL = "https://aj-builds-drone.github.io/projects/bwb-vtol/";
 const SUMMARY =
-  "A 3D-printed blended-wing delivery drone with two props and nothing that tilts. It stands on its tail, climbs like a rocket, pitches over and flies as a flying wing, then hovers to drop a 250 g parcel. Designed in Python, checked by a 23-point gate and a premortem, and flown through a full delivery in PX4 + Gazebo simulation.";
+  "A 3D-printed blended-wing delivery drone with two props and nothing that tilts. It stands on its tail, climbs like a rocket, pitches over and flies as a flying wing, then hovers to drop a 250 g parcel. Designed in Python, checked by a 23-point gate and a premortem, flown through a full delivery in PX4 + Gazebo simulation, and sliced for two printers: printing next.";
 
 export const metadata: Metadata = {
   title: "Blended-Wing Tailsitter: Takes Off Like a Rocket, Flies Like a Plane",
@@ -91,6 +91,7 @@ const PIPELINE = [
   { step: "Propulsion", text: "Blade-element props, DC motors and a Li-ion pack: the thrust the battery can really pay for." },
   { step: "Simulation model", text: "A Gazebo plugin with the same motors, full-envelope wing strips and slipstream, and both PX4 parameter sets, all from the same geometry and masses." },
   { step: "Gate", text: "23 checks run before any filament is used." },
+  { step: "Slicing", text: "Three slicer projects for the two printers. Each part is sliced alone to choose its supports and brim, and every plate is audited down to its G-code." },
 ];
 
 const GATE = [
@@ -107,10 +108,17 @@ const GATE = [
 ];
 
 const NEXT_STEPS = [
-  "Test prints: an LW-PLA wing panel with its PETG pod rib and spigot bands, weighed against the estimate.",
+  "Print, starting with the flow-test skin (LW-PLA 01), then a wing panel with its PETG pod rib and spigot bands, weighed against the estimate.",
   "Thrust-stand a motor with its prop on this pack, and put the measured throttles into the PX4 parameter file.",
   "Weigh every part into measured.json, rebuild, and balance the finished aircraft on the CG it gives. Bond the tubes, then a 3 g sandbag test and a drop test onto the feet.",
   "Build PX4 v1.17 with the patch, load the parameters, test every output with the props off, then a tethered hover.",
+];
+
+const PRINT_JOBS = [
+  ["Kobra X · LW-PLA skins", "15 plates, one vase-mode skin each: 167 g, about 29½ hours"],
+  ["Kobra X · LW-PLA fins", "one plate, both fins with two walls: 55 g, about 11 hours"],
+  ["Kobra S1 · PETG", "6 plates, one per assembly group: 396 g with 88 g of support, about 18½ hours"],
+  ["Audited", "supports only under the 17 parts that need them and none inside a carbon tube's bore, brims clear of the next part, and every plate re-sliced from its project and compared"],
 ];
 
 const HARDWARE = [
@@ -198,7 +206,7 @@ export default function BwbVtolPage() {
                 IN DEVELOPMENT
               </span>
               <span className="font-mono text-[11px] tracking-wider text-text-secondary">
-                v1 · flown in simulation · test prints next
+                v1 · flown in simulation · sliced · printing next
               </span>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -430,16 +438,19 @@ export default function BwbVtolPage() {
           <SectionHeader
             code="PRT"
             title="PRINT-READY"
-            subtitle="One material per printer: a Kobra X prints the 17 LW-PLA skins in vase mode and a Kobra S1 the 27 PETG parts. Every part fits its bed and no skin overhangs more than 32°."
+            subtitle="Sliced: three slicer projects, one plate per print, each named for its filament. A Kobra X prints the 17 LW-PLA skins and a Kobra S1 the 27 PETG parts. Every part fits its bed and no skin overhangs more than 32°."
           />
-          <Figure caption="The PETG parts in their print orientation.">
+          <Figure caption="The 27 PETG parts in the orientation they print in.">
             <Image src={`${MEDIA}/print_petg.webp`} alt="The PETG parts laid out in their print orientation" width={1600} height={1000} className="block w-full h-auto" />
           </Figure>
+          <div className="mt-6 max-w-3xl">
+            <Bullets items={PRINT_JOBS} />
+          </div>
         </section>
 
         {/* Status */}
         <section className="mb-16">
-          <SectionHeader code="NXT" title="STATUS + NEXT STEPS" subtitle="Designed, put through a premortem and flown in simulation. Not built yet." />
+          <SectionHeader code="NXT" title="STATUS + NEXT STEPS" subtitle="Designed, put through a premortem, flown in simulation and sliced. Printing next." />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <ol className="space-y-3">
               {NEXT_STEPS.map((s, i) => (
