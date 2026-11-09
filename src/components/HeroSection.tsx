@@ -21,14 +21,12 @@ const DroneScene = dynamic(() => import("./DroneModel/DroneScene"), {
 });
 
 const capabilities = [
-  { label: "PX4 AUTOPILOT", status: "CERTIFIED" },
-  { label: "ROS2 HUMBLE", status: "ACTIVE" },
-  { label: "GAZEBO SIM", status: "READY" },
-  { label: "COMPUTER VISION", status: "ONLINE" },
-  { label: "SLAM NAV", status: "OPERATIONAL" },
-  { label: "OAK-D DEPTH AI", status: "LINKED" },
-  { label: "MISSION PLANNER", status: "SYNCED" },
-  { label: "CUSTOM FIRMWARE", status: "DEPLOYED" },
+  { label: "PX4 AUTOPILOT", status: "FLOWN" },
+  { label: "STM32 FLIGHT CONTROLLER", status: "FLOWN" },
+  { label: "VTOL TRANSITIONS", status: "SIMULATED" },
+  { label: "ROS 2 VISION TRACKING", status: "SIMULATED" },
+  { label: "3D-PRINTED VTOL AIRFRAMES", status: "IN DEVELOPMENT" },
+  { label: "FAA PART 107", status: "CERTIFIED" },
 ];
 
 export default function HeroSection() {

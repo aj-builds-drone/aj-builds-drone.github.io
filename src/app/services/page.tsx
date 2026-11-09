@@ -5,15 +5,15 @@ import PricingCalculator from "@/components/PricingCalculator";
 import DataPipeline from "@/components/DataPipeline/DataPipeline";
 
 export const metadata = {
-  title: "Services — Drone, FPGA & Aerial Photography",
+  title: "Services — Drone Builds, Simulation & FPGA",
   description:
-    "Professional drone services: custom UAV hardware integration, FPGA & embedded systems, computer vision & SLAM, Gazebo simulation, and FAA Part 107 aerial photography. Austin TX — global operations. Request a free quote.",
+    "Drone engineering services: custom UAV hardware integration, computer vision & SLAM, Gazebo simulation, and FPGA & embedded systems. FAA Part 107 certified. Austin TX — global operations. Request a free quote.",
   alternates: {
     canonical: "https://aj-builds-drone.github.io/services/",
   },
   openGraph: {
     title: "Drone Engineering Services | AJ Builds Drone",
-    description: "Custom UAV builds, FPGA systems, computer vision, Gazebo simulation, aerial photography. FAA Part 107 certified. Austin TX.",
+    description: "Custom UAV builds, computer vision, Gazebo simulation and FPGA systems. FAA Part 107 certified. Austin TX.",
     url: "https://aj-builds-drone.github.io/services/",
     siteName: "AJ Builds Drone",
     type: "website",
@@ -22,7 +22,7 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Drone Engineering Services | AJ Builds Drone",
-    description: "Custom UAV builds, FPGA systems, CV & SLAM, Gazebo simulation, aerial photography. FAA Part 107 certified.",
+    description: "Custom UAV builds, CV & SLAM, Gazebo simulation and FPGA systems. FAA Part 107 certified.",
     images: ["/og-services.jpg"],
   },
 };
@@ -51,7 +51,7 @@ const coreServices = [
     title: "Computer Vision & SLAM",
     tagline: "Perception for Autonomous Machines",
     description:
-      "Visual perception pipelines that enable autonomous operation in complex, GPS-denied environments. From PX4 ROI Object Tracking simulations to real-time 3D mapping, delivering production-ready ROS2 nodes.",
+      "Visual perception pipelines that enable autonomous operation in complex, GPS-denied environments. From the PX4 vision follow-me simulation to real-time 3D mapping, delivering production-ready ROS2 nodes.",
     deliverables: [
       "Stereo camera & depth sensor integration (OAK-D, RealSense)",
       "Visual-Inertial Odometry (VIO) for GPS-denied navigation",
@@ -95,23 +95,6 @@ const coreServices = [
       "Custom SoC integration for autonomous flight controllers",
     ],
     tools: ["Vivado", "Vitis", "Petalinux", "Zynq UltraScale+", "SystemVerilog", "C/C++"],
-  },
-  {
-    code: "SVC-05",
-    icon: "◉",
-    title: "Aerial Photography & Videography",
-    tagline: "FAA Part 107 Certified",
-    description:
-      "Professional aerial cinematography for real estate, events, construction progress, and creative productions. FAA Part 107 certified with footage captured across Austin, NYC, Miami, and beyond. Also a private pilot student with 60+ hours of manned flight experience.",
-    deliverables: [
-      "4K aerial photography & cinematic video capture",
-      "Real estate & construction progress documentation",
-      "Event coverage (weddings, festivals, corporate)",
-      "Orthomosaic mapping & 3D terrain modeling",
-      "FAA Part 107 compliant flight planning & airspace authorization",
-      "Post-production editing & color grading",
-    ],
-    tools: ["DJI", "Litchi", "DroneDeploy", "Pix4D", "DaVinci Resolve", "Lightroom"],
   },
 ];
 
@@ -168,7 +151,7 @@ export default function ServicesPage() {
             code="SVC"
             title="SERVICE MATRIX"
             as="h1"
-            subtitle="Five verticals with modular engagement — from single consultation to full platform development lifecycle. Austin TX based, operating globally."
+            subtitle="Four verticals with modular engagement — from single consultation to full platform development lifecycle. Austin TX based, operating globally."
           />
         </div>
 

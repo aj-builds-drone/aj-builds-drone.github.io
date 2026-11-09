@@ -165,8 +165,8 @@ export default async function Home() {
             READY TO BUILD?
           </h2>
           <p className="text-text-secondary mb-8 max-w-xl mx-auto">
-            Whether you need a full autonomous platform, aerial cinematography, FPGA
-            integration, or a targeted consultation on flight controller firmware —
+            Whether you need a full autonomous platform, FPGA integration, or a
+            targeted consultation on flight controller firmware —
             let&apos;s scope it out.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

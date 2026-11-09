@@ -13,7 +13,6 @@ const serviceOptions = [
   "Computer Vision & SLAM",
   "Digital Twin & Gazebo Simulation",
   "FPGA & Embedded Systems",
-  "Aerial Photography & Videography",
   "Research Platform Prototyping",
   "Curriculum Development Support",
   "Competition Team Consulting",

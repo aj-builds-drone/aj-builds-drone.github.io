@@ -14,8 +14,6 @@ interface Deliverable {
 }
 
 const DELIVERABLES: Deliverable[] = [
-  { id: "photo-4k", label: "4K Aerial Photography", price: 150 },
-  { id: "video-cinematic", label: "Cinematic Video Capture", price: 300 },
   { id: "orthomosaic", label: "Orthomosaic Map", price: 500 },
   { id: "3d-model", label: "3D Terrain Model", price: 750 },
   { id: "thermal", label: "Thermal Inspection", price: 400 },
@@ -30,7 +28,7 @@ const COMPLEXITY_MULTIPLIERS = [1.0, 1.3, 1.7, 2.2];
 export default function PricingCalculator() {
   const [area, setArea] = useState(5); // acres
   const [complexity, setComplexity] = useState(1); // 0-3
-  const [selected, setSelected] = useState<Set<string>>(new Set(["photo-4k"]));
+  const [selected, setSelected] = useState<Set<string>>(new Set(["orthomosaic"]));
 
   function toggleDeliverable(id: string) {
     setSelected((prev) => {

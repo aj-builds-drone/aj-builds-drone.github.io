@@ -149,9 +149,7 @@ I've seen too many $50K drones collecting dust because the PI who bought it grad
     title: "Tutorial",
     category: "Technical",
     hook: "How to get your Part 107 drone license in 2 weeks (step by step for researchers)... 📋",
-    body: `I've helped 15+ graduate students pass their Part 107.
-
-Here's the exact study plan:
+    body: `I hold an FAA Part 107 remote pilot certificate. Here's the two-week study plan I'd give any grad student preparing for the test:
 
 📅 Week 1: Knowledge
 Day 1-2: Airspace classification (this is 30% of the test)
@@ -174,9 +172,7 @@ Day 14: Test day
 💡 Pro tips:
 → The sectional chart questions are free points if you practice
 → METAR decoding seems hard but follows a simple pattern
-→ Don't overthink the weather questions — they want practical knowledge
-
-Pass rate with this method: 100% (15/15 students).`,
+→ Don't overthink the weather questions — they want practical knowledge`,
     cta: "Studying for Part 107? Drop a 🙋 and I'll send you my free cheat sheet.",
     hashtags: ["#Part107", "#DroneLicense", "#FAA", "#Tutorial", "#DroneTraining", "#RemotePilot", "#STEM", "#GradSchool"],
   },

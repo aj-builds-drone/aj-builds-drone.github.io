@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: "%s | AJ Builds Drone",
   },
   description:
-    "FAA Part 107 certified drone contractor & Sr. FPGA Engineer. Custom UAV builds, PX4/ArduPilot integration, computer vision & SLAM, Gazebo simulation, aerial cinematography, and FPGA-based embedded systems. Austin TX — operating globally. Request a free quote today.",
+    "FAA Part 107 certified drone contractor & Sr. FPGA Engineer. Custom UAV builds, PX4/ArduPilot integration, computer vision & SLAM, Gazebo simulation, and FPGA-based embedded systems. Austin TX — operating globally. Request a free quote today.",
   keywords: [
     "drone contractor Austin TX",
     "custom drone builder",
@@ -40,8 +40,6 @@ export const metadata: Metadata = {
     "custom drone build service",
     "FAA Part 107 certified pilot",
     "FPGA embedded systems engineer",
-    "aerial photography Austin Texas",
-    "drone cinematography services",
     "research drone prototyping",
     "university drone lab setup",
     "NXP HoverGames",
@@ -61,7 +59,7 @@ export const metadata: Metadata = {
     siteName: "AJ Builds Drone",
     title: "AJ Builds Drone | Custom UAV Systems Contractor — Austin, TX",
     description:
-      "FAA Part 107 certified. Custom UAV builds, PX4 integration, computer vision & SLAM, FPGA embedded systems, and aerial cinematography. From simulation to maiden flight. Get a free quote.",
+      "FAA Part 107 certified. Custom UAV builds, PX4 integration, computer vision & SLAM, Gazebo simulation, and FPGA embedded systems. From simulation to maiden flight. Get a free quote.",
     images: [
       {
         url: "/og-home.jpg",
@@ -75,7 +73,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AJ Builds Drone | Custom UAV Systems Contractor",
     description:
-      "FAA Part 107 certified. Custom UAV builds, PX4, FPGA, aerial cinematography. Austin TX — operating globally.",
+      "FAA Part 107 certified. Custom UAV builds, PX4, Gazebo simulation, FPGA. Austin TX — operating globally.",
     images: ["/og-home.jpg"],
   },
   robots: {
@@ -117,7 +115,7 @@ const jsonLd = {
       logo: `${siteUrl}/og-image.png`,
       image: `${siteUrl}/og-image.png`,
       description:
-        "Professional UAV systems contractor offering custom drone builds, FPGA integration, computer vision & SLAM, Gazebo simulation, and aerial cinematography. FAA Part 107 certified. Austin TX — operating globally.",
+        "Professional UAV systems contractor offering custom drone builds, FPGA integration, computer vision & SLAM, and Gazebo simulation. FAA Part 107 certified. Austin TX — operating globally.",
       areaServed: {
         "@type": "Place",
         name: "Worldwide",
@@ -136,7 +134,6 @@ const jsonLd = {
         "Computer Vision & SLAM Development",
         "Digital Twin & Gazebo Simulation",
         "FPGA & Embedded Systems Design",
-        "Aerial Photography & Videography",
         "Research Platform Prototyping",
         "University Drone Lab Setup",
         "Competition Team Consulting",
@@ -175,14 +172,6 @@ const jsonLd = {
               "@type": "Service",
               name: "FPGA & Embedded Systems",
               description: "Custom FPGA and embedded system design for high-speed data processing and real-time control.",
-            },
-          },
-          {
-            "@type": "Offer",
-            itemOffered: {
-              "@type": "Service",
-              name: "Aerial Photography & Videography",
-              description: "FAA Part 107 certified professional aerial cinematography for real estate, events, and construction.",
             },
           },
         ],
@@ -227,7 +216,6 @@ const jsonLd = {
         "SLAM Navigation",
         "ROS2",
         "Gazebo Simulation",
-        "Aerial Cinematography",
         "SystemVerilog",
         "PCB Design",
       ],
@@ -259,7 +247,7 @@ const jsonLd = {
           name: "What types of drones does AJ Builds Drone build?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "We build custom multirotor, fixed-wing, and VTOL UAV platforms for research, inspection, agriculture, and cinematography. Each platform is designed around your specific payload and mission requirements, from sensor selection through maiden flight.",
+            text: "We build custom multirotor, fixed-wing, and VTOL UAV platforms for research, inspection, and agriculture. Each platform is designed around your specific payload and mission requirements, from sensor selection through maiden flight.",
           },
         },
         {

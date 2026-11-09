@@ -60,20 +60,6 @@ const services = [
       "Zynq UltraScale+ SoC Integration",
     ],
   },
-  {
-    code: "SVC-05",
-    icon: "◉",
-    title: "Aerial Photography & Videography",
-    description:
-      "FAA Part 107 certified aerial cinematography for real estate, events, construction, and creative productions. Multi-city portfolio across Austin, NYC, and Miami.",
-    capabilities: [
-      "4K Drone Photography & Video",
-      "Real Estate & Construction Progress",
-      "FAA Part 107 Compliant Operations",
-      "Orthomosaic Mapping & 3D Terrain",
-      "Post-production & Color Grading",
-    ],
-  },
 ];
 
 export default function ServiceMatrix() {
@@ -97,12 +83,12 @@ export default function ServiceMatrix() {
             SERVICE MATRIX
           </h2>
           <p className="mt-2 text-text-secondary text-base max-w-2xl">
-            Five verticals. Modular engagement. Scale from a single
+            Four verticals. Modular engagement. Scale from a single
             consultation to a full platform build.
           </p>
         </motion.div>
 
-        {/* Service Grid — flex wrap to center the last row's 2 items */}
+        {/* Service Grid: 2 columns, 4 on wide screens */}
         <div className="flex flex-wrap justify-center gap-6">
           {services.map((service, i) => (
             <motion.div
@@ -111,7 +97,7 @@ export default function ServiceMatrix() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.15 }}
-              className="osd-card rounded-lg overflow-hidden hud-corners flex flex-col w-full md:w-[calc(33.333%-1rem)]"
+              className="osd-card rounded-lg overflow-hidden hud-corners flex flex-col w-full md:w-[calc(50%-0.75rem)] xl:w-[calc(25%-1.125rem)]"
             >
               {/* Card Header */}
               <div className="px-5 py-3 border-b border-border-dim bg-elevated/50 flex items-center justify-between">

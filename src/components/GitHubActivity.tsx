@@ -1,9 +1,8 @@
 "use client";
 
 /* ── GitHub Activity Heatmap ──
-   Fetches public contribution data from GitHub's API and displays
-   a contribution heatmap + recent commit list in HUD style.
-   Falls back to simulated data if API fails (rate-limited, etc). */
+   Real contribution calendar (github-contributions-api.jogruber.de serves
+   GitHub's public calendar with CORS) + the latest public push per repo. */
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -14,50 +13,26 @@ interface ContributionDay {
   level: 0 | 1 | 2 | 3 | 4;
 }
 
-interface RepoEvent {
+interface RepoPush {
   repo: string;
-  message: string;
+  branch: string;
   date: string;
   sha: string;
+  url: string;
+}
+
+interface GitHubEvent {
+  type: string;
+  repo: { name: string };
+  payload: { ref?: string; head?: string };
+  created_at: string;
 }
 
 const GITHUB_USERNAME = "ajayadahal";
 
-// Generate simulated contribution data for fallback
-function generateFallbackData(): ContributionDay[] {
-  const days: ContributionDay[] = [];
-  const now = new Date();
-  for (let i = 364; i >= 0; i--) {
-    const date = new Date(now);
-    date.setDate(date.getDate() - i);
-    const dayOfWeek = date.getDay();
-    // Simulate realistic activity: more on weekdays, some weekends
-    const isWeekday = dayOfWeek > 0 && dayOfWeek < 6;
-    const rand = Math.random();
-    let count = 0;
-    if (isWeekday) {
-      if (rand > 0.3) count = Math.floor(Math.random() * 8) + 1;
-    } else {
-      if (rand > 0.6) count = Math.floor(Math.random() * 4) + 1;
-    }
-    const level = count === 0 ? 0 : count <= 2 ? 1 : count <= 4 ? 2 : count <= 6 ? 3 : 4;
-    days.push({
-      date: date.toISOString().split("T")[0],
-      count,
-      level: level as 0 | 1 | 2 | 3 | 4,
-    });
-  }
-  return days;
-}
-
-function generateFallbackEvents(): RepoEvent[] {
-  return [
-    { repo: "aj-builds-drone.github.io", message: "feat: add Three.js drone model to hero section", date: "2d ago", sha: "a3f2b1c" },
-    { repo: "px4-roi-tracking", message: "fix: adjust PID gains for smoother ROI lock", date: "4d ago", sha: "e7d4a5f" },
-    { repo: "hovergames-3", message: "docs: update flight test results and telemetry logs", date: "1w ago", sha: "b2c8f3e" },
-    { repo: "gazebo-drone-sim", message: "feat: add wind disturbance model to SITL", date: "1w ago", sha: "9a1e4d2" },
-    { repo: "oak-d-slam", message: "refactor: migrate to ORB-SLAM3 ROS2 wrapper", date: "2w ago", sha: "c5f7b8a" },
-  ];
+function daysAgo(iso: string): string {
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  return days === 0 ? "today" : days === 1 ? "1d ago" : `${days}d ago`;
 }
 
 const LEVEL_COLORS = [
@@ -70,57 +45,45 @@ const LEVEL_COLORS = [
 
 export default function GitHubActivity() {
   const [contributions, setContributions] = useState<ContributionDay[]>([]);
-  const [events, setEvents] = useState<RepoEvent[]>([]);
-  const [totalContributions, setTotalContributions] = useState(0);
-  const [isLive, setIsLive] = useState(false);
+  const [totalContributions, setTotalContributions] = useState<number | null>(null);
+  const [calendarFailed, setCalendarFailed] = useState(false);
+  const [pushes, setPushes] = useState<RepoPush[]>([]);
+  const [pushesFailed, setPushesFailed] = useState(false);
 
   useEffect(() => {
-    async function fetchActivity() {
-      try {
-        // Fetch recent public events from GitHub API (no auth needed)
-        const res = await fetch(
-          `https://api.github.com/users/${GITHUB_USERNAME}/events/public?per_page=30`,
-          { cache: "no-store" }
-        );
-        if (!res.ok) throw new Error("API failed");
+    fetch(`https://github-contributions-api.jogruber.de/v4/${GITHUB_USERNAME}?y=last`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`calendar ${res.status}`);
+        return res.json() as Promise<{ total: { lastYear: number }; contributions: ContributionDay[] }>;
+      })
+      .then((data) => {
+        setContributions(data.contributions);
+        setTotalContributions(data.total.lastYear);
+      })
+      .catch(() => setCalendarFailed(true));
 
-        const eventsData = await res.json();
-        const pushEvents = eventsData
-          .filter((e: { type: string }) => e.type === "PushEvent")
-          .slice(0, 5)
-          .map((e: {
-            repo: { name: string };
-            payload: { commits: { message: string; sha: string }[] };
-            created_at: string;
-          }) => {
-            const daysAgo = Math.floor(
-              (Date.now() - new Date(e.created_at).getTime()) / 86400000
-            );
-            return {
-              repo: e.repo.name.split("/")[1] || e.repo.name,
-              message: e.payload.commits?.[0]?.message?.split("\n")[0] || "commit",
-              date: daysAgo === 0 ? "today" : daysAgo === 1 ? "1d ago" : `${daysAgo}d ago`,
-              sha: e.payload.commits?.[0]?.sha?.slice(0, 7) || "0000000",
-            };
+    // Push events no longer carry commit messages, so list repo, branch and head commit.
+    fetch(`https://api.github.com/users/${GITHUB_USERNAME}/events/public?per_page=100`, { cache: "no-store" })
+      .then((res) => {
+        if (!res.ok) throw new Error(`events ${res.status}`);
+        return res.json() as Promise<GitHubEvent[]>;
+      })
+      .then((events) => {
+        const latest = new Map<string, RepoPush>();
+        for (const e of events) {
+          if (e.type !== "PushEvent" || !e.payload.head || latest.has(e.repo.name)) continue;
+          latest.set(e.repo.name, {
+            repo: e.repo.name.split("/")[1] || e.repo.name,
+            branch: (e.payload.ref ?? "").replace("refs/heads/", ""),
+            date: daysAgo(e.created_at),
+            sha: e.payload.head.slice(0, 7),
+            url: `https://github.com/${e.repo.name}/commit/${e.payload.head}`,
           });
-
-        if (pushEvents.length > 0) {
-          setEvents(pushEvents);
-          setIsLive(true);
-        } else {
-          setEvents(generateFallbackEvents());
         }
-      } catch {
-        setEvents(generateFallbackEvents());
-      }
-    }
-
-    // Contribution heatmap: use generated data (GitHub doesn't expose this via REST API without GraphQL + auth)
-    const contribs = generateFallbackData();
-    setContributions(contribs);
-    setTotalContributions(contribs.reduce((sum, d) => sum + d.count, 0));
-
-    fetchActivity();
+        if (latest.size === 0) throw new Error("no public pushes");
+        setPushes([...latest.values()].slice(0, 5));
+      })
+      .catch(() => setPushesFailed(true));
   }, []);
 
   // Build the heatmap grid (52 weeks x 7 days)
@@ -147,7 +110,9 @@ export default function GitHubActivity() {
             COMMIT LOG
           </h2>
           <p className="mt-2 text-text-secondary text-sm">
-            {isLive ? "Live from GitHub" : "Engineering activity"} — {totalContributions.toLocaleString()} contributions in the last year.
+            {totalContributions === null
+              ? "Public activity from GitHub."
+              : `Live from GitHub — ${totalContributions.toLocaleString()} contributions in the last year.`}
           </p>
         </motion.div>
 
@@ -165,6 +130,12 @@ export default function GitHubActivity() {
                 CONTRIBUTION HEATMAP
               </span>
             </div>
+
+            {calendarFailed && (
+              <p className="font-mono text-xs text-text-secondary mb-3">
+                The contribution calendar didn&apos;t load. It&apos;s on the GitHub profile.
+              </p>
+            )}
 
             {/* Grid */}
             <div className="flex gap-[3px] min-w-[700px]">
@@ -202,18 +173,30 @@ export default function GitHubActivity() {
             </div>
 
             <div className="space-y-4">
-              {events.map((event, i) => (
-                <div key={i} className="border-b border-border-dim pb-3 last:border-0 last:pb-0">
+              {pushesFailed && (
+                <p className="font-mono text-xs text-text-secondary leading-relaxed">
+                  GitHub isn&apos;t answering right now. The full history is on the profile.
+                </p>
+              )}
+              {pushes.map((push) => (
+                <div key={push.repo} className="border-b border-border-dim pb-3 last:border-0 last:pb-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-mono text-[10px] text-accent-cyan bg-accent-cyan/10 px-1.5 py-0.5 rounded">
-                      {event.repo}
+                      {push.repo}
                     </span>
-                    <span className="font-mono text-[9px] text-text-secondary ml-auto">{event.date}</span>
+                    <span className="font-mono text-[9px] text-text-secondary ml-auto">{push.date}</span>
                   </div>
                   <p className="font-mono text-xs text-text-secondary leading-relaxed truncate">
-                    {event.message}
+                    pushed to {push.branch}
                   </p>
-                  <span className="font-mono text-[9px] text-accent-green">{event.sha}</span>
+                  <a
+                    href={push.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-[9px] text-accent-green hover:text-foreground transition-colors"
+                  >
+                    {push.sha}
+                  </a>
                 </div>
               ))}
             </div>
