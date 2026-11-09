@@ -30,12 +30,11 @@ function generateEmail(prospect: Prospect): EmailDraft {
 
 I came across your work in ${researchFocus} at ${prospect.organization}${prospect.department ? ` (${prospect.department})` : ""} and wanted to reach out.
 
-We specialize in helping university research teams integrate drone-based data collection into their workflows. Based on your focus areas, I think our capabilities in ${capabilities} could significantly accelerate your fieldwork.
+I design and build custom drones for research: airframe, flight software and data pipeline, with every mission flown in PX4 + Gazebo simulation before anything is built. Based on your focus areas, a drone set up for ${capabilities} could speed up your fieldwork.
 
-A few quick wins we've delivered for similar programs:
-• 90% reduction in field survey time (see our case study: aj-builds-drone.github.io/case-studies)
-• Publication-ready datasets with sub-centimeter accuracy
-• Grant budget templates specifically for drone integration (aj-builds-drone.github.io/grant-calculator)
+What I can offer:
+• A platform designed around your sensors and mission, fully documented (examples: aj-builds-drone.github.io/projects)
+• Grant budget templates for drone integration (aj-builds-drone.github.io/grant-calculator)
 
 I'd love to do a quick 15-minute call to understand your current data collection workflow and see if there's a fit.
 

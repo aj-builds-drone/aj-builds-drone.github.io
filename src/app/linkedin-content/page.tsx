@@ -21,7 +21,7 @@ const templates: Template[] = [
     title: "Research Spotlight",
     category: "Research",
     hook: "Just published: [paper topic]. Here's what we found about [drone application]... 🔬",
-    body: `We spent 6 months collecting aerial data across [X] sites.
+    body: `We spent [N] months collecting aerial data across [X] sites.
 
 The results surprised even us.
 
@@ -41,28 +41,28 @@ Full paper link in comments 👇`,
     id: 2,
     title: "Before/After",
     category: "Technical",
-    hook: "This bridge inspection used to take 3 days. With drones: 20 minutes. Here's the data... 🌉",
+    hook: "This bridge inspection used to take [X days]. With a drone: [Y minutes]. Here's the data... 🌉",
     body: `Before:
-→ 3-day road closure
-→ $15,000 in equipment rental
-→ 4-person crew with rope access certification
-→ Still missed 30% of the underside
+→ [X]-day road closure
+→ $[X] in equipment rental
+→ [N]-person crew with rope access certification
+→ Still missed [X]% of the underside
 
 After:
-→ 20-minute autonomous flight
-→ Sub-centimeter imagery of EVERY surface
-→ AI-flagged crack detection
-→ Zero road closure needed
+→ [X]-minute autonomous flight
+→ [Resolution] imagery of every surface
+→ [What the software flagged]
+→ [Road closure needed?]
 
-The university's civil engineering department couldn't believe the cost comparison.
+[Client]'s team couldn't believe the cost comparison.
 
-Traditional inspection: $15,000+
-Drone inspection: $2,500
-Savings per bridge: $12,500
+Traditional inspection: $[X]
+Drone inspection: $[Y]
+Savings per bridge: $[X − Y]
 
-Multiply that across 47 bridges in their study area.
+Multiply that across [N] bridges in their study area.
 
-That's $587,500 in savings. Per inspection cycle.`,
+That's $[total] in savings. Per inspection cycle.`,
     cta: "If you're still doing infrastructure inspections the old way, let's talk. Link in bio for a free assessment.",
     hashtags: ["#DroneInspection", "#Infrastructure", "#CivilEngineering", "#BridgeInspection", "#UAV", "#CostSavings", "#Engineering"],
   },
@@ -71,7 +71,7 @@ That's $587,500 in savings. Per inspection cycle.`,
     title: "Grant Win",
     category: "Research",
     hook: "Just received NSF funding for [project]. If you're writing a drone integration proposal, here's what reviewers look for... 💰",
-    body: `After reviewing 50+ grant proposals that include drone components, I've noticed a pattern.
+    body: `After reviewing [N] grant proposals that include drone components, I've noticed a pattern.
 
 The ones that get funded do 3 things differently:
 
@@ -85,7 +85,7 @@ The ones that get funded do 3 things differently:
    — TB-scale imagery needs a real pipeline. Show you've planned for storage, processing, and archival.
 
 The proposals that DON'T get funded? They treat drones as a cool gadget, not a research instrument.`,
-    cta: "Writing a grant that includes drone operations? DM me — I review 3 proposals per month for free.",
+    cta: "Writing a grant that includes drone operations? DM me — I review [N] proposals per month for free.",
     hashtags: ["#NSF", "#GrantWriting", "#ResearchFunding", "#DroneResearch", "#AcademicLife", "#STEM", "#UniversityResearch"],
   },
   {
@@ -95,15 +95,15 @@ The proposals that DON'T get funded? They treat drones as a cool gadget, not a r
     hook: "What a day of drone data collection actually looks like (spoiler: it's 10% flying, 90% data processing)... 📊",
     body: `5:30 AM — Alarm goes off. Early flights = best light conditions.
 
-6:15 AM — On-site. Wind check: 8 mph. ✅ Humidity: 65%. ✅ Airspace: cleared via LAANC.
+6:15 AM — On-site. Wind check: [X] mph. ✅ Humidity: [X]%. ✅ Airspace: cleared via LAANC.
 
 6:30 AM — Pre-flight checklist. Firmware current. Batteries charged. Sensors calibrated. GCPs placed and surveyed.
 
-7:00 AM — First flight. 22 minutes of automated grid pattern. Swap battery. Second flight.
+7:00 AM — First flight. [X] minutes of automated grid pattern. Swap battery. Second flight.
 
 8:00 AM — Flying done. Now the REAL work begins.
 
-8:30 AM — Transfer 127 GB of raw imagery. Start stitching pipeline.
+8:30 AM — Transfer [X] GB of raw imagery. Start stitching pipeline.
 
 10:00 AM — QC check on orthomosaic. One strip has poor overlap. Flag for re-flight.
 
@@ -111,7 +111,7 @@ The proposals that DON'T get funded? They treat drones as a cool gadget, not a r
 
 2:00 PM — Report generation. Maps, statistics, recommendations.
 
-5:00 PM — Deliverables sent. 10 hours of work. 44 minutes of actual flying.
+5:00 PM — Deliverables sent. [X] hours of work. [X] minutes of actual flying.
 
 This is what "drone services" really means. The aircraft is 10% of the value.`,
     cta: "Want to see the full workflow? I'm documenting our entire process on my site → link in bio.",
@@ -122,7 +122,7 @@ This is what "drone services" really means. The aircraft is 10% of the value.`,
     title: "Hot Take",
     category: "Engagement",
     hook: "Unpopular opinion: Most university drone programs are wasting money on the wrong hardware. Here's why... 🔥",
-    body: `I've consulted with 20+ university drone labs.
+    body: `I've talked with [N] university drone labs.
 
 The #1 mistake? Buying a $30K enterprise drone when a $2K platform would do 90% of their research.
 
@@ -140,7 +140,7 @@ When SHOULD you go enterprise?
 
 For everything else? Start small. Prove the concept. Scale up when the data justifies it.
 
-I've seen too many $50K drones collecting dust because the PI who bought it graduated.`,
+[Your own example: an expensive drone that sat unused.]`,
     cta: "Agree? Disagree? I want to hear from drone program managers — what's YOUR biggest equipment mistake?",
     hashtags: ["#HotTake", "#DroneIndustry", "#UniversityResearch", "#UAV", "#ResearchEquipment", "#HigherEd", "#DroneProgram"],
   },
@@ -180,30 +180,30 @@ Day 14: Test day
     id: 7,
     title: "Case Study",
     category: "Research",
-    hook: "We helped [university] reduce their field survey costs by 90%. Here's exactly how... 📉",
+    hook: "We helped [university] reduce their field survey costs by [X]%. Here's exactly how... 📉",
     body: `The problem:
-A geology department was spending $200K/year on traditional topographic surveys. Manual GPS points. Hired surveyors. Weeks of fieldwork per site.
+A [department] was spending $[X]/year on traditional topographic surveys. Manual GPS points. Hired surveyors. Weeks of fieldwork per site.
 
 Our solution:
 → Drone-based photogrammetry with RTK positioning
 → Automated flight planning for consistent coverage
-→ Custom processing pipeline: raw images → DEM → contour maps in 4 hours
+→ Custom processing pipeline: raw images → DEM → contour maps in [X] hours
 
 The numbers:
 
 | Metric | Before | After |
 |--------|--------|-------|
-| Cost per survey | $8,000 | $800 |
-| Time per site | 5 days | 3 hours |
-| Points per survey | 500 | 50,000,000 |
-| Repeat frequency | 2x/year | Monthly |
+| Cost per survey | $[X] | $[Y] |
+| Time per site | [X] | [Y] |
+| Points per survey | [X] | [Y] |
+| Repeat frequency | [X] | [Y] |
 
 The best part? Graduate students now run the surveys independently.
 
-We trained 4 students in 2 days. They've completed 30+ surveys since.
+We trained [N] students in [N] days. They've completed [N] surveys since.
 
-Total first-year savings: $180,000
-ROI on drone investment: 1,200%`,
+Total first-year savings: $[X]
+ROI on drone investment: [X]%`,
     cta: "Want the full case study with methodology details? Comment 'SURVEY' and I'll send it over.",
     hashtags: ["#CaseStudy", "#DroneMapping", "#Photogrammetry", "#UniversityResearch", "#ROI", "#Surveying", "#GIS"],
   },
@@ -212,7 +212,7 @@ ROI on drone investment: 1,200%`,
     title: "Industry Trend",
     category: "Technical",
     hook: "3 drone technology trends that will change research in 2026... 🚀",
-    body: `I've been tracking drone tech for 8 years. These 3 shifts are going to be massive:
+    body: `I've been tracking drone tech for [N] years. These 3 shifts are going to be massive:
 
 1️⃣ Edge AI on the drone itself
 No more "fly, land, process." New chips (like NVIDIA Jetson Orin Nano) enable real-time object detection, crop classification, and anomaly flagging IN FLIGHT. Your drone tells you what it found before it lands.
@@ -231,32 +231,24 @@ The common thread? Drones are becoming research INSTRUMENTS, not just cameras th
     id: 9,
     title: "Personal Story",
     category: "Personal",
-    hook: "From FPGA engineer at AMD to running drone operations for universities. Here's what I learned... 🛤️",
-    body: `3 years ago I was designing chips at AMD.
+    hook: "FPGA engineer at AMD by day, drone builder the rest of the time. Here's what each job teaches the other... 🛤️",
+    body: `By day I'm an FPGA engineer at AMD.
 
-Great job. Great team. But something was missing.
+The rest of the time I build drones. It started with a flight controller board I designed around an STM32 Blue Pill. Then came two NXP HoverGames entries, one of which won a bonus prize. Now I design 3D-printed VTOL planes in Python and fly their full missions in simulation first.
 
-I kept building drones on weekends. Custom frames. Custom flight controllers. Spending vacation days at drone meetups.
-
-One day a professor friend asked: "Can you fly a drone over our research site?"
-
-That single flight turned into a contract.
-That contract turned into a business.
-That business now serves universities across Texas.
-
-What I learned:
+What each side teaches the other:
 
 → Engineering skills transfer. FPGA timing analysis → flight controller optimization. Same mindset, different domain.
 
-→ The best business ideas come from solving YOUR OWN problems. I built tools I wished existed.
+→ Verify before you build. Chips are simulated long before silicon; I fly each airframe's full mission in PX4 + Gazebo first.
 
-→ University researchers are the most underserved market in drones. They need technical partners, not just pilots.
+→ The best projects come from solving YOUR OWN problems. I build the tools I wish existed.
 
-→ Leaving a "safe" job is terrifying. But staying in the wrong one is worse.
+→ University researchers need technical partners, not just pilots.
 
-The AMD experience wasn't wasted — it's my competitive advantage. I think about drones like an engineer, not just an operator.`,
-    cta: "Ever made a career pivot that scared you? I'd love to hear your story in the comments.",
-    hashtags: ["#CareerChange", "#Entrepreneurship", "#DroneLife", "#Engineering", "#StartupStory", "#FPGA", "#TechCareers"],
+The AMD experience is my competitive advantage. I think about drones like an engineer, not just an operator.`,
+    cta: "Building something on the side of your day job? I'd love to hear about it in the comments.",
+    hashtags: ["#SideProject", "#Drones", "#Engineering", "#VTOL", "#PX4", "#FPGA", "#TechCareers"],
   },
   {
     id: 10,
@@ -331,7 +323,7 @@ export default function LinkedInContentPage() {
             LinkedIn Content <span className="text-accent-orange">Templates</span>
           </h1>
           <p className="text-text-secondary max-w-2xl">
-            10 battle-tested LinkedIn post templates optimized for engagement in the drone / research / university space. 
+            10 LinkedIn post templates for the drone / research / university space. Anything in [brackets] is a placeholder: put in your own numbers and names before posting. 
             One-click copy, ready to customize and post.
           </p>
         </motion.div>

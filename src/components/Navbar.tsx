@@ -12,10 +12,9 @@ const navLinks = [
   { href: "/services", label: "SERVICES", code: "02" },
   { href: "/research-match", label: "RESEARCH", code: "03" },
   { href: "/grant-calculator", label: "GRANTS", code: "04" },
-  { href: "/case-studies", label: "CASES", code: "05" },
-  { href: "/university-partners", label: "PARTNERS", code: "06" },
-  { href: "/roi-calculator", label: "ROI", code: "07" },
-  { href: "/contact", label: "RFQ", code: "08" },
+  { href: "/university-partners", label: "PARTNERS", code: "05" },
+  { href: "/roi-calculator", label: "ROI", code: "06" },
+  { href: "/contact", label: "RFQ", code: "07" },
 ];
 
 export default function Navbar() {
