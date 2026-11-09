@@ -7,13 +7,13 @@ import Link from "next/link";
 export const metadata = {
   title: "The Hangar — UAV Portfolio | Custom Drone Builds",
   description:
-    "Portfolio of custom UAV builds: STM32 Return-to-Home drone, NXP HoverGames entries, PX4 simulations, aerial cinematography, and 3D-printed RC aircraft. Full BOM & software stack included. By Ajaya Dahal, Austin TX.",
+    "Portfolio of UAV builds: a blended-wing tailsitter and a tilt-rotor VTOL designed in Python and flown in PX4 simulation, an STM32 custom flight-controller drone, NXP HoverGames entries and more. Parts lists and software stacks included. By Ajaya Dahal, Austin TX.",
   alternates: {
     canonical: "https://aj-builds-drone.github.io/projects/",
   },
   openGraph: {
     title: "The Hangar — UAV Portfolio | AJ Builds Drone",
-    description: "Custom drone builds with full bill of materials and software stack breakdowns. STM32 drones, NXP HoverGames, PX4 simulation, aerial cinematography.",
+    description: "UAV builds with parts lists and software stacks: VTOL tailsitter and tilt-rotor designs, an STM32 custom flight controller, NXP HoverGames entries, PX4 simulation.",
     url: "https://aj-builds-drone.github.io/projects/",
     siteName: "AJ Builds Drone",
     type: "website",
@@ -22,7 +22,7 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: "The Hangar — UAV Portfolio | AJ Builds Drone",
-    description: "Custom drone builds with full BOM & software stack. STM32, NXP HoverGames, PX4, aerial cinematography.",
+    description: "UAV builds with parts lists and software stacks. VTOL designs, STM32, NXP HoverGames, PX4.",
     images: ["/og-projects.jpg"],
   },
 };
@@ -43,7 +43,7 @@ export default async function ProjectsPage() {
             code="HGR"
             title="THE HANGAR"
             as="h1"
-            subtitle="Complete portfolio of UAV platforms, research projects, and simulation environments. Each entry includes a full bill of materials and software stack breakdown."
+            subtitle="UAV platforms, competition entries and simulations, most important first. Each entry lists what it is built from and the software behind it."
           />
         </div>
 

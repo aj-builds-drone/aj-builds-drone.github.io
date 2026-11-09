@@ -18,10 +18,11 @@ function getYouTubeId(url?: string): string | null {
 
 function StatusBadge({ status }: { status: string }) {
   const colorMap: Record<string, string> = {
-    OPERATIONAL: "bg-accent-green/10 text-accent-green border-accent-green/30",
     "IN DEVELOPMENT": "bg-accent-orange/10 text-accent-orange border-accent-orange/30",
-    ACTIVE: "bg-accent-cyan/10 text-accent-cyan border-accent-cyan/30",
-    RESEARCH: "bg-purple-500/10 text-purple-400 border-purple-400/30",
+    FLOWN: "bg-accent-green/10 text-accent-green border-accent-green/30",
+    "FIELD TESTED": "bg-accent-green/10 text-accent-green border-accent-green/30",
+    SIMULATED: "bg-accent-cyan/10 text-accent-cyan border-accent-cyan/30",
+    BUILT: "bg-purple-500/10 text-purple-400 border-purple-400/30",
   };
 
   const colors = colorMap[status] || "bg-text-secondary/10 text-text-secondary border-text-secondary/30";
@@ -53,7 +54,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 border border-accent-green bg-accent-green/20" />
           <span className="font-mono text-[11px] tracking-widest text-text-secondary">
-            UAV//{project.id.toUpperCase()}
+            {(project.kind ?? "UAV").toUpperCase()}//{project.id.toUpperCase()}
           </span>
         </div>
         <StatusBadge status={project.status} />
@@ -124,21 +125,23 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
         </div>
 
         {/* Software Stack Tags */}
-        <div>
-          <h3 className="font-mono text-xs tracking-widest text-accent-orange mb-2">
-            // SOFTWARE STACK
-          </h3>
-          <div className="flex flex-wrap gap-1.5">
-            {project.softwareStack.map((tech) => (
-              <span
-                key={tech}
-                className="px-2 py-0.5 bg-accent-green/5 border border-accent-green/20 rounded text-[11px] font-mono text-accent-green tracking-wider"
-              >
-                {tech}
-              </span>
-            ))}
+        {project.softwareStack.length > 0 && (
+          <div>
+            <h3 className="font-mono text-xs tracking-widest text-accent-orange mb-2">
+              // SOFTWARE STACK
+            </h3>
+            <div className="flex flex-wrap gap-1.5">
+              {project.softwareStack.map((tech) => (
+                <span
+                  key={tech}
+                  className="px-2 py-0.5 bg-accent-green/5 border border-accent-green/20 rounded text-[11px] font-mono text-accent-green tracking-wider"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* OSD Footer with Links */}

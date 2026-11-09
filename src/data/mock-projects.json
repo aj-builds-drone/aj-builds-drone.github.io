@@ -58,22 +58,21 @@
     "title": "STM32 RETURN-TO-HOME DRONE",
     "subtitle": "Custom PCB Flight Controller on F450 Frame",
     "thumbnail": "/images/stm32-drone.jpg",
-    "status": "OPERATIONAL",
+    "status": "FLOWN",
     "bom": [
-      "STM32F103C8T6 (Blue Pill)",
-      "DJI F450 Frame",
-      "Custom PCB (KiCad Designed)",
-      "GPS Module (Return-to-Home)",
+      "STM32F103C8T6 (Blue Pill) on a Custom KiCad Board",
+      "F450 Quadcopter Frame",
+      "GPS Module for Return to Home",
       "Brushless Motors + ESCs",
-      "3D-Printed Component Mounts"
+      "YMFC-32 Autonomous Firmware (Joop Brokking)"
     ],
     "softwareStack": ["Arduino IDE", "KiCad", "STM32", "C/C++", "GrabCAD"],
-    "description": "A full custom-built quadcopter featuring a hand-designed PCB flight controller using the STM32 Blue Pill. The board sits directly on top of the F450 frame, integrating GPS for autonomous return-to-home capability. Project spans 3D modeling, schematic capture, PCB layout, firmware development, and flight testing.",
+    "description": "A quadcopter flying on a flight controller built from scratch: an STM32 Blue Pill on a KiCad-designed board that sits on top of an F450 frame, running Joop Brokking's YMFC-32 firmware with GPS return to home. CAD model, schematic, board layout, assembly and flight test, with every file published on GrabCAD. A two-person build with 10,000+ views on Hackster.",
     "specs": {
       "controller": "STM32F103C8T6",
-      "frame": "DJI F450",
-      "feature": "GPS RTH",
-      "views": "9,500+ on Hackster"
+      "frame": "F450",
+      "feature": "GPS Return to Home",
+      "views": "10,000+ on Hackster"
     },
     "links": {
       "hackster": "https://www.hackster.io/ajayadahal/diy-return-to-home-drone-using-stm32-bluepill-9b1886",
@@ -82,101 +81,102 @@
     }
   },
   {
-    "id": "px4-roi-tracking",
-    "title": "PX4 ROI OBJECT TRACKING",
-    "subtitle": "QGroundControl Region-of-Interest Simulation",
-    "thumbnail": "/images/px4-roi.jpg",
-    "status": "ACTIVE",
+    "id": "hovergames-2",
+    "title": "COVID-19 TESTING DRONE",
+    "subtitle": "NXP HoverGames Challenge 2 · Bonus Prize",
+    "thumbnail": "/images/hovergames2.jpg",
+    "status": "FLOWN",
     "bom": [
-      "PX4 Autopilot (SITL)",
-      "QGroundControl Ground Station",
-      "Gazebo Simulation Environment",
-      "ROI Tracking Algorithm",
-      "MAVLink Protocol"
+      "NXP RDDRONE-FMUK66 Flight Controller (HoverGames Kit)",
+      "NXP NavQ Companion Computer (i.MX 8M Mini) + Camera",
+      "Ultrasonic Sensor for a Safe Landing",
+      "SIM800L GSM Module for Position Updates",
+      "Sample Box for a Swab Kit"
     ],
-    "softwareStack": ["PX4", "QGroundControl", "Gazebo", "MAVLink", "SITL"],
-    "description": "A simulation-first approach to region-of-interest tracking using PX4 autopilot and QGroundControl. The system autonomously locks onto and tracks a target while maintaining stable flight, demonstrating the full SITL pipeline from algorithm development to mission validation.",
+    "softwareStack": ["PX4", "PX4-Avoidance", "Android", "Firebase", "Google Maps API"],
+    "description": "A drone you order from a phone app to collect a COVID-19 test sample, so a sick person never has to leave quarantine. The app sends the location, the drone flies out with a swab kit, picks a safe spot to land with its camera and ultrasonic sensor, and returns once the sample is in its box. The Android app and Firebase backend were built and the drone flew on NXP's HoverGames kit; autonomous flight to the requested location was the next step. Won a bonus prize in NXP HoverGames Challenge 2.",
     "specs": {
-      "autopilot": "PX4 SITL",
-      "gcs": "QGroundControl",
-      "mode": "ROI Track",
-      "status": "Sim Validated"
+      "competition": "HoverGames 2",
+      "result": "Bonus Prize",
+      "fmu": "NXP FMUK66",
+      "app": "Android + Firebase"
     },
     "links": {
-      "youtube": "https://www.youtube.com/watch?v=-4iIzqeIK_s"
+      "youtube": "https://www.youtube.com/watch?v=gxKfjFzo7fg",
+      "hackster": "https://www.hackster.io/ajayadahal/covid-19-testing-service-via-drone-65c52a"
+    }
+  },
+  {
+    "id": "px4-roi-tracking",
+    "title": "PX4 VISION FOLLOW-ME",
+    "subtitle": "Target Tracking With YOLO and ROS 2, in Simulation",
+    "thumbnail": "/images/px4-roi.jpg",
+    "status": "SIMULATED",
+    "bom": [
+      "PX4 Autopilot (SITL) on a Quadcopter Model",
+      "Depth Camera (OAK-D Model in Gazebo)",
+      "YOLO Target Detector (ROS 2 Node)",
+      "Offboard Follow Controller (ROS 2 Node)",
+      "Video Stream to QGroundControl"
+    ],
+    "softwareStack": ["PX4", "ROS 2", "YOLO", "OpenCV", "Gazebo", "QGroundControl"],
+    "description": "A drone that finds a target and follows it on its own. A YOLO detector locates the target in the camera and depth images, a ROS 2 node turns its position into offboard setpoints for PX4, and the video streams to QGroundControl. Developed and tested end to end in Gazebo against PX4 SITL, with a deployment guide for a Raspberry Pi companion computer.",
+    "specs": {
+      "autopilot": "PX4 SITL",
+      "vision": "YOLO + Depth",
+      "control": "ROS 2 Offboard",
+      "stage": "Simulation"
+    },
+    "links": {
+      "youtube": "https://www.youtube.com/watch?v=-4iIzqeIK_s",
+      "code": "https://github.com/AjayaDahal/px4-followme-ros2"
     }
   },
   {
     "id": "hovergames-3-hazard",
     "title": "CHEMICAL HAZARD TESTING RANGER",
-    "subtitle": "NXP HoverGames 3.0 Competition Entry",
+    "subtitle": "NXP HoverGames 3 · Team Entry",
     "thumbnail": "/images/hovergames3.jpg",
-    "status": "OPERATIONAL",
+    "status": "SIMULATED",
     "bom": [
-      "NXP FMUK66 Flight Controller",
-      "NXP HoverGames Drone Kit",
-      "Chemical/Gas Sensor Array",
-      "Telemetry Downlink",
-      "Custom Sensor Integration Board"
+      "Holybro S500 Drone Kit",
+      "NXP HoverGames Rover Kit: the Sampling Rover",
+      "NXP NavQPlus Companion Computer + Camera",
+      "Bosch BME688 Gas Sensor",
+      "Ultrasonic Sensor + NEO-M8N GPS"
     ],
-    "softwareStack": ["PX4", "NuttX", "MAVLink", "Python", "Sensor Fusion"],
-    "description": "Competition entry for NXP HoverGames 3.0 — an autonomous drone platform designed to detect and map chemical hazards in disaster zones. Features real-time sensor data telemetry and autonomous survey patterns for first-responder safety assessment.",
+    "softwareStack": ["ROS", "Gazebo", "Flutter", "Firebase", "Google Maps API"],
+    "description": "A drone that delivers a small rover to a chemical facility. It lands, the rover drives inside to sample the air with a Bosch BME688 gas sensor while operators watch its video, and the drone flies it back to base. Requested from a phone app built with Flutter, Firebase and Google Maps. A three-person NXP HoverGames 3 entry, taken through design and Gazebo simulation.",
     "specs": {
-      "competition": "HoverGames 3.0",
-      "sponsor": "NXP Semiconductors",
-      "mission": "Hazard Detection",
-      "autonomy": "Waypoint Survey"
+      "competition": "HoverGames 3",
+      "team": "3 People",
+      "sensor": "Bosch BME688",
+      "stage": "Simulation"
     },
     "links": {
-      "youtube": "https://www.youtube.com/watch?v=Ba8dZ647reI"
-    }
-  },
-  {
-    "id": "hovergames-2",
-    "title": "NXP HOVERGAMES CHALLENGE 2",
-    "subtitle": "Autonomous Drone for Social Good",
-    "thumbnail": "/images/hovergames2.jpg",
-    "status": "OPERATIONAL",
-    "bom": [
-      "NXP FMUK66 Flight Controller",
-      "NXP HoverGames Drone Kit",
-      "Companion Computer",
-      "Camera Payload",
-      "Custom Mission Software"
-    ],
-    "softwareStack": ["PX4", "NuttX", "MAVLink", "ROS", "OpenCV"],
-    "description": "Second-generation HoverGames competition entry leveraging the NXP FMUK66 flight management unit. Focused on using drone technology for social good, integrating computer vision for autonomous mission execution.",
-    "specs": {
-      "competition": "HoverGames 2",
-      "fmu": "NXP FMUK66",
-      "framework": "PX4 + ROS",
-      "mission": "Social Good"
-    },
-    "links": {
-      "youtube": "https://www.youtube.com/watch?v=gxKfjFzo7fg"
+      "youtube": "https://www.youtube.com/watch?v=Ba8dZ647reI",
+      "hackster": "https://www.hackster.io/497750/chemical-hazard-testing-and-confirmation-ranger-7b50b6"
     }
   },
   {
     "id": "s500-build",
     "title": "S500 QUADCOPTER BUILD",
-    "subtitle": "Multi-Purpose Research Quadcopter Platform",
+    "subtitle": "Kit Quadcopter: Assembled, Debugged and Flown",
     "thumbnail": "/images/s500.jpg",
-    "status": "OPERATIONAL",
+    "status": "FLOWN",
     "bom": [
       "S500 Frame Kit",
-      "Pixhawk-Compatible FC",
-      "920KV Brushless Motors x4",
-      "30A ESCs x4",
-      "GPS + Compass Module",
-      "FPV Camera System"
+      "Flight Controller",
+      "4 Brushless Motors + ESCs",
+      "LiPo Battery + RC Receiver"
     ],
-    "softwareStack": ["ArduPilot", "Mission Planner", "MAVLink", "Telemetry"],
-    "description": "A versatile S500-class quadcopter built as a reliable platform for testing flight controllers, sensors, and autonomous navigation algorithms. Designed for modularity, allowing quick payload swaps and sensor integration for research applications.",
+    "softwareStack": [],
+    "description": "An S500 quadcopter built from the kit: assembled, its wiring debugged on the bench until everything checked out, then flown outdoors.",
     "specs": {
       "frame": "S500",
       "config": "Quadcopter",
-      "use": "Research Platform",
-      "status": "Flight Tested"
+      "build": "From the Kit",
+      "stage": "Flown"
     },
     "links": {
       "youtube": "https://www.youtube.com/watch?v=yG9O7N9spW8"
@@ -184,25 +184,23 @@
   },
   {
     "id": "shark-aero-rc",
-    "title": "SHARK AERO RC PLANE",
-    "subtitle": "3D-Printed Fixed-Wing RC Aircraft",
+    "title": "SHARK 1:8 SCALE RC PLANE",
+    "subtitle": "3D-Printed From Shark.Aero's Published Design",
     "thumbnail": "/images/shark-aero.jpg",
-    "status": "OPERATIONAL",
+    "status": "BUILT",
     "bom": [
-      "3D-Printed Airframe (PLA/PETG)",
-      "Brushless Outrunner Motor",
-      "ESC + LiPo Battery",
-      "Servo Actuators x4",
-      "RC Transmitter/Receiver",
-      "Custom 3D-Printed Components"
+      "3D-Printed Airframe (Shark.Aero's Free 1:8 Design)",
+      "Brushless Motor, ESC and LiPo Battery",
+      "Control-Surface Servos",
+      "RC Transmitter and Receiver"
     ],
-    "softwareStack": ["FreeCAD", "Cura Slicer", "3D Printing", "RC Systems"],
-    "description": "A fully 3D-printed fixed-wing RC aircraft designed and manufactured in-house. Demonstrates end-to-end aerospace fabrication: CAD modeling, slicing for FDM printing, structural analysis, assembly, and flight testing of a custom airframe.",
+    "softwareStack": [],
+    "description": "A 1:8 scale model of the Shark two-seat light aircraft, printed from the free design that Shark.Aero, the full-size aircraft's maker, publishes, then assembled with its motor, servos and RC gear. The video covers the print and the assembly; it has not been flown yet.",
     "specs": {
       "type": "Fixed-Wing",
-      "fabrication": "3D Printed",
-      "material": "PLA/PETG",
-      "views": "100+ on YouTube"
+      "scale": "1:8",
+      "design": "Shark.Aero (Free)",
+      "stage": "Built, Not Flown"
     },
     "links": {
       "youtube": "https://www.youtube.com/watch?v=zGE-E661loY"
@@ -211,55 +209,29 @@
   {
     "id": "collide-o-scope",
     "title": "COLLIDE-O-SCOPE",
-    "subtitle": "Anti-Collision Drone System",
+    "subtitle": "Guardrail Collision Alerts · Senior Design IoT System",
+    "kind": "IoT",
     "thumbnail": "/images/collide-o-scope.jpg",
-    "status": "RESEARCH",
+    "status": "FIELD TESTED",
     "bom": [
-      "Custom Drone Platform",
-      "Proximity Sensor Array",
-      "Companion Computer",
-      "Collision Avoidance Algorithm",
-      "Real-Time Telemetry"
+      "Kinetic Impact Sensor on the Guardrail",
+      "Microcontroller Node (Arduino C++)",
+      "LoRa Radio + Cellular Uplink",
+      "Roadside Power Supply",
+      "Phone App + Web Dashboard"
     ],
-    "softwareStack": ["Python", "ROS", "Sensor Fusion", "MAVLink", "OpenCV"],
-    "description": "A team-developed anti-collision drone system with pitch-deck-ready commercial viability. Features multi-sensor obstacle detection and autonomous avoidance maneuvers for safe operation in cluttered environments.",
+    "softwareStack": ["C++", "LoRa", "Cellular", "Flutter", "Firebase"],
+    "description": "WRECKS, a Wireless Roadside Emergency Collision Kinetic Sensor, and not a drone: a node on the guardrail detects an impact and sends a real-time alert over LoRa and cellular to a phone app and a web dashboard. Mississippi State senior design, 2022: a five-person team led by Ajaya, with Atwood Fence Company as industry advisor, field-tested at their site.",
     "specs": {
-      "type": "Anti-Collision",
-      "team": "Collide-O-Scope",
-      "stage": "Pitch-Ready",
-      "detection": "Multi-Sensor"
+      "type": "IoT Sensor Network",
+      "role": "Team Lead (5)",
+      "radio": "LoRa + Cellular",
+      "stage": "Field Tested"
     },
     "links": {
       "youtube": "https://www.youtube.com/watch?v=Iy9BQ6hLyu4",
-      "pitch": "https://www.youtube.com/watch?v=h99lT8m0vn4"
-    }
-  },
-  {
-    "id": "aerial-cinematography",
-    "title": "AERIAL CINEMATOGRAPHY REEL",
-    "subtitle": "Part 107 Certified Drone Videography",
-    "thumbnail": "/images/aerial-reel.jpg",
-    "status": "ACTIVE",
-    "bom": [
-      "DJI Drone Platform",
-      "4K Camera Gimbal",
-      "ND Filter Kit",
-      "Part 107 Certification",
-      "Post-Production Pipeline"
-    ],
-    "softwareStack": ["DaVinci Resolve", "LUT Grading", "4K Workflow", "FAA Part 107"],
-    "description": "Professional aerial videography across multiple states — Downtown Austin TX, New York City, Miami FL, Noxubee Lake MS, Fossil Rim TX, and Little Sturgis Rally. All flights conducted under FAA Part 107 certification with proper airspace authorization.",
-    "specs": {
-      "certification": "FAA Part 107",
-      "locations": "TX, NY, FL, MS",
-      "resolution": "4K",
-      "flights": "50+ missions"
-    },
-    "links": {
-      "austin": "https://www.youtube.com/watch?v=sSDNeOy3z3g",
-      "rally": "https://www.youtube.com/watch?v=NSjGU2b5mi8",
-      "miami": "https://www.youtube.com/watch?v=T4jWjB5ql9o",
-      "noxubee": "https://www.youtube.com/watch?v=6rhIfveJ1Mc"
+      "pitch": "https://www.youtube.com/watch?v=h99lT8m0vn4",
+      "site": "https://collide-o-scope-msu.github.io/"
     }
   }
 ]

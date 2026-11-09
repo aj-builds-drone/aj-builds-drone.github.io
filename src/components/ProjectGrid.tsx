@@ -5,10 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import ProjectCard from "@/components/ProjectCard";
 import type { Project } from "@/lib/getProjects";
 
-const FILTERS = ["ALL", "OPERATIONAL", "IN DEVELOPMENT", "RESEARCH", "ACTIVE"];
-
 export default function ProjectGrid({ projects }: { projects: Project[] }) {
   const [activeFilter, setActiveFilter] = useState("ALL");
+  const FILTERS = ["ALL", ...new Set(projects.map((p) => p.status))];
 
   const filtered =
     activeFilter === "ALL"
@@ -44,8 +43,8 @@ export default function ProjectGrid({ projects }: { projects: Project[] }) {
         {[
           { label: "SHOWING", value: filtered.length.toString() },
           {
-            label: "OPERATIONAL",
-            value: projects.filter((p) => p.status === "OPERATIONAL").length.toString(),
+            label: "FLOWN",
+            value: projects.filter((p) => p.status === "FLOWN").length.toString(),
           },
           {
             label: "IN DEVELOPMENT",

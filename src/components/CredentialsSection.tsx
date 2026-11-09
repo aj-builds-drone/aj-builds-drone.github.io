@@ -209,18 +209,18 @@ export default function CredentialsSection() {
           </h3>
           <div className="md:columns-2 gap-8 text-sm text-text-secondary leading-relaxed space-y-4">
             <p>
-              I started building drones by hand-soldering a custom PCB flight
-              controller onto an STM32 Blue Pill — not because I had to, but
+              I started building drones by designing my own flight controller
+              board around an STM32 Blue Pill — not because I had to, but
               because I wanted to understand every electron between the
-              gyroscope and the motor. That project hit 9,500+ views on
+              gyroscope and the motor. That project passed 10,000 views on
               Hackster.io and taught me more about control systems than any
               textbook.
             </p>
             <p>
-              From there it was NXP HoverGames competitions (twice), a
-              3D-printed Shark Aero fixed-wing, PX4 SITL simulations, and
-              eventually strapping real sensors to real airframes for real
-              missions. Along the way, I earned my FAA Part 107 and started
+              From there it was NXP HoverGames competitions (twice, with a bonus
+              prize for a COVID-19 testing drone), a 3D-printed Shark scale model,
+              PX4 SITL simulations, and eventually strapping real sensors to real
+              airframes for real missions. Along the way, I earned my FAA Part 107 and started
               training for my Private Pilot certificate — because the best way to
               understand flight is to do it yourself at 3,000 feet.
             </p>

@@ -22,27 +22,27 @@ const videos: VideoEntry[] = [
   },
   {
     id: "px4-roi",
-    title: "PX4 QGC ROI Object Tracking Simulation",
+    title: "PX4 Vision Follow-Me — Simulation",
     category: "SIMULATION",
     youtubeId: "-4iIzqeIK_s",
     description:
-      "Region-of-interest tracking using PX4 autopilot in SITL with QGroundControl.",
+      "A YOLO detector and a ROS 2 offboard controller make a PX4 drone follow a target, in Gazebo.",
   },
   {
     id: "hovergames3",
-    title: "Chemical Hazard Testing Ranger — HoverGames 3.0",
+    title: "Chemical Hazard Testing Ranger — HoverGames 3",
     category: "COMPETITION",
     youtubeId: "Ba8dZ647reI",
     description:
-      "NXP HoverGames 3.0 competition entry for autonomous chemical hazard detection.",
+      "Team entry: a drone that lands a gas-sampling rover at a chemical facility, taken through simulation.",
   },
   {
     id: "hovergames2",
-    title: "NXP HoverGames Challenge 2",
+    title: "COVID-19 Testing Drone — HoverGames 2",
     category: "COMPETITION",
     youtubeId: "gxKfjFzo7fg",
     description:
-      "Second HoverGames entry using NXP FMUK66 flight controller for social good.",
+      "A drone ordered from a phone app to collect a test sample. Bonus prize, NXP HoverGames Challenge 2.",
   },
   {
     id: "s500-build",
@@ -50,15 +50,15 @@ const videos: VideoEntry[] = [
     category: "BUILD",
     youtubeId: "yG9O7N9spW8",
     description:
-      "Building and testing an S500-class research quadcopter platform.",
+      "An S500 kit quadcopter: assembled, debugged on the bench and flown.",
   },
   {
     id: "shark-aero",
-    title: "Shark Aero — 3D Printed RC Plane Build",
+    title: "Shark 1:8 Scale Model — 3D-Printed Build",
     category: "BUILD",
     youtubeId: "zGE-E661loY",
     description:
-      "End-to-end build of a fully 3D-printed fixed-wing RC aircraft.",
+      "Printing and assembling Shark.Aero's free 1:8 scale design.",
   },
 ];
 
