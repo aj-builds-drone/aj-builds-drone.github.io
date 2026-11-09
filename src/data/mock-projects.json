@@ -1,26 +1,26 @@
 [
   {
     "id": "bwb-vtol",
-    "title": "BLENDED-WING DELIVERY VTOL",
-    "subtitle": "Audited, Redesigned and Flown in PX4 Simulation",
+    "title": "BLENDED-WING TAILSITTER",
+    "subtitle": "Takes Off Like a Rocket, Flies Like a Plane",
     "thumbnail": "/projects/bwb-vtol/card.webp",
     "image": "/projects/bwb-vtol/card.webp",
     "status": "IN DEVELOPMENT",
     "bom": [
-      "Pixhawk 6C Mini Flight Controller (PX4)",
-      "2x 2216 1100KV Tilting + 2212 1400KV Rear Lift Motor",
-      "3x 30A ESCs + 4S1P Molicel P42A 21700 Pack",
-      "2x Direct-Drive Tilt Servos, 2x Elevon Servos, Bay Latch",
+      "Pixhawk 6C Mini Flight Controller (PX4 + Tailsitter Patch)",
+      "2x 2814 900KV Motors on 11x6 Props",
+      "2x 40A ESCs + 6V Servo BEC + 4S1P Molicel P50B 21700 Pack",
+      "2x Metal-Gear Elevon Servos + Bay Latch Servo",
       "M10 GPS, Airspeed Sensor + Pitot, ELRS",
-      "LW-PLA Vase Skins, PETG Structure, Carbon Spars"
+      "LW-PLA Vase Skins, PETG Structure + Feet, Carbon Spars"
     ],
-    "softwareStack": ["Python", "manifold3d", "PX4", "Gazebo", "three.js"],
-    "description": "An audit of a blended-wing delivery drone design found it could not hover, its wing flew backwards and its 'simulation' was a scripted replay. The redesign is a 3D-printed tilt-rotor flying wing with a 250 g parcel bay on the centre of gravity, generated in Python, checked by a 12-point gate and flown through a full delivery in PX4 + Gazebo simulation.",
+    "softwareStack": ["Python", "manifold3d", "PX4", "Gazebo", "C++", "three.js"],
+    "description": "A 3D-printed blended-wing delivery drone with two props and nothing that tilts. It stands on its tail, climbs like a rocket, pitches over and flies as a flying wing, then zooms back up into a hover to drop a 250 g parcel from a bay on its centre of gravity. Generated in Python, checked by a 23-point gate and a premortem, and flown through a full delivery in PX4 + Gazebo simulation, with a custom Gazebo plugin for its aerodynamics and a small PX4 patch for its back transition.",
     "specs": {
-      "config": "BWB Tilt-Rotor VTOL",
+      "config": "BWB Twin-Prop Tailsitter",
       "span": "900 mm",
       "autopilot": "PX4 / Pixhawk 6C Mini",
-      "verification": "12-Check Gate"
+      "verification": "23-Check Gate + Premortem"
     },
     "links": {
       "full build": "/projects/bwb-vtol/"

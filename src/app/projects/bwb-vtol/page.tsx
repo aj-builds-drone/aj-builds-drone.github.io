@@ -7,23 +7,23 @@ import { SectionHeader, StatBox } from "@/components/HUDElements";
 const MEDIA = "/projects/bwb-vtol";
 const PAGE_URL = "https://aj-builds-drone.github.io/projects/bwb-vtol/";
 const SUMMARY =
-  "A 3D-printed blended-wing-body delivery VTOL. An audit showed the original design could not fly. The redesign is generated in Python, checked by a 12-point gate and flies a full parcel delivery in PX4 + Gazebo simulation.";
+  "A 3D-printed blended-wing delivery drone with two props and nothing that tilts. It stands on its tail, climbs like a rocket, pitches over and flies as a flying wing, then hovers to drop a 250 g parcel. Designed in Python, checked by a 23-point gate and a premortem, and flown through a full delivery in PX4 + Gazebo simulation.";
 
 export const metadata: Metadata = {
-  title: "Blended-Wing Delivery VTOL: Audited, Redesigned, Flown in Simulation",
-  description: `${SUMMARY} 900 mm span, 1.6 kg with a 250 g parcel, PX4.`,
+  title: "Blended-Wing Tailsitter: Takes Off Like a Rocket, Flies Like a Plane",
+  description: `${SUMMARY} 900 mm span, 1.72 kg with the parcel, PX4.`,
   alternates: { canonical: PAGE_URL },
   openGraph: {
-    title: "Blended-Wing Delivery VTOL | AJ Builds Drone",
+    title: "Blended-Wing Tailsitter | AJ Builds Drone",
     description: SUMMARY,
     url: PAGE_URL,
     siteName: "AJ Builds Drone",
     type: "article",
-    images: [{ url: `${MEDIA}/og.jpg`, width: 1200, height: 630, alt: "The blended-wing-body delivery VTOL, front rotors up for hover" }],
+    images: [{ url: `${MEDIA}/og.jpg`, width: 1200, height: 630, alt: "The blended-wing tailsitter: a flying wing with two props ahead of its leading edge" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Blended-Wing Delivery VTOL | AJ Builds Drone",
+    title: "Blended-Wing Tailsitter | AJ Builds Drone",
     description: SUMMARY,
     images: [`${MEDIA}/og.jpg`],
   },
@@ -31,74 +31,100 @@ export const metadata: Metadata = {
 
 const STATS = [
   { label: "Span", value: "900", unit: "mm" },
-  { label: "All-up weight", value: "1.61", unit: "kg" },
+  { label: "All-up weight", value: "1.72", unit: "kg" },
   { label: "Parcel", value: "250", unit: "g" },
   { label: "Cruise (est.)", value: "17", unit: "m/s" },
-  { label: "Static margin", value: "4.7", unit: "% MAC" },
-  { label: "Gate checks", value: "12", unit: "passing" },
+  { label: "Props", value: "2", unit: "nothing tilts" },
+  { label: "Gate checks", value: "23", unit: "passing" },
 ];
 
-const AUDIT = [
-  ["It could not hover", "with both rotors on one tilt axis, PX4 has nothing left to control hover pitch with"],
-  ["The wing flew backwards", "with the nacelles tilted forward, the trailing edge led"],
-  ["PX4 could not load it", "6 parameter names that do not exist, the wrong airframe type, no outputs connected"],
-  ["The model was not the aircraft", "12 of its 22 parts were missing from the Gazebo model, and the elevons were drawn beyond the wing tips"],
-  ["The holes would print solid", "once a slicer united the overlapping shells, 31 of 33 bolt holes and spar bores filled in"],
-  ["The simulation was a replay", "a scripted profile that passed all of its gates with the wing deleted"],
+const FLIGHT = [
+  ["Stands on its tail", "four PETG feet on the fin tips, nose up, belly toward where it will fly"],
+  ["Climbs like a rocket", "both props pull it straight up; PX4 steers the hover with differential thrust and the elevons in the slipstream"],
+  ["Pitches over", "in 2.5 s it tips onto its belly and is flying on the wing at 12 m/s or more"],
+  ["Flies like a plane", "a reflexed, swept flying wing at 17 m/s; the elevons pitch and roll it, the fins keep it straight"],
+  ["Zooms up and hovers", "it slows on the wing, then pitches up holding 85 % thrust, climbing off its speed into the hover"],
+  ["Drops the parcel", "the bay door lets go and the parcel slides down a 45° ramp and out of the belly"],
+  ["Lands on its feet", "it zooms into the hover again near home and comes straight down, slowing to 0.4 m/s, back on its tail"],
 ];
 
 const MOVES = [
-  { name: "transition", title: "Hover → cruise", text: "The yokes swing the front rotors from straight up to straight ahead." },
-  { name: "burst", title: "Burst view", text: "40 printed parts, the carbon tubes and the equipment inside." },
-  { name: "drop", title: "Delivery", text: "The parcel bay sits on the centre of gravity, so dropping the parcel leaves the balance alone." },
+  { name: "transition", title: "Rocket to plane", text: "Standing on its tail, it pitches over onto its belly and flies on the wing." },
+  { name: "drop", title: "Hover delivery", text: "It lifts into the hover, the door swings open, and the parcel slides down the ramp to the ground." },
+  { name: "burst", title: "Burst view", text: "44 printed parts, the carbon tubes and the equipment inside." },
   { name: "battery", title: "Battery change", text: "The nose cap comes off and the pack slides out through the nose ring." },
 ];
 
 const SIM_RESULTS = [
-  { item: "Hover", result: "15.9 N of thrust for 15.8 N of weight, about a third of each motor's full thrust, as the mass balance predicted" },
-  { item: "Transitions", result: "Front: 10.6 s and 10.0 s. Back: 4.6 s and 6.2 s, climbing at most 4.3 m" },
-  { item: "Cruise", result: "17.4 m/s on 8 % of full thrust; elevons 2.7° up, where the model trims at 2.4°" },
-  { item: "Delivery", result: "Released over the target at 8 m. Hover thrust fell 16.4 %; the parcel is 15.6 % of the weight" },
-  { item: "Control", result: "Roll 0.3° and pitch 1.1° RMS in hover; 1.9° and 1.4° in fixed-wing flight, 50° turns included" },
-  { item: "Landing", result: "0.1 m from home, on the pad" },
+  { item: "Take-off", result: "Straight up to 30 m on both props, the nose within a degree of vertical" },
+  { item: "Pitch-over", result: "Onto the wing in 2.5 s" },
+  { item: "Cruise", result: "17 m/s at 40 m on 47 % throttle, elevons 3.4° up, nose 7° above the horizon; banks to 49°" },
+  { item: "Zoom into hover", result: "From 14 m/s to a slow, nose-up hover in 2.0–2.9 s, about 17 m higher" },
+  { item: "Delivery", result: "Parcel released 0.0 m from the target, 8 m up; the hover thrust fell 13.2 % (the parcel is 14.5 % of the weight)" },
+  { item: "Landing", result: "Touched down at 0.4 m/s, 0.1 m from home, standing on its tail" },
+];
+
+const PREMORTEM = [
+  ["Hanging nose-high in the back transition", "pitching up from cruise, a swept flying wing's stalled outer panels push harder than the elevons can above about 6 m/s. Stock PX4 lets the thrust drop as it starts to climb, and the simulated aircraft hung at 37° for 20 s. A 2-D model of the same aerodynamics showed only a powered zoom gets through, so a small PX4 patch holds 85 % thrust until the nose is up and the speed is gone"],
+  ["A quad-chute on every transition", "PX4 checks its pitch and roll limits against a tailsitter's hover-frame attitude, where level flight is −90°. They are off; the altitude-loss limits stay on"],
+  ["Wind in the hover", "face on, the elevons hold the hover in 4.7 m/s of wind; with a wingtip into it, 13.4 m/s. The hover is capped at 3 m/s and drop legs are planned crosswind"],
+  ["No thrust left at the end of the battery", "11 × 6 props give 1.64× the hover thrust at 20 % charge, where an 11 × 5.5 left 1.60; flat out a motor draws 35.6 A of its 39 A"],
+  ["Falling over before take-off", "standing, it tips over only past 20°, but wind on the wing pushes it over above 6.3 m/s: arm and go"],
+  ["Falling over after landing", "PX4's VTOL landing starts down while the zoom is still carrying the aircraft up, so in simulation it chased its setpoint down at 1.2 m/s; on its feet, the minimum thrust then held most of its weight up and it rolled over a foot. The mission hovers over home first and lands as a multicopter, touching down at 0.4 m/s"],
+  ["Too much thrust on a fresh pack", "after the drop, a full pack hovers on only 38 % of full thrust; a floor on hover thrust above that and PX4 could never bring it down. The floor, 0.26, comes from that lightest hover and the gate checks it, and the delivery is flown on a full pack as well"],
+  ["A model that never spawned", "a perfectly flat propeller inertia, which Gazebo rejects. The props now have depth, and the gate checks every link's inertia"],
+];
+
+const NUMBERS = [
+  { item: "Static margin (worst case)", value: "8.1 % (4.2 %)" },
+  { item: "Thrust reserve at 20 % charge", value: "1.64×" },
+  { item: "Hover wind, face on / edge on", value: "4.7 / 13.4 m/s" },
+  { item: "Back transition to a slow hover", value: "2.0–2.9 s" },
+  { item: "Elevon servo torque margin", value: "2.3" },
+  { item: "Tips over when standing past", value: "20°" },
+  { item: "Compass to power wiring", value: "204 mm" },
 ];
 
 const PIPELINE = [
   { step: "params.py", text: "One parameter file holds every dimension." },
   { step: "Vortex lattice", text: "Lift slope, neutral point, trim and stall, computed from the planform." },
-  { step: "Parts", text: "40 watertight solids: LW-PLA vase skins, PETG structure, and bores that stay open in the slicer." },
-  { step: "Mass balance", text: "CG, static margin, hover thrust and PX4 airspeeds. The battery slides to the CG the wing needs." },
-  { step: "Simulation model", text: "The Gazebo model and PX4 airframe come from the same geometry and masses." },
-  { step: "Gate", text: "12 checks run before any filament is used." },
+  { step: "Parts", text: "44 watertight solids: LW-PLA vase skins, PETG structure and feet, and bores that stay open in the slicer." },
+  { step: "Mass balance", text: "CG, static margin, hover thrust and PX4 airspeeds. The battery slides to the CG the wing needs; weighed parts replace the estimates." },
+  { step: "Propulsion", text: "Blade-element props, DC motors and a Li-ion pack: the thrust the battery can really pay for." },
+  { step: "Simulation model", text: "A Gazebo plugin with the same motors, full-envelope wing strips and slipstream, and both PX4 parameter sets, all from the same geometry and masses." },
+  { step: "Gate", text: "23 checks run before any filament is used." },
 ];
 
 const GATE = [
-  ["Printability", "every part fits its printer's bed, and no vase panel overhangs past 45°"],
-  ["Fit", "no two parts overlap, and the carbon tubes and every piece of equipment run clear"],
-  ["Inside", "everything that belongs inside the skin is inside it"],
-  ["Mechanism", "yokes and props clear the airframe from −10° to 90° of tilt"],
-  ["Balance", "static margin of 4–10 %, with and without the parcel"],
-  ["Power", "every motor under 60 % of its thrust in hover on a nearly empty pack"],
+  ["Printability", "every part fits its printer's bed, and no vase skin overhangs past 45°"],
+  ["Fit", "no two parts or pieces of equipment overlap, and the carbon tubes run clear"],
+  ["Standing", "nothing but the feet within 5 mm of the ground; it falls over only past 18°"],
+  ["Balance", "static margin of 4–10 %, and at least 3 % with the props and mass-estimate errors"],
+  ["Power", "1.6× the hover thrust at 20 % charge, a motor flat out inside its rating, a front transition that loses at most 5 m"],
+  ["Hover control", "the elevons hold the hover face on to 4.5 m/s of wind, more than PX4's hover speed limit"],
+  ["Loads", "joiners, spars, booms, fin rods and fin skins; servo torque in hand"],
+  ["PX4", "every parameter the files set exists in PX4 v1.17 or the patch"],
+  ["Simulation model", "every link's inertia is one Gazebo accepts"],
   ["Freshness", "the viewer and the simulation files match the current design"],
 ];
 
 const NEXT_STEPS = [
   "Test prints: an LW-PLA wing panel with its PETG pod rib and spigot bands, weighed against the estimate.",
-  "Thrust-stand the 2216 1100 KV on a 10 × 4.5 and the 2212 on an 8 × 4.5 to replace the book thrust figures.",
-  "Raise the static margin from 4.7 % toward 6.5 %, with a longer battery bay or more outer-panel sweep, and re-run the gate.",
-  "Build, balance on the marked CG, bench-test with the props off, then a tethered hover.",
+  "Thrust-stand a motor with its prop on this pack, and put the measured throttles into the PX4 parameter file.",
+  "Weigh every part into measured.json, rebuild, and balance the finished aircraft on the CG it gives. Bond the tubes, then a 3 g sandbag test and a drop test onto the feet.",
+  "Build PX4 v1.17 with the patch, load the parameters, test every output with the props off, then a tethered hover.",
 ];
 
 const HARDWARE = [
-  "Pixhawk 6C Mini running PX4 (tiltrotor VTOL)",
-  "2 × 2216 1100 KV on 10 × 4.5 (tilting), 2212 1400 KV on 8 × 4.5 (rear lift)",
-  "3 × 30 A ESCs, 4S1P Molicel P42A 21700 pack (60 Wh)",
-  "2 direct-drive tilt servos, 2 elevon servos, a bay-latch servo",
+  "Pixhawk 6C Mini running PX4 v1.17 (Duo Tailsitter) with a back-transition patch",
+  "2 × 2814 900 KV on 11 × 6 props, ahead of the leading edge",
+  "2 × 40 A ESCs in the nacelles, 6 V servo BEC, 4S1P Molicel P50B 21700 pack (72 Wh)",
+  "2 metal-gear elevon servos (6 kg·cm), a bay-latch servo",
   "M10 GPS + compass, digital airspeed sensor with pitot, ELRS",
-  "LW-PLA vase skins, PETG structure, carbon spars and pod booms",
+  "LW-PLA vase skins, PETG structure and feet, carbon spars, booms and fin rods",
 ];
 
-const STACK = ["Python", "manifold3d", "NumPy", "SciPy", "PX4", "Gazebo Harmonic", "three.js"];
+const STACK = ["Python", "manifold3d", "NumPy", "SciPy", "PX4", "Gazebo Harmonic", "C++", "three.js"];
 
 function Animation({ name, alt, eager = false }: { name: string; alt: string; eager?: boolean }) {
   return (
@@ -128,6 +154,22 @@ function Figure({ children, caption }: { children: ReactNode; caption: ReactNode
   );
 }
 
+function Bullets({ items, end = "." }: { items: string[][]; end?: string }) {
+  return (
+    <ul className="space-y-3">
+      {items.map(([name, text]) => (
+        <li key={name} className="flex items-start gap-2 text-sm text-text-secondary">
+          <span className="text-border-bright font-mono shrink-0">├─</span>
+          <span>
+            <span className="text-foreground font-semibold">{name}:</span> {text}
+            {end}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default function BwbVtolPage() {
   return (
     <div className="pt-24 pb-16">
@@ -141,15 +183,15 @@ export default function BwbVtolPage() {
 
         <SectionHeader
           code="BWB"
-          title="BLENDED-WING DELIVERY VTOL"
+          title="BLENDED-WING TAILSITTER"
           as="h1"
-          subtitle="It began as an audit of a design that could not fly. The redesign is a 3D-printed flying wing that takes off vertically, flies a delivery, drops a 250 g parcel on target and lands back at home in PX4 simulation."
+          subtitle="Takes off like a rocket, flies like a plane. A 3D-printed flying wing with two props and nothing that tilts, built to fly a 250 g parcel out, drop it from a hover and come home."
         />
 
         {/* Hero */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8">
           <div className="lg:col-span-3 osd-card rounded-lg overflow-hidden hud-corners">
-            <Animation name="turntable" alt="The blended-wing-body VTOL turning on a turntable: two tilting front rotors, a rear lift rotor and winglets" eager />
+            <Animation name="turntable" alt="The blended-wing tailsitter turning on a turntable: a flying wing with two props ahead of its leading edge and fins through its wing tips" eager />
           </div>
           <div className="lg:col-span-2 flex flex-col gap-4">
             <div className="flex flex-wrap items-center gap-3">
@@ -158,7 +200,7 @@ export default function BwbVtolPage() {
                 IN DEVELOPMENT
               </span>
               <span className="font-mono text-[11px] tracking-wider text-text-secondary">
-                v2 · flown in simulation · test prints next
+                v1 · flown in simulation · test prints next
               </span>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -171,44 +213,43 @@ export default function BwbVtolPage() {
 
         <div className="max-w-3xl space-y-4 text-text-secondary leading-relaxed mb-24">
           <p>
-            Two front rotors on tilting yokes lift the aircraft in hover and swing forward for cruise. A
-            third, fixed rotor behind the wing shares the hover load and stops in cruise. In forward flight
-            a reflexed, swept flying wing with winglets carries it, under PX4. The parcel rides in a belly
-            bay on the centre of gravity and drops through a door.
+            Two motors on carbon booms sit ahead of a blended wing body. There are no tilting nacelles or
+            third motor: the whole aircraft turns between hover and cruise. It stands on its tail, climbs
+            straight up on the two props, pitches over onto its belly and flies as a reflexed, swept flying
+            wing under PX4. To deliver it hovers again, and the parcel slides out of a bay that sits on the
+            centre of gravity.
           </p>
           <p>
-            The skin is printed in LW-PLA in vase mode, over PETG rings, ribs and pods and carbon spars.
-            Every part, the mass balance, the Gazebo model and the PX4 airframe come from one parameter
-            file, and a gate checks fits, clearances and balance before anything is printed.
+            The skin is printed in LW-PLA in vase mode, over PETG rings, ribs, nacelles and feet and carbon
+            spars. Every part, the mass balance, the Gazebo model and the PX4 parameters come from one
+            parameter file. A gate checks fits, balance, thrust, hover control and loads before anything is
+            printed, and a premortem asked how the first build would crash.
           </p>
         </div>
 
-        {/* Audit */}
+        {/* How it flies */}
         <section className="mb-24">
           <SectionHeader
-            code="AUD"
-            title="THE AUDIT"
-            subtitle="The design this started from was described as audit-fixed and passing all of its tests. Checking it against PX4, Gazebo and a slicer found otherwise."
+            code="FLY"
+            title="HOW IT FLIES"
+            subtitle="A tailsitter: the props lift it in the hover and pull it along in cruise. The elevons sit in their slipstream, so they steer the hover too."
           />
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            <div className="lg:col-span-2 border border-border-dim rounded-lg bg-surface p-5 hud-corners">
-              <h3 className="font-mono text-xs tracking-widest text-accent-orange mb-3">{"// WHAT IT FOUND"}</h3>
-              <ul className="space-y-3">
-                {AUDIT.map(([name, text]) => (
-                  <li key={name} className="flex items-start gap-2 text-sm text-text-secondary">
-                    <span className="text-border-bright font-mono shrink-0">├─</span>
-                    <span>
-                      <span className="text-foreground font-semibold">{name}:</span> {text}.
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <ol className="lg:col-span-2 space-y-3">
+              {FLIGHT.map(([name, text], i) => (
+                <li key={name} className="flex gap-4 border border-border-dim rounded-lg bg-surface px-4 py-3">
+                  <span className="font-mono text-xs text-accent-green pt-0.5">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="text-sm text-text-secondary">
+                    <span className="text-foreground font-semibold">{name}:</span> {text}.
+                  </span>
+                </li>
+              ))}
+            </ol>
             <div className="lg:col-span-3">
-              <Figure caption="Top: the original, as its own Gazebo model placed it. The outboard wings and winglets are missing, the elevons float beyond the tips, and at 90° the prop discs (red) cut through the wing. Bottom: the redesign.">
+              <Figure caption="Standing on its tail, ready to climb; the hover drop, door open and parcel on the ground; the four feet; a nacelle with its motor; a fin and its foot; the elevons.">
                 <Image
-                  src={`${MEDIA}/original_vs_v2.webp`}
-                  alt="Six renders: the original design as its Gazebo model placed it, and the redesign, in hover, cruise and from above"
+                  src={`${MEDIA}/tailsitter.webp`}
+                  alt="Six renders of the tailsitter: standing on its tail, dropping the parcel in the hover, its feet, a nacelle, a fin and the elevons"
                   width={1600}
                   height={667}
                   className="block w-full h-auto"
@@ -243,9 +284,9 @@ export default function BwbVtolPage() {
           <SectionHeader
             code="SIM"
             title="A DELIVERY, IN SIMULATION"
-            subtitle="PX4 v1.17 software-in-the-loop with Gazebo Harmonic, flying a model generated from the design and this airframe's own PX4 settings."
+            subtitle="PX4 v1.17 software-in-the-loop with Gazebo Harmonic, flying a model generated from the design with this airframe's own PX4 settings."
           />
-          <Figure caption="The delivery flight (2 min 42 s, chase camera; the hover legs and the circuit are sped up): vertical takeoff to 30 m, the front transition, cruise north at 17 m/s, the back transition over the drop zone, the parcel released 8 m above the target, the climb-out and a second transition, a 3 km circuit at 40 m, and a vertical landing on the pad.">
+          <Figure caption="The whole delivery, filmed by a chase camera in Gazebo: real time for the take-off, the transitions, the drop and the touchdown, sped up for the hover descents and the circuit. Every check passes, on the end-of-flight pack and on a full one.">
             <video controls preload="none" playsInline poster={`${MEDIA}/sim_poster.webp`} className="block w-full h-auto bg-black">
               <source src={`${MEDIA}/sim_flight.mp4`} type="video/mp4" />
             </video>
@@ -266,20 +307,22 @@ export default function BwbVtolPage() {
               </div>
               <div className="text-text-secondary text-sm leading-relaxed space-y-3">
                 <p>
-                  <span className="text-foreground font-semibold">An honest model.</span> The wing is a
-                  vortex-lattice solution cut into lift strips that keep its neutral point and pitching moment,
-                  so the simulated aircraft trims where the design says it should. The masses are the mass
-                  balance&apos;s, and the motors are the ones on the parts list.
+                  <span className="text-foreground font-semibold">A model built for a tailsitter.</span> Gazebo&apos;s
+                  stock wing and motor models stall into nothing at high angles and have no slipstream, so the
+                  aircraft gets its own plugin. The motors are DC machines on a sagging Li-ion pack, driving
+                  props from the blade-element model. The wing is cut into strips that keep the vortex
+                  lattice&apos;s neutral point and blend into a flat plate past the stall. Every strip behind a
+                  prop feels its slipstream, which is how the elevons steer the hover.
                 </p>
                 <p>
-                  <span className="text-foreground font-semibold">What it caught.</span> PX4&apos;s VTOL
-                  defaults hold the heading in hover, so the mission could not line up for the front
-                  transition after the drop, and PX4 kept the previous mission&apos;s position on an upload.
-                  Both are fixed in the airframe and the test script.
+                  <span className="text-foreground font-semibold">The patch.</span> The simulation found that
+                  stock PX4 cannot bring this wing out of cruise into the hover. A small change to its
+                  tailsitter code adds one parameter: it holds the thrust through the pitch-up, so the aircraft
+                  zooms into the hover. Stock behaviour stays the default.
                 </p>
               </div>
             </div>
-            <Figure caption="What PX4 logged on the delivery flight: altitude, airspeed, motor and tilt commands, attitude against setpoint. The orange line is the parcel release.">
+            <Figure caption="What PX4 logged on the delivery flight: altitude, airspeed, motors, nose angle and the elevons. The orange line is the parcel release.">
               <Image
                 src={`${MEDIA}/sim_log.webp`}
                 alt="PX4 flight log plots from the simulated delivery flight"
@@ -288,6 +331,39 @@ export default function BwbVtolPage() {
                 className="block w-full h-auto bg-white"
               />
             </Figure>
+          </div>
+        </section>
+
+        {/* Premortem */}
+        <section className="mb-24">
+          <SectionHeader
+            code="PRE"
+            title="THE PREMORTEM"
+            subtitle="Assume the first build crashed, and work out why, with numbers from the design files and the simulation."
+          />
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div className="lg:col-span-3 border border-border-dim rounded-lg bg-surface p-5 hud-corners">
+              <h3 className="font-mono text-xs tracking-widest text-accent-orange mb-3">{"// WHAT WOULD HAVE CRASHED IT"}</h3>
+              <Bullets items={PREMORTEM} />
+            </div>
+            <div className="lg:col-span-2 space-y-4">
+              <div className="border border-border-dim rounded-lg bg-surface p-5">
+                <h3 className="font-mono text-xs tracking-widest text-accent-orange mb-3">{"// THE NUMBERS THAT HOLD"}</h3>
+                <dl className="divide-y divide-border-dim">
+                  {NUMBERS.map((r) => (
+                    <div key={r.item} className="grid grid-cols-5 gap-3 py-2 text-sm">
+                      <dt className="col-span-3 text-text-secondary">{r.item}</dt>
+                      <dd className="col-span-2 font-mono text-foreground text-right">{r.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+              <p className="text-text-secondary text-sm leading-relaxed">
+                The numbers come from the design files, a blade-element model of the props with a DC model of
+                each motor and a Li-ion pack, and the simulation&apos;s own aerodynamics. The ones that must hold
+                are checks in the gate.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -312,16 +388,7 @@ export default function BwbVtolPage() {
             </ol>
             <div className="border border-border-dim rounded-lg bg-surface p-5 hud-corners">
               <h3 className="font-mono text-xs tracking-widest text-accent-orange mb-3">{"// WHAT THE GATE CHECKS"}</h3>
-              <ul className="space-y-2">
-                {GATE.map(([name, text]) => (
-                  <li key={name} className="flex items-start gap-2 text-sm text-text-secondary">
-                    <span className="text-border-bright font-mono shrink-0">├─</span>
-                    <span>
-                      <span className="text-foreground font-semibold">{name}:</span> {text}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <Bullets items={GATE} end="" />
             </div>
           </div>
         </section>
@@ -330,10 +397,10 @@ export default function BwbVtolPage() {
         <section className="mb-24">
           <SectionHeader code="INS" title="INSIDE THE AIRFRAME" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Figure caption="Structure: PETG rings, ribs and keel, carbon spars on joiners across the body, the pod booms and the rear motor mast.">
+            <Figure caption="Structure: PETG rings, ribs and keel, carbon spars on joiners across the body, the booms in their pod ribs, and the fin rods.">
               <Image src={`${MEDIA}/xray_structure.webp`} alt="X-ray view of the airframe structure" width={1600} height={1000} className="block w-full h-auto" />
             </Figure>
-            <Figure caption="Equipment: the battery in the nose, avionics above the parcel bay, ESCs in the wings and the servos in the pods and outer wings.">
+            <Figure caption="Equipment: the battery in the nose with the power module and servo BEC beside it, the avionics above the parcel bay, the GPS behind it, the ESCs in the nacelles.">
               <Image src={`${MEDIA}/xray_equipment.webp`} alt="X-ray view of the battery, avionics, ESCs and servos inside the airframe" width={1600} height={1000} className="block w-full h-auto" />
             </Figure>
             <Figure caption="Cut through the bay: the parcel between the bay ribs with the door under it, the avionics above, and a main spar on either side.">
@@ -347,7 +414,7 @@ export default function BwbVtolPage() {
           <SectionHeader
             code="PRT"
             title="PRINT-READY"
-            subtitle="One material per printer: a Kobra X prints the 17 LW-PLA skins in vase mode and a Kobra S1 the 23 PETG parts. Every part fits its bed and no skin overhangs more than 30°."
+            subtitle="One material per printer: a Kobra X prints the 17 LW-PLA skins in vase mode and a Kobra S1 the 27 PETG parts. Every part fits its bed and no skin overhangs more than 32°."
           />
           <Figure caption="The PETG parts in their print orientation.">
             <Image src={`${MEDIA}/print_petg.webp`} alt="The PETG parts laid out in their print orientation" width={1600} height={1000} className="block w-full h-auto" />
@@ -356,7 +423,7 @@ export default function BwbVtolPage() {
 
         {/* Status */}
         <section className="mb-16">
-          <SectionHeader code="NXT" title="STATUS + NEXT STEPS" subtitle="Designed, verified and flown in simulation. Not built yet." />
+          <SectionHeader code="NXT" title="STATUS + NEXT STEPS" subtitle="Designed, put through a premortem and flown in simulation. Not built yet." />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <ol className="space-y-3">
               {NEXT_STEPS.map((s, i) => (
@@ -394,10 +461,10 @@ export default function BwbVtolPage() {
 
         {/* CTA */}
         <div className="mt-16 border-t border-border-dim pt-16 text-center">
-          <p className="font-mono text-xs tracking-[0.3em] text-accent-green mb-4">▸ HAVE A DESIGN THAT NEEDS A SECOND LOOK?</p>
+          <p className="font-mono text-xs tracking-[0.3em] text-accent-green mb-4">▸ HAVE A VTOL IDEA THAT NEEDS TO FLY?</p>
           <h2 className="font-mono text-xl md:text-2xl font-bold tracking-wider mb-4">LET&apos;S MAKE IT FLY</h2>
           <p className="text-text-secondary text-sm max-w-lg mx-auto mb-8">
-            Design audits, custom VTOL and fixed-wing airframes, from parametric CAD and simulation through the first flight.
+            Custom VTOL and fixed-wing airframes, from parametric CAD and simulation through the first flight.
           </p>
           <Link
             href="/contact"

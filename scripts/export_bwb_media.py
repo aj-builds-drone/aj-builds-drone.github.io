@@ -20,7 +20,8 @@ ANIMATIONS = {
     "anim_battery.gif": "battery",
 }
 STILLS = {
-    "00_original_vs_v2.png": "original_vs_v2",
+    "00_tailsitter.png": "tailsitter",
+    "09_standing.png": "standing",
     "10_xray_structure.png": "xray_structure",
     "11_xray_equipment.png": "xray_equipment",
     "19_cut_bay.png": "cut_bay",
