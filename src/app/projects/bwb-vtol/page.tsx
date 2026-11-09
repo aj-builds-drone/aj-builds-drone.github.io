@@ -64,16 +64,14 @@ const SIM_RESULTS = [
   { item: "Landing", result: "Touched down at 0.4 m/s, 0.1 m from home, standing on its tail" },
 ];
 
-const PREMORTEM = [
-  ["Hanging nose-high in the back transition", "pitching up from cruise, a swept flying wing's stalled outer panels push harder than the elevons can above about 6 m/s. Stock PX4 lets the thrust drop as it starts to climb, and the simulated aircraft hung at 37° for 20 s. A 2-D model of the same aerodynamics showed only a powered zoom gets through, so a small PX4 patch holds 85 % thrust until the nose is up and the speed is gone"],
-  ["A quad-chute on every transition", "PX4 checks its pitch and roll limits against a tailsitter's hover-frame attitude, where level flight is −90°. They are off; the altitude-loss limits stay on"],
-  ["Wind in the hover", "face on, the elevons hold the hover in 4.7 m/s of wind; with a wingtip into it, 13.4 m/s. The hover is capped at 3 m/s and drop legs are planned crosswind"],
-  ["No thrust left at the end of the battery", "11 × 6 props give 1.64× the hover thrust at 20 % charge, where an 11 × 5.5 left 1.60; flat out a motor draws 35.6 A of its 39 A"],
-  ["Falling over before take-off", "standing, it tips over only past 20°, but wind on the wing pushes it over above 6.3 m/s: arm and go"],
-  ["Falling over after landing", "PX4's VTOL landing starts down while the zoom is still carrying the aircraft up, so in simulation it chased its setpoint down at 1.2 m/s; on its feet, the minimum thrust then held most of its weight up and it rolled over a foot. The mission hovers over home first and lands as a multicopter, touching down at 0.4 m/s"],
-  ["Too much thrust on a fresh pack", "after the drop, a full pack hovers on only 38 % of full thrust; a floor on hover thrust above that and PX4 could never bring it down. The floor, 0.26, comes from that lightest hover and the gate checks it, and the delivery is flown on a full pack as well"],
-  ["A model that never spawned", "a perfectly flat propeller inertia, which Gazebo rejects. The props now have depth, and the gate checks every link's inertia"],
+const PROCESS = [
+  { step: "Premortem", text: "We assume the first build crashed and work back through every way it could have, with numbers from the design files. Every finding gets a fix and, where it can, a check in the gate." },
+  { step: "Design gate", text: "23 automated checks on every change: fit, balance, thrust, hover control, loads and the PX4 setup. Nothing is printed until all of them pass." },
+  { step: "Simulation", text: "The whole mission in PX4 and Gazebo, on a physics model generated from the design, on an end-of-flight pack and a full one. Problems show up as log plots, not as wreckage." },
+  { step: "Measure, then fly", text: "Weighed parts, a thrust stand and a tethered hover replace the estimates before the first free flight." },
 ];
+
+const AREAS = ["Pitch stability", "Thrust and battery", "Hover control", "Structure", "Servo torque", "Tipping over", "Compass and wiring", "Battery heat", "Flight software"];
 
 const NUMBERS = [
   { item: "Static margin (worst case)", value: "8.1 % (4.2 %)" },
@@ -223,7 +221,7 @@ export default function BwbVtolPage() {
             The skin is printed in LW-PLA in vase mode, over PETG rings, ribs, nacelles and feet and carbon
             spars. Every part, the mass balance, the Gazebo model and the PX4 parameters come from one
             parameter file. A gate checks fits, balance, thrust, hover control and loads before anything is
-            printed, and a premortem asked how the first build would crash.
+            printed, and a premortem worked through every way the first build could fail.
           </p>
         </div>
 
@@ -334,21 +332,39 @@ export default function BwbVtolPage() {
           </div>
         </section>
 
-        {/* Premortem */}
+        {/* Process */}
         <section className="mb-24">
           <SectionHeader
-            code="PRE"
-            title="THE PREMORTEM"
-            subtitle="Assume the first build crashed, and work out why, with numbers from the design files and the simulation."
+            code="ENG"
+            title="ENGINEERED BEFORE IT'S BUILT"
+            subtitle="Every airframe goes through the same steps before any filament is used: we try to crash it on paper and in simulation first."
           />
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <div className="lg:col-span-3 border border-border-dim rounded-lg bg-surface p-5 hud-corners">
-              <h3 className="font-mono text-xs tracking-widest text-accent-orange mb-3">{"// WHAT WOULD HAVE CRASHED IT"}</h3>
-              <Bullets items={PREMORTEM} />
+              <h3 className="font-mono text-xs tracking-widest text-accent-orange mb-4">{"// THE PROCESS"}</h3>
+              <ol className="space-y-4">
+                {PROCESS.map((p, i) => (
+                  <li key={p.step} className="flex gap-4">
+                    <span className="font-mono text-xs text-accent-green pt-0.5">{String(i + 1).padStart(2, "0")}</span>
+                    <div>
+                      <span className="block font-mono text-sm tracking-wider text-foreground">{p.step}</span>
+                      <span className="block text-sm text-text-secondary">{p.text}</span>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              <h3 className="font-mono text-xs tracking-widest text-accent-orange mt-6 mb-3">{"// WHAT THE PREMORTEM COVERS"}</h3>
+              <ul className="flex flex-wrap gap-1.5">
+                {AREAS.map((a) => (
+                  <li key={a} className="px-2 py-0.5 bg-accent-green/5 border border-accent-green/20 rounded text-[11px] font-mono text-accent-green tracking-wider">
+                    {a}
+                  </li>
+                ))}
+              </ul>
             </div>
             <div className="lg:col-span-2 space-y-4">
               <div className="border border-border-dim rounded-lg bg-surface p-5">
-                <h3 className="font-mono text-xs tracking-widest text-accent-orange mb-3">{"// THE NUMBERS THAT HOLD"}</h3>
+                <h3 className="font-mono text-xs tracking-widest text-accent-orange mb-3">{"// KEY MARGINS"}</h3>
                 <dl className="divide-y divide-border-dim">
                   {NUMBERS.map((r) => (
                     <div key={r.item} className="grid grid-cols-5 gap-3 py-2 text-sm">
