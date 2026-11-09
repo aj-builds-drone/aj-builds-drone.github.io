@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 interface LocationPin {
   id: string;
   name: string;
-  type: "primary" | "university" | "service-area";
+  type: "primary" | "service-area";
   detail: string;
   cx: number;
   cy: number;
@@ -15,14 +15,6 @@ interface LocationPin {
 
 const LOCATION_PINS: LocationPin[] = [
   { id: "austin", name: "Austin, TX", type: "primary", detail: "Primary Operations Base — FAA Part 107 Certified", cx: 478, cy: 380 },
-  { id: "ut-austin", name: "UT Austin", type: "university", detail: "Computer Science & Engineering Research", cx: 475, cy: 376 },
-  { id: "tamu", name: "Texas A&M", type: "university", detail: "Agricultural & Environmental Engineering", cx: 490, cy: 372 },
-  { id: "uh", name: "University of Houston", type: "university", detail: "Civil & Environmental Engineering", cx: 500, cy: 385 },
-  { id: "utd", name: "UT Dallas", type: "university", detail: "Computer Science & Robotics", cx: 488, cy: 350 },
-  { id: "rice", name: "Rice University", type: "university", detail: "Engineering & Applied Sciences", cx: 498, cy: 383 },
-  { id: "oklahoma", name: "University of Oklahoma", type: "university", detail: "Atmospheric Science & Environmental Studies", cx: 478, cy: 318 },
-  { id: "lsu", name: "Louisiana State University", type: "university", detail: "Coastal & Environmental Science", cx: 535, cy: 375 },
-  { id: "uark", name: "University of Arkansas", type: "university", detail: "Agricultural Systems & Engineering", cx: 515, cy: 330 },
 ];
 
 /* Simplified US state paths — Texas highlighted, surrounding states available, rest dimmed */
@@ -199,7 +191,7 @@ export default function ServiceAreaMap() {
                   <span className="font-mono text-xs font-bold tracking-wider text-foreground">{hoveredPin.name}</span>
                 </div>
                 <span className={`font-mono text-[9px] tracking-widest ${hoveredPin.type === "primary" ? "text-accent-orange" : "text-accent-cyan"}`}>
-                  {hoveredPin.type === "primary" ? "PRIMARY BASE" : hoveredPin.type === "university" ? "UNIVERSITY PARTNER" : "SERVICE AREA"}
+                  {hoveredPin.type === "primary" ? "PRIMARY BASE" : "SERVICE AREA"}
                 </span>
                 <p className="font-mono text-[11px] text-text-secondary mt-2">{hoveredPin.detail}</p>
               </motion.div>
@@ -211,10 +203,6 @@ export default function ServiceAreaMap() {
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-accent-orange/60 border border-accent-orange" />
               <span>Primary Operations</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-accent-cyan border border-accent-cyan" />
-              <span>University Partners</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-6 h-3 rounded bg-accent-cyan/10 border border-accent-cyan/30" />

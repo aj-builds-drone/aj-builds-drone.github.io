@@ -70,7 +70,7 @@ const credentials = [
 const stats = [
   { value: "60+", label: "FLIGHT HOURS" },
   { value: "8+", label: "UAV BUILDS" },
-  { value: "9.5K+", label: "HACKSTER VIEWS" },
+  { value: "10K+", label: "HACKSTER VIEWS" },
   { value: "2", label: "COMPETITION ENTRIES" },
   { value: "107", label: "FAA CERT" },
   { value: "11+", label: "PUBLISHED PROJECTS" },

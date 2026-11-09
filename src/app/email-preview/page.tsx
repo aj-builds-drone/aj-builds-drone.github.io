@@ -26,7 +26,7 @@ function generateEmail(prospect: Prospect): EmailDraft {
 
   return {
     subject: `Drone Data Collection Support for ${prospect.organization} — ${researchFocus}`,
-    body: `Hi ${prospect.name.split(" ")[0]},
+    body: `Hi ${prospect.name.replace(/^(Dr|Prof)\.?\s+/i, "").split(" ")[0]},
 
 I came across your work in ${researchFocus} at ${prospect.organization}${prospect.department ? ` (${prospect.department})` : ""} and wanted to reach out.
 
@@ -48,13 +48,13 @@ FAA Part 107 Certified | Austin, TX`,
   };
 }
 
-// Mock data for when API is unavailable
+// Mock data for when API is unavailable; fictional people on the reserved .example domain
 const mockProspects: Prospect[] = [
   {
     id: "1",
-    name: "Dr. Sarah Chen",
-    email: "s.chen@university.edu",
-    organization: "UT Austin",
+    name: "Dr. Alex Sample",
+    email: "alex.sample@university.example",
+    organization: "Example State University",
     department: "Civil Engineering",
     researchAreas: ["Infrastructure Inspection", "Structural Health Monitoring"],
     matchingCapabilities: ["Bridge Inspection", "Photogrammetry", "3D Modeling"],
@@ -63,9 +63,9 @@ const mockProspects: Prospect[] = [
   },
   {
     id: "2",
-    name: "Prof. James Walker",
-    email: "j.walker@tamu.edu",
-    organization: "Texas A&M",
+    name: "Prof. Jordan Example",
+    email: "j.example@university.example",
+    organization: "Example Tech",
     department: "Agricultural Sciences",
     researchAreas: ["Precision Agriculture", "Crop Monitoring"],
     matchingCapabilities: ["Multispectral Imaging", "NDVI Analysis", "Automated Flight Planning"],
@@ -74,9 +74,9 @@ const mockProspects: Prospect[] = [
   },
   {
     id: "3",
-    name: "Dr. Maria Rodriguez",
-    email: "m.rodriguez@utsa.edu",
-    organization: "UT San Antonio",
+    name: "Dr. Casey Placeholder",
+    email: "c.placeholder@university.example",
+    organization: "Example Coastal University",
     department: "Environmental Science",
     researchAreas: ["Wetland Mapping", "Habitat Assessment"],
     matchingCapabilities: ["LiDAR Surveys", "Orthomosaic Generation", "GIS Integration"],
