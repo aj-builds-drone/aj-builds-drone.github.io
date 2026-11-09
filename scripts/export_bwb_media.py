@@ -29,6 +29,8 @@ STILLS = {
     "sim_poster.jpg": "sim_poster",
     "sim_flight.png": "sim_log",
 }
+# The project card and social preview: a photo of the real build once there is one, else the livery render.
+CARD = ["build_photo.jpg", "29_livery.png", "01_iso_front.png"]
 
 
 def crop_to(im, aspect):
@@ -59,7 +61,7 @@ def main(renders):
         im = Image.open(renders / src).convert("RGB")
         im.thumbnail((1600, 1600), Image.LANCZOS)
         im.save(OUT / f"{name}.webp", quality=82, method=6)
-    front = Image.open(renders / "01_iso_front.png").convert("RGB")
+    front = Image.open(next(renders / n for n in CARD if (renders / n).exists())).convert("RGB")
     crop_to(front, 16 / 9).resize((800, 450), Image.LANCZOS).save(OUT / "card.webp", quality=82, method=6)
     crop_to(front, 1200 / 630).resize((1200, 630), Image.LANCZOS).save(OUT / "og.jpg", quality=85, optimize=True)
     if (renders / "sim_flight.mp4").exists():
