@@ -70,7 +70,7 @@ const GATE = [
   ["Paths", "spars, joiners, the tail boom and every wire route clear"],
   ["Mechanism", "the tilt sweep, prop clearances, motor screws with hex-key room"],
   ["Balance", "CG band, static margin, front motors at most 60 % of their thrust in hover"],
-  ["Printability", "no part needs supports; every G-code file checked move by move"],
+  ["Printability", "no part needs supports; every G-code line measured against the layer below, and no wall left hanging in mid-air"],
   ["Servicing", "the battery slides out through the nose; every servo comes out through its hatch"],
   ["Simulation", "the Gazebo model and PX4 airframe match the current design"],
 ];
